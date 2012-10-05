@@ -1,0 +1,16 @@
+apply plugin: 'idea'
+
+buildscript {
+	repositories {
+		ivy { url '../repository' }
+		ivy { url 'http://unity-technologies.github.com/kaizen/repositories/integration' }
+	}
+	dependencies {
+		classpath group: 'kaizen', name: 'kaizen', version: 'latest.integration'
+	}
+}
+
+apply plugin: 'kaizen-bundle'
+
+version = '1.0'
+

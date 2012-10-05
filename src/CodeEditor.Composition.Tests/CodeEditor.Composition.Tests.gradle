@@ -1,0 +1,4 @@
+dependencies {
+	editor project(path: ':CodeEditor.Composition', configuration: 'editor')
+	editor group: 'nunit', name: 'nunit.framework', version: '2.6.0.12051'
+}

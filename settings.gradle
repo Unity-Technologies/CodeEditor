@@ -1,0 +1,15 @@
+include 'CodeEditor.Composition'
+
+//include 'CodeEditor.Text'
+//include 'CodeEditor.Collections'
+//include 'CodeEditor.UI.UnityEditor'
+
+rootProject.children.each { project ->
+  def projectDirName = "src/$project.name"
+
+  project.projectDir = new File(settingsDir, projectDirName)
+  assert project.projectDir.isDirectory()
+
+  project.buildFileName = "${project.name}.gradle"
+  assert project.buildFile.isFile()
+}
