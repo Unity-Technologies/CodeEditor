@@ -1,16 +1,22 @@
-apply plugin: 'idea'
 
 buildscript {
 	repositories {
 		ivy { url '../repository' }
-		ivy { url 'http://unity-technologies.github.com/kaizen/repositories/integration' }
+		ivy { url 'http://unity-technologies.github.com/kaizen/repositories/unstable' }
+		mavenCentral()
 	}
 	dependencies {
-		classpath group: 'kaizen', name: 'kaizen', version: 'latest.integration'
+		classpath 'kaizen:kaizen:latest.integration'
 	}
 }
 
 apply plugin: 'kaizen-bundle'
+apply plugin: 'nunit'
+apply plugin: 'idea'
 
 version = '1.0'
+
+nunit {
+	version = '2.6+'
+}
 
