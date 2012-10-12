@@ -1,16 +1,10 @@
-include 'CodeEditor.Composition'
-include 'CodeEditor.Composition.Tests'
 
-//include 'CodeEditor.Text'
-//include 'CodeEditor.Collections'
-//include 'CodeEditor.UI.UnityEditor'
+// automatically include all directories under src/ as projects 
+def srcDir = file('src')
+srcDir.eachDir { include it.name }
 
-rootProject.children.each { project ->
-  def projectDirName = "src/$project.name"
-
-  project.projectDir = new File(settingsDir, projectDirName)
-  assert project.projectDir.isDirectory()
-
-  project.buildFileName = "${project.name}.gradle"
-  assert project.buildFile.isFile()
+rootProject.children.each {
+  it.projectDir = new File(srcDir, it.name)
+  it.buildFileName = "${it.name}.gradle"
 }
+
