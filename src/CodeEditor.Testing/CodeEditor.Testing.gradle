@@ -1,16 +1,12 @@
+
+version = '0.1'
+
 configurations {
 	       tests
 }
 
 dependencies {
-	def projectReferences = [
-		'CodeEditor.Composition',
-//		'CodeEditor.IO',
-	]
-	projectReferences.each {
-		tests project(path: ":$it", configuration: 'editor')
-	}
-
+	tests project(path: ':CodeEditor.Composition', configuration: 'editor')
 	tests rootProject.references.nunitFramework
 	tests rootProject.references.moq
 }

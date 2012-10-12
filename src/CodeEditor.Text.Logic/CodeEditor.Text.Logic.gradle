@@ -1,4 +1,6 @@
 
+version = '0.1'
+
 dependencies {
 	def projectReferences = [
 		'CodeEditor.Composition',
