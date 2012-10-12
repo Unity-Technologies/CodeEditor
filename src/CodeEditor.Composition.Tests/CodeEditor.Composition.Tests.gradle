@@ -1,3 +1,0 @@
-dependencies {
-	tests project(path: ':CodeEditor.Composition', configuration: 'editor')
-}
