@@ -1,0 +1,5 @@
+
+dependencies {
+	tests project(path: ':CodeEditor.Text.Data', configuration: 'editor')
+	tests rootProject.references.moq
+}
