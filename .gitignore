@@ -10,3 +10,5 @@ libs
 *~
 *.user
 gradle.properties
+
+.DS_Store
