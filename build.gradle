@@ -20,3 +20,10 @@ nunit {
 	version = '2.6+'
 }
 
+ext {
+    references = [
+    	       'nunitFramework': "nunit:nunit.framework:${nunit.version}",
+	       'moq': 'Moq:Moq:4.0+'
+    ]
+}
+

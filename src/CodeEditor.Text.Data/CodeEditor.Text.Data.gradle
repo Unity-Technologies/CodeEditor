@@ -1,0 +1,12 @@
+version = '1.0'
+
+dependencies {
+	def projectReferences = [
+		'CodeEditor.Composition',
+		'CodeEditor.IO',
+		'CodeEditor.Collections'
+	]
+	projectReferences.each {
+		editor project(path: ":$it", configuration: 'editor')
+	}
+}

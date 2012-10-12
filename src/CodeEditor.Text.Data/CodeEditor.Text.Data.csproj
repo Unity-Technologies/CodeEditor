@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A6107081-C1F6-4B9C-AFED-2BE0AB8E5BAF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CodeEditor.Text.Data</RootNamespace>
+    <AssemblyName>CodeEditor.Text.Data</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <SolutionDir Condition="'$(SolutionDir)' == ''">..\..\..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IContentType.cs" />
+    <Compile Include="Implementation\ContentType.cs" />
+    <Compile Include="Implementation\ContentTypeRegistry.cs" />
+    <Compile Include="Implementation\Immutable.cs" />
+    <Compile Include="Implementation\LineParser.cs" />
+    <Compile Include="Implementation\LineSpan.cs" />
+    <Compile Include="Implementation\TextSnapshotLine.cs" />
+    <Compile Include="Implementation\TextContentType.cs" />
+    <Compile Include="Implementation\TextDocument.cs" />
+    <Compile Include="Implementation\TextDocumentFactory.cs" />
+    <Compile Include="Implementation\TextSnapshotLines.cs" />
+    <Compile Include="ITextBuffer.cs" />
+    <Compile Include="ITextDocument.cs" />
+    <Compile Include="ITextSnapshotLine.cs" />
+    <Compile Include="ITextSnapshot.cs" />
+    <Compile Include="ITextSnapshotLines.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Span.cs" />
+    <Compile Include="Implementation\TextBuffer.cs" />
+    <Compile Include="TextChange.cs" />
+    <Compile Include="Implementation\TextSnapshot.cs" />
+    <Compile Include="TextSpan.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Frameworks\CodeEditor.Collections\CodeEditor.Collections.csproj">
+      <Project>{59F47162-813F-47E0-9E62-99090D2081C1}</Project>
+      <Name>CodeEditor.Collections</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Frameworks\CodeEditor.Composition\CodeEditor.Composition.csproj">
+      <Project>{9DB8BFD3-06C8-4A8C-8842-5931B924B56C}</Project>
+      <Name>CodeEditor.Composition</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Frameworks\CodeEditor.IO\CodeEditor.IO.csproj">
+      <Project>{489773FF-92B1-40B0-98EF-3ED337E5448F}</Project>
+      <Name>CodeEditor.IO</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
