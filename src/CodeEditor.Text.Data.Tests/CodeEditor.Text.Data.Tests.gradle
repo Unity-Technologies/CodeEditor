@@ -11,21 +11,3 @@ dependencies {
 	tests project(path: ':CodeEditor.Testing', configuration: 'tests')
 	tests rootProject.references.moq
 }
-
-task dump << {
-
-     def config = project.configurations.tests
-     config.incoming.dependencies.each { println it }
-     println "*" * 20
-
-     config.incoming.files.each { println it }
-     println "*" * 20
-
-     def resolved = config.resolvedConfiguration
-     resolved.resolvedArtifacts.each {
-     //println it.properties
-     //println "*" * 20
-     if (rootProject.findProject(":${it.name}")) print "project: "
-     println "${it.properties}"
-     }
-}
