@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{55006E6E-9E07-4C4C-94A9-6F8A6F235FFC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CodeEditor.Languages.Tests</RootNamespace>
+    <AssemblyName>CodeEditor.Languages.Tests</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <SolutionDir Condition="'$(SolutionDir)' == ''">..\..\..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <Compile Include="CompletionTriggerTest.cs" />
+    <Compile Include="UnityScriptClassifierTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Moq, Version=4.0.10818.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SolutionDir)..\Moq\Moq.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>$(SolutionDir)..\NUnit\bin\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Languages\CodeEditor.Languages.Common\CodeEditor.Languages.Common.csproj">
+      <Project>{80FD90AA-4188-4D81-AB31-6CDF792A84FA}</Project>
+      <Name>CodeEditor.Languages.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Languages\CodeEditor.Languages.UnityScript\CodeEditor.Languages.UnityScript.csproj">
+      <Project>{6EBD7F15-9B34-49BA-B50B-1AC51527D085}</Project>
+      <Name>CodeEditor.Languages.UnityScript</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.Text.Data.Tests\CodeEditor.Text.Data.Tests.csproj">
+      <Project>{02E4A566-1A0F-4C5A-8949-6B8E0398497F}</Project>
+      <Name>CodeEditor.Text.Data.Tests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Text\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
+      <Project>{A6107081-C1F6-4B9C-AFED-2BE0AB8E5BAF}</Project>
+      <Name>CodeEditor.Text.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Text\CodeEditor.Text.Logic\CodeEditor.Text.Logic.csproj">
+      <Project>{E563745A-460A-4FBF-A72B-B2D4492A9716}</Project>
+      <Name>CodeEditor.Text.Logic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Text\CodeEditor.Text.UI\CodeEditor.Text.UI.csproj">
+      <Project>{6A91E197-9142-40C7-8C24-A75E8709E26D}</Project>
+      <Name>CodeEditor.Text.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.Text.Logic.Tests\CodeEditor.Text.Logic.Tests.csproj">
+      <Project>{DF4E0C96-8013-497D-8B45-37D71A3A9FBC}</Project>
+      <Name>CodeEditor.Text.Logic.Tests</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

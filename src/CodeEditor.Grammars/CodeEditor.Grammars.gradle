@@ -1,0 +1,10 @@
+
+version = '0.1'
+
+dependencies {
+	def booExtensions = ['Boo.OMeta', 'Boo.Adt']
+	booExtensions.each {
+		editor group: 'boo-extensions', name: it, version: '0.1+', configuration: 'editor'
+	}
+}
+
