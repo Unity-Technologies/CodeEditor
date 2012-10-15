@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{81C749CC-09BF-4F72-B9C7-93D8446360DF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CodeEditor.Languages.CSharp</RootNamespace>
+    <AssemblyName>CodeEditor.Languages.CSharp</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <SolutionDir Condition="'$(SolutionDir)' == ''">..\..\..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CSharpCompletionProvider.cs" />
+    <Compile Include="CSharpClassifier.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CSharpClassifierProvider.cs" />
+    <Compile Include="CSharpContentType.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Frameworks\CodeEditor.Remoting\CodeEditor.Remoting.csproj">
+      <Project>{F3B4F98B-CC7D-4E3F-A8B6-FEA8E8C4A078}</Project>
+      <Name>CodeEditor.Remoting</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Frameworks\CodeEditor.Composition\CodeEditor.Composition.csproj">
+      <Project>{9DB8BFD3-06C8-4A8C-8842-5931B924B56C}</Project>
+      <Name>CodeEditor.Composition</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Services\CodeEditor.Remoting.Completion\CodeEditor.Remoting.Completion.csproj">
+      <Project>{D5A79034-8547-44FD-98F2-0E8869C7D742}</Project>
+      <Name>CodeEditor.Remoting.Completion</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.Languages.Common\CodeEditor.Languages.Common.csproj">
+      <Project>{80FD90AA-4188-4D81-AB31-6CDF792A84FA}</Project>
+      <Name>CodeEditor.Languages.Common</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Text\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
+      <Project>{A6107081-C1F6-4B9C-AFED-2BE0AB8E5BAF}</Project>
+      <Name>CodeEditor.Text.Data</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Text\CodeEditor.Text.Logic\CodeEditor.Text.Logic.csproj">
+      <Project>{E563745A-460A-4FBF-A72B-B2D4492A9716}</Project>
+      <Name>CodeEditor.Text.Logic</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Text\CodeEditor.Text.UI\CodeEditor.Text.UI.csproj">
+      <Project>{6A91E197-9142-40C7-8C24-A75E8709E26D}</Project>
+      <Name>CodeEditor.Text.UI</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

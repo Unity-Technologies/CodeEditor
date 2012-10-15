@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C290F98D-894E-4878-AE4A-D1E83DA95619}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CodeEditor.Text.UI.Unity.Engine</RootNamespace>
+    <AssemblyName>CodeEditor.Text.UI.Unity.Engine</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <SolutionDir Condition="'$(SolutionDir)' == ''">..\..\..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GUIUtils.cs" />
+    <Compile Include="IClassificationStyler.cs" />
+    <Compile Include="Implementation\Colors.cs" />
+    <Compile Include="ITextViewMarginProvider.cs" />
+    <Compile Include="ITextViewMarginsFactory.cs" />
+    <Compile Include="Implementation\LineNumberMarginProvider.cs" />
+    <Compile Include="Implementation\TextViewMarginsFactory.cs" />
+    <Compile Include="ITextViewMargin.cs" />
+    <Compile Include="ITextViewMargins.cs" />
+    <Compile Include="Implementation\LineNumberMargin.cs" />
+    <Compile Include="Implementation\TextViewAdornments.cs" />
+    <Compile Include="Implementation\TextViewMargins.cs" />
+    <Compile Include="ITextViewAdornments.cs" />
+    <Compile Include="Implementation\TextViewFactory.cs" />
+    <Compile Include="ITextViewAdornment.cs" />
+    <Compile Include="ITextViewAppearanceProvider.cs" />
+    <Compile Include="ITextViewDocument.cs" />
+    <Compile Include="ITextViewDocumentFactory.cs" />
+    <Compile Include="ITextViewFactory.cs" />
+    <Compile Include="ITextViewLine.cs" />
+    <Compile Include="Implementation\ClassificationStyler.cs" />
+    <Compile Include="Implementation\TextViewDocument.cs" />
+    <Compile Include="Implementation\TextViewDocumentFactory.cs" />
+    <Compile Include="Implementation\TextViewLine.cs" />
+    <Compile Include="Implementation\CodeTimer.cs" />
+    <Compile Include="ITextViewAppearance.cs" />
+    <Compile Include="Implementation\MissingEngineAPI.cs" />
+    <Compile Include="ITextView.cs" />
+    <Compile Include="Implementation\TextView.cs" />
+    <Compile Include="TextViewExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Projects\CSharp\UnityEngine.csproj">
+      <Project>{F0499708-3EB6-4026-8362-97E6FFC4E7C8}</Project>
+      <Name>UnityEngine</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Frameworks\CodeEditor.Composition\CodeEditor.Composition.csproj">
+      <Project>{9DB8BFD3-06C8-4A8C-8842-5931B924B56C}</Project>
+      <Name>CodeEditor.Composition</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Frameworks\CodeEditor.IO\CodeEditor.IO.csproj">
+      <Project>{489773FF-92B1-40B0-98EF-3ED337E5448F}</Project>
+      <Name>CodeEditor.IO</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
+      <Project>{A6107081-C1F6-4B9C-AFED-2BE0AB8E5BAF}</Project>
+      <Name>CodeEditor.Text.Data</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.Text.Logic\CodeEditor.Text.Logic.csproj">
+      <Project>{E563745A-460A-4FBF-A72B-B2D4492A9716}</Project>
+      <Name>CodeEditor.Text.Logic</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.Text.UI\CodeEditor.Text.UI.csproj">
+      <Project>{6A91E197-9142-40C7-8C24-A75E8709E26D}</Project>
+      <Name>CodeEditor.Text.UI</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

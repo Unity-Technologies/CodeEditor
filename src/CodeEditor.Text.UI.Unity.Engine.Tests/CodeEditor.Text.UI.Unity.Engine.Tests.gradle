@@ -1,0 +1,14 @@
+
+dependencies {
+	def projectReferences = [
+		'CodeEditor.IO',
+		'CodeEditor.Text.Data',
+		'CodeEditor.Text.Logic',
+		'CodeEditor.Text.UI',
+	]
+	projectReferences.each {
+		tests project(path: ":$it", configuration: 'editor')
+	}
+	tests rootProject.references.moq
+	tests project(path: ':CodeEditor.Testing', configuration: 'tests')
+}

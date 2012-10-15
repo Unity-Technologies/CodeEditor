@@ -1,0 +1,16 @@
+
+version = '0.1'
+
+dependencies {
+	def projectReferences = [
+		'CodeEditor.Composition',
+		'CodeEditor.IO',
+		'CodeEditor.Text.Data',
+		'CodeEditor.Text.Logic',
+		'CodeEditor.Text.UI',
+	]
+	projectReferences.each {
+		editor project(path: ":$it", configuration: 'editor')
+	}
+	editor group: 'Unity', name: 'UnityEngine', version: '4.0+', configuration: 'editor'
+}
