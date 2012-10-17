@@ -10,8 +10,10 @@ buildscript {
 	}
 }
 
-repositories {
-	ivy { url 'http://unity-technologies.github.com/kaizen/repositories/unstable' }
+allprojects {
+	repositories {
+		ivy { url 'http://unity-technologies.github.com/kaizen/repositories/unstable' }
+	}
 }
 
 apply plugin: 'kaizen-bundle'
