@@ -1,4 +1,6 @@
 
+version = '0.1'
+
 buildscript {
 	repositories {
 		ivy { url '../repository' }
@@ -19,8 +21,6 @@ allprojects {
 apply plugin: 'kaizen-bundle'
 apply plugin: 'nunit'
 apply plugin: 'idea'
-
-version = '1.0'
 
 nunit {
 	version = '2.6+'
