@@ -1,9 +1,8 @@
 
-version = '0.1'
-
 configurations {
 	       tests
 }
+version = '0.1.1'
 
 dependencies {
 	tests project(path: ':CodeEditor.Composition', configuration: 'editor')
