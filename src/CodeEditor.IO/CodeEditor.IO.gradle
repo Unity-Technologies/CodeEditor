@@ -1,5 +1,5 @@
 version = '0.1.1'
 
 dependencies {
-	editor project(path: ':CodeEditor.Composition', configuration: 'editor')
+	'default' project(':CodeEditor.Composition')
 }

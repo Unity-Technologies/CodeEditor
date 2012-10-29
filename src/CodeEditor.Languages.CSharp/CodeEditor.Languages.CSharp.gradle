@@ -10,6 +10,6 @@ dependencies {
 		'CodeEditor.Languages.Common',
 	]
 	projectReferences.each {
-		editor project(path: ":$it", configuration: 'editor')
+		'default' project(":$it")
 	}
 }

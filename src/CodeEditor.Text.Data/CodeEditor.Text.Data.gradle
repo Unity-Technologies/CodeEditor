@@ -7,6 +7,6 @@ dependencies {
 		'CodeEditor.Collections'
 	]
 	projectReferences.each {
-		editor project(path: ":$it", configuration: 'editor')
+		'default' project(":$it")
 	}
 }

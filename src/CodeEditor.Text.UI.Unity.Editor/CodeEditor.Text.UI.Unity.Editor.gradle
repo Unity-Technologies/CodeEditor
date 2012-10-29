@@ -11,8 +11,10 @@ dependencies {
 		'CodeEditor.Text.UI.Unity.Engine',
 	]
 	projectReferences.each {
-		editor project(path: ":$it", configuration: 'editor')
+		'default' project(":$it")
 	}
-	editor group: 'Unity', name: 'UnityEngine', version: '4.0+', configuration: 'editor'
-	editor group: 'Unity', name: 'UnityEditor', version: '4.0+', configuration: 'editor'
+	def unityReferences = ['UnityEngine', 'UnityEditor']
+	unityReferences.each {
+		'default' group: 'Unity', name: it, version: '4.0+', configuration: 'editor'
+	}
 }

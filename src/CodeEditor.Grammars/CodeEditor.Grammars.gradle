@@ -2,9 +2,8 @@
 version = '0.1.1'
 
 dependencies {
-	def booExtensions = ['Boo.OMeta', 'Boo.Adt']
-	booExtensions.each {
-		editor group: 'boo-extensions', name: it, version: '0.1+', configuration: 'editor'
-	}
+	'default' 'boo-extensions:Boo.Adt:0.1.1+'
+	'default' 'boo-extensions:Boo.OMeta:0.1.1+'
+	'default' 'boo:Boo.Lang.PatternMatching:0.9.5+'
 }
 

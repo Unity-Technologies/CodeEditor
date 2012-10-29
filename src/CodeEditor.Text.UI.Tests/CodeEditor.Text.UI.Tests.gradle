@@ -1,6 +1,6 @@
 
 dependencies {
-	tests rootProject.references.moq
-	tests project(path: ":CodeEditor.Text.Data", configuration: "editor")
-	tests project(path: ":CodeEditor.Text.Data.Tests", configuration: "tests")
+	'default' rootProject.references.moq
+	'default' project(":CodeEditor.Text.Data")
+	'default' project(":CodeEditor.Text.Data.Tests")
 }

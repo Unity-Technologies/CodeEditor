@@ -5,10 +5,10 @@ dependencies {
 		'CodeEditor.Text.Data',
 		'CodeEditor.Text.Logic',
 		'CodeEditor.Text.UI',
+		'CodeEditor.Testing',
 	]
 	projectReferences.each {
-		tests project(path: ":$it", configuration: 'editor')
+		'default' project(":$it")
 	}
-	tests rootProject.references.moq
-	tests project(path: ':CodeEditor.Testing', configuration: 'tests')
+	'default' rootProject.references.moq
 }

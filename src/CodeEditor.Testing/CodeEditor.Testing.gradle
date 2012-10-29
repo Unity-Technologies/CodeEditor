@@ -1,11 +1,8 @@
 
-configurations {
-	       tests
-}
 version = '0.1.1'
 
 dependencies {
-	tests project(path: ':CodeEditor.Composition', configuration: 'editor')
-	tests rootProject.references.nunitFramework
-	tests rootProject.references.moq
+	'default' project(':CodeEditor.Composition')
+	'default' rootProject.references.nunitFramework
+	'default' rootProject.references.moq
 }

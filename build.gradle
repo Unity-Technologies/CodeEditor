@@ -18,9 +18,39 @@ allprojects {
 	}
 }
 
+configurations {
+	editor
+	tests
+}
+
 apply plugin: 'kaizen-bundle'
 apply plugin: 'nunit'
 apply plugin: 'idea'
+
+def bundleDependencies = project.dependencies
+subprojects { subProject ->
+	switch (subProject.name) {
+	case ~/.+\.Tests$/:
+		apply plugin: 'nunit-assembly'
+		dependencies {
+			// Foo.Bar.Tests depends on Foo.Bar
+			'default' project(subProject.path[0..-('.Tests'.length() + 1)])
+		}
+		bundleDependencies.add('tests', bundleDependencies.project(path: subProject.path))
+		break
+	case ~/.+\.Testing$/:
+		break
+	default:
+		bundleDependencies.add('editor', bundleDependencies.project(path: subProject.path))
+	}
+}
+
+task publish {
+	dependsOn uploadEditor
+	project.configurations.editor.dependencies.each {
+		dependsOn ":$it.name:uploadDefault" 
+	}
+}
 
 nunit {
 	version = '2.6+'
