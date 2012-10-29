@@ -28,8 +28,8 @@ nunit {
 
 ext {
     references = [
-    	       'nunitFramework': "nunit:nunit.framework:${nunit.version}",
-	       'moq': 'Moq:Moq:4.0+'
+			'nunitFramework': "nunit:nunit.framework:${nunit.version}",
+			'moq': 'Moq:Moq:4.0+'
     ]
 }
 
