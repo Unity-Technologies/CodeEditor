@@ -2,6 +2,7 @@
 dependencies {
 	def projectReferences = [
 		'CodeEditor.Composition',
+		'CodeEditor.Collections',
 		'CodeEditor.IO',
 		'CodeEditor.Testing',
 	]

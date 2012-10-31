@@ -8,8 +8,12 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'kaizen:kaizen:0.2.0'
+		classpath 'kaizen:kaizen:0.2.1'
 	}
+}
+
+subprojects {
+	apply plugin: 'vs2010' 
 }
 
 allprojects {
@@ -59,7 +63,9 @@ nunit {
 ext {
     references = [
 			'nunitFramework': "nunit:nunit.framework:${nunit.version}",
-			'moq': 'Moq:Moq:4.0+'
+			'moq': 'Moq:Moq:4.0+',
+			'adt': 'boo-extensions:Boo.Adt:0.1.1+',
+			'ometa': 'boo-extensions:Boo.OMeta:0.1.1+',  
     ]
 }
 

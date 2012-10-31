@@ -2,8 +2,8 @@
 version = '0.1.1'
 
 dependencies {
-	'default' 'boo-extensions:Boo.Adt:0.1.1+'
-	'default' 'boo-extensions:Boo.OMeta:0.1.1+'
+	'default' rootProject.references.adt 
+	'default' rootProject.references.ometa
 	'default' 'boo:Boo.Lang.PatternMatching:0.9.5+'
 }
 
