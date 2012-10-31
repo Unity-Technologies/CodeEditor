@@ -9,6 +9,7 @@ lib
 *.iws
 *~
 *.user
+*.suo
+_ReSharper.*
 gradle.properties
-
 .DS_Store
