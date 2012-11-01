@@ -8,12 +8,64 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'kaizen:kaizen:0.2.1'
+		classpath 'kaizen:kaizen:0.2.2'
 	}
 }
 
-subprojects {
+allprojects {
 	apply plugin: 'vs2010' 
+}
+
+vs {
+	solutions {
+
+		def frameworkProjects = [
+			':CodeEditor.Collections',
+			':CodeEditor.Composition',
+			':CodeEditor.IO',
+			':CodeEditor.Testing',
+		]
+		def testProjects = subprojects.findAll { it.name.endsWith('.Tests') }.collect { it.path }
+		def languageProjects = subprojects.findAll { it.name.contains('Languages') && !(it.path in testProjects) }.collect { it.path }
+		def categorizedProjects = (frameworkProjects + testProjects + languageProjects).toSet()
+		def remainingProjects = subprojects.collect { it.path }.findAll { !(it in categorizedProjects) }
+
+		CodeEditor {
+			folder('Frameworks') { f ->
+				frameworkProjects.each {
+					f.project(it)
+				}
+			}
+			folder('Languages') { f ->
+				languageProjects.each {
+					f.project(it)
+				}
+			}
+			folder('Tests') { f ->
+				testProjects.each {
+					f.project(it)
+				}
+			}
+			remainingProjects.each {
+				project(it)
+			}
+		}
+	}
+}
+
+task dumpSolution <<{
+	project.extensions.vs.solutions.each {
+		println it.name
+		it.folders.each {
+			println "\t$it.name"
+			it.projects.each {
+				println "\t\t$it.name"
+			}
+		}
+		it.projects.each {
+			println it.path
+		}
+	}
 }
 
 allprojects {

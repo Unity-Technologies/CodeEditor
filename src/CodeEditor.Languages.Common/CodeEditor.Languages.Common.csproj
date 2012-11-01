@@ -1,22 +1,17 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{80FD90AA-4188-4D81-AB31-6CDF792A84FA}</ProjectGuid>
+    <ProjectGuid>{28889557-A438-D250-EDC6-8413E1E484D7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CodeEditor.Languages.Common</RootNamespace>
     <AssemblyName>CodeEditor.Languages.Common</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <SolutionDir Condition="'$(SolutionDir)' == ''">..\..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,50 +31,54 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Boo.OMeta, Version=1.0.4528.0, Culture=neutral, PublicKeyToken=32c39770e9a21a67, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)libs\Boo.OMeta.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="CodeEditor.Grammars, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)libs\CodeEditor.Grammars.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="CodeEditor.Grammars">
+    	<SpecificVersion>False</SpecificVersion>
+    	<HintPath>build\Default\CodeEditor.Grammars.dll</HintPath>
+    </Reference>
+    <Reference Include="Boo.OMeta">
+    	<SpecificVersion>False</SpecificVersion>
+    	<HintPath>build\Default\Boo.OMeta.dll</HintPath>
+    </Reference>
+    
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classifier.cs" />
-    <Compile Include="CompletionTrigger.cs" />
-    <Compile Include="PartitionTokenTypeCache.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+  	<Compile Include="Classifier.cs" />
+  	<Compile Include="CompletionTrigger.cs" />
+  	<Compile Include="PartitionTokenTypeCache.cs" />
+  	<Compile Include="Properties\AssemblyInfo.cs" />
+  	
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Text\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
-      <Project>{A6107081-C1F6-4B9C-AFED-2BE0AB8E5BAF}</Project>
-      <Name>CodeEditor.Text.Data</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Text\CodeEditor.Text.Logic\CodeEditor.Text.Logic.csproj">
-      <Project>{E563745A-460A-4FBF-A72B-B2D4492A9716}</Project>
-      <Name>CodeEditor.Text.Logic</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Text\CodeEditor.Text.UI\CodeEditor.Text.UI.csproj">
-      <Project>{6A91E197-9142-40C7-8C24-A75E8709E26D}</Project>
-      <Name>CodeEditor.Text.UI</Name>
-      <Private>False</Private>
-    </ProjectReference>
+  	<ProjectReference Include="..\CodeEditor.Composition\CodeEditor.Composition.csproj">
+  		<Project>{58FB57AC-D851-1FC2-D877-123C5ED6EED6}</Project>
+  		<Name>CodeEditor.Composition</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	<ProjectReference Include="..\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
+  		<Project>{5B2491E7-A751-C355-297F-509403E5A7BA}</Project>
+  		<Name>CodeEditor.Text.Data</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	<ProjectReference Include="..\CodeEditor.Text.Logic\CodeEditor.Text.Logic.csproj">
+  		<Project>{0086EDE0-4744-C2B7-520B-A15C15069463}</Project>
+  		<Name>CodeEditor.Text.Logic</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	<ProjectReference Include="..\CodeEditor.Text.UI\CodeEditor.Text.UI.csproj">
+  		<Project>{CA457554-4BEA-54AA-4F97-63D66F3970E6}</Project>
+  		<Name>CodeEditor.Text.UI</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	<ProjectReference Include="..\CodeEditor.Collections\CodeEditor.Collections.csproj">
+  		<Project>{56A3FC7A-E320-BB71-D8C7-DDB1DBB5FDAB}</Project>
+  		<Name>CodeEditor.Collections</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

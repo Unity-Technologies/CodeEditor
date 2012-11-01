@@ -1,30 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{C8831BDA-0DB4-45FF-AB6D-DAE3F68D6CEF}</ProjectGuid>
+    <ProjectGuid>{70F4436E-4FE3-8DA9-1A3C-FEDAEB59F1EC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CodeEditor.Text.UI.Tests</RootNamespace>
     <AssemblyName>CodeEditor.Text.UI.Tests</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <StartupObject>
-    </StartupObject>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <SolutionDir Condition="'$(SolutionDir)' == ''">..\..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -32,49 +25,48 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
   <ItemGroup>
-    <Compile Include="CaretTest.cs" />
-    <Compile Include="DefaultTextStructureNavigatorTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Moq, Version=4.0.10818.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)..\Moq\Moq.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)..\NUnit\bin\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="nunit.framework">
+    	<SpecificVersion>False</SpecificVersion>
+    	<HintPath>build\Default\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Moq">
+    	<SpecificVersion>False</SpecificVersion>
+    	<HintPath>build\Default\Moq.dll</HintPath>
+    </Reference>
+    
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CodeEditor.Text.Data.Tests\CodeEditor.Text.Data.Tests.csproj">
-      <Project>{02E4A566-1A0F-4C5A-8949-6B8E0398497F}</Project>
-      <Name>CodeEditor.Text.Data.Tests</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Text\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
-      <Project>{A6107081-C1F6-4B9C-AFED-2BE0AB8E5BAF}</Project>
-      <Name>CodeEditor.Text.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Text\CodeEditor.Text.UI\CodeEditor.Text.UI.csproj">
-      <Project>{6A91E197-9142-40C7-8C24-A75E8709E26D}</Project>
-      <Name>CodeEditor.Text.UI</Name>
-    </ProjectReference>
+  	<Compile Include="CaretTest.cs" />
+  	<Compile Include="DefaultTextStructureNavigatorTest.cs" />
+  	
   </ItemGroup>
+  <ItemGroup>
+  	<ProjectReference Include="..\CodeEditor.Text.UI\CodeEditor.Text.UI.csproj">
+  		<Project>{CA457554-4BEA-54AA-4F97-63D66F3970E6}</Project>
+  		<Name>CodeEditor.Text.UI</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	<ProjectReference Include="..\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
+  		<Project>{5B2491E7-A751-C355-297F-509403E5A7BA}</Project>
+  		<Name>CodeEditor.Text.Data</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	<ProjectReference Include="..\CodeEditor.Text.Data.Tests\CodeEditor.Text.Data.Tests.csproj">
+  		<Project>{D60B8475-ADE9-0BDC-5FB9-AEC12B3CD645}</Project>
+  		<Name>CodeEditor.Text.Data.Tests</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

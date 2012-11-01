@@ -1,28 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{6B6B0AB2-0DA0-40F8-A56D-C6CC1CADEF16}</ProjectGuid>
+    <ProjectGuid>{256F6043-AEF1-4CBB-5D00-7D9AF17BF356}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CodeEditor.Text.UI.Unity.Editor.Tests</RootNamespace>
     <AssemblyName>CodeEditor.Text.UI.Unity.Editor.Tests</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <SolutionDir Condition="'$(SolutionDir)' == ''">..\..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -30,84 +25,33 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Moq, Version=4.0.10818.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)..\Moq\Moq.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework, Version=2.6.0.12051, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)..\NUnit\bin\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="nunit.framework">
+    	<SpecificVersion>False</SpecificVersion>
+    	<HintPath>build\Default\nunit.framework.dll</HintPath>
+    </Reference>
+    
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
+  	<Compile Include="Properties\AssemblyInfo.cs" />
+  	
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Projects\CSharp\UnityEditor.csproj">
-      <Project>{016C8D73-3641-47FB-8D33-7A015A7EC7DB}</Project>
-      <Name>UnityEditor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\..\Projects\CSharp\UnityEngine.csproj">
-      <Project>{F0499708-3EB6-4026-8362-97E6FFC4E7C8}</Project>
-      <Name>UnityEngine</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Frameworks\CodeEditor.Composition\CodeEditor.Composition.csproj">
-      <Project>{9DB8BFD3-06C8-4A8C-8842-5931B924B56C}</Project>
-      <Name>CodeEditor.Composition</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Frameworks\CodeEditor.IO\CodeEditor.IO.csproj">
-      <Project>{489773FF-92B1-40B0-98EF-3ED337E5448F}</Project>
-      <Name>CodeEditor.IO</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Languages\CodeEditor.Languages.Common\CodeEditor.Languages.Common.csproj">
-      <Project>{80FD90AA-4188-4D81-AB31-6CDF792A84FA}</Project>
-      <Name>CodeEditor.Languages.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Languages\CodeEditor.Languages.UnityScript\CodeEditor.Languages.UnityScript.csproj">
-      <Project>{6EBD7F15-9B34-49BA-B50B-1AC51527D085}</Project>
-      <Name>CodeEditor.Languages.UnityScript</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Frameworks\CodeEditor.Testing\CodeEditor.Testing.csproj">
-      <Project>{A4F64CB6-1002-4CA6-8571-8ABFBDE63877}</Project>
-      <Name>CodeEditor.Testing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Text\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
-      <Project>{A6107081-C1F6-4B9C-AFED-2BE0AB8E5BAF}</Project>
-      <Name>CodeEditor.Text.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Text\CodeEditor.Text.Logic\CodeEditor.Text.Logic.csproj">
-      <Project>{E563745A-460A-4FBF-A72B-B2D4492A9716}</Project>
-      <Name>CodeEditor.Text.Logic</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Text\CodeEditor.Text.UI.Unity.Editor\CodeEditor.Text.UI.Unity.Editor.csproj">
-      <Project>{B339EC21-C05C-4350-A62B-7126C82541AF}</Project>
-      <Name>CodeEditor.Text.UI.Unity.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Text\CodeEditor.Text.UI.Unity.Engine\CodeEditor.Text.UI.Unity.Engine.csproj">
-      <Project>{C290F98D-894E-4878-AE4A-D1E83DA95619}</Project>
-      <Name>CodeEditor.Text.UI.Unity.Engine</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Text\CodeEditor.Text.UI\CodeEditor.Text.UI.csproj">
-      <Project>{6A91E197-9142-40C7-8C24-A75E8709E26D}</Project>
-      <Name>CodeEditor.Text.UI</Name>
-    </ProjectReference>
+  	<ProjectReference Include="..\CodeEditor.Text.UI.Unity.Editor\CodeEditor.Text.UI.Unity.Editor.csproj">
+  		<Project>{C9F1637E-BA1E-A55A-3E09-531BF9C0535B}</Project>
+  		<Name>CodeEditor.Text.UI.Unity.Editor</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

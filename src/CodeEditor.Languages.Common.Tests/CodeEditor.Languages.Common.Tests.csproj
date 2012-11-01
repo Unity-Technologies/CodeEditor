@@ -1,24 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1318FD98-D715-47F2-B3E7-74E12F042114}</ProjectGuid>
+    <ProjectGuid>{173EC652-E77F-01D4-7CCF-F70FABA74951}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CodeEditor.Languages.Common.Tests</RootNamespace>
     <AssemblyName>CodeEditor.Languages.Common.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="'$(SolutionDir)' == ''">..\..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>$(SolutionDir)bin\Debug\</OutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,55 +25,57 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>$(SolutionDir)bin\Release\</OutputPath>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CodeEditor.Grammars">
-      <HintPath>$(SolutionDir)libs\CodeEditor.Grammars.dll</HintPath>
-    </Reference>
-    <Reference Include="Moq, Version=4.0.10818.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL" />
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\..\NUnit\bin\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="nunit.framework">
+    	<SpecificVersion>False</SpecificVersion>
+    	<HintPath>build\Default\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="CodeEditor.Grammars">
+    	<SpecificVersion>False</SpecificVersion>
+    	<HintPath>build\Default\CodeEditor.Grammars.dll</HintPath>
+    </Reference>
+    <Reference Include="Moq">
+    	<SpecificVersion>False</SpecificVersion>
+    	<HintPath>build\Default\Moq.dll</HintPath>
+    </Reference>
+    
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PartitionTokenTypeCacheTest.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+  	<Compile Include="PartitionTokenTypeCacheTest.cs" />
+  	<Compile Include="Properties\AssemblyInfo.cs" />
+  	
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Frameworks\CodeEditor.Collections\CodeEditor.Collections.csproj">
-      <Project>{59F47162-813F-47E0-9E62-99090D2081C1}</Project>
-      <Name>CodeEditor.Collections</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Languages\CodeEditor.Languages.Common\CodeEditor.Languages.Common.csproj">
-      <Project>{80FD90AA-4188-4D81-AB31-6CDF792A84FA}</Project>
-      <Name>CodeEditor.Languages.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Frameworks\CodeEditor.Testing\CodeEditor.Testing.csproj">
-      <Project>{A4F64CB6-1002-4CA6-8571-8ABFBDE63877}</Project>
-      <Name>CodeEditor.Testing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Text\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
-      <Project>{A6107081-C1F6-4B9C-AFED-2BE0AB8E5BAF}</Project>
-      <Name>CodeEditor.Text.Data</Name>
-    </ProjectReference>
+  	<ProjectReference Include="..\CodeEditor.Languages.Common\CodeEditor.Languages.Common.csproj">
+  		<Project>{28889557-A438-D250-EDC6-8413E1E484D7}</Project>
+  		<Name>CodeEditor.Languages.Common</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	<ProjectReference Include="..\CodeEditor.Collections\CodeEditor.Collections.csproj">
+  		<Project>{56A3FC7A-E320-BB71-D8C7-DDB1DBB5FDAB}</Project>
+  		<Name>CodeEditor.Collections</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	<ProjectReference Include="..\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
+  		<Project>{5B2491E7-A751-C355-297F-509403E5A7BA}</Project>
+  		<Name>CodeEditor.Text.Data</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	<ProjectReference Include="..\CodeEditor.Testing\CodeEditor.Testing.csproj">
+  		<Project>{830610FF-B035-B844-22CE-D1606FF8A8C6}</Project>
+  		<Name>CodeEditor.Testing</Name>
+  		<Private>True</Private>
+  	</ProjectReference>
+  	
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

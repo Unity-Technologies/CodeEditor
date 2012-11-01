@@ -1,6 +1,7 @@
 
 dependencies {
 	def projectReferences = [
+		'CodeEditor.Collections',
 		'CodeEditor.Text.Data',
 		'CodeEditor.Languages.Common',
 		'CodeEditor.Grammars',
