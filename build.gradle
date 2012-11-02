@@ -112,6 +112,27 @@ task publish {
 	}
 }
 
+task updateUnityProject {
+
+	description 'Builds and copies required assemblies to the configured Unity project (unityProjectDir)'
+
+	def config = project.configurations.editor
+	dependsOn config
+
+	doFirst {
+		def unityProjectDir = project.properties.get('unityProjectDir', '../UnityProject')
+
+		def destinationDir = project.file("$unityProjectDir/Assets/kaizen/lib/Editor")
+		config.incoming.files.collect { f ->
+			project.copy {
+				from project.zipTree(f)
+				into destinationDir
+				include '*.dll'
+			}
+		}
+	}
+}
+
 nunit {
 	version = '2.6+'
 }
