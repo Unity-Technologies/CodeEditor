@@ -15,6 +15,20 @@ CodeEditor is developed using the new [kaizen dependency management framework](h
     cd CodeEditor
     ./gradlew update
     ./gradlew test
+    
+### Updating a local Unity project with the latest CodeEditor libraries
+
+    ./gradlew updateUnityProject
+
+The location of the unity project can be set through the _unityProjectDir_ gradle property which by default is assumed to be in _../UnityProject_
+
+The property can be set through the _-P_ command line argument:
+
+    ./gradlew -PunityProjectDir=/path/to/my/unity/project updateUnityProject
+    
+or more permanently through a _gradle.properties_ file.
+
+For more information on setting gradle project properties check the [gradle tutorial](http://www.gradle.org/docs/current/userguide/tutorial_this_and_that.html).
 
 ## Contributors
 
