@@ -43,12 +43,11 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				EraseBackground();
 
 			_scrollOffset = GUI.BeginScrollView(ViewPort, _scrollOffset, ContentRect);
-
-			DoGUIOnElements();
-
-			MoveCaretOnMouseClick();
-
-			GUI.EndScrollView();
+			{
+				DoGUIOnElements();
+				MoveCaretOnMouseClick();
+			
+			} GUI.EndScrollView();
 		}
 
 		private void EraseBackground()
@@ -68,7 +67,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 			for (var row = firstRow; row <= lastRow; ++row)
 			{
-				var lineRect = new Rect(0, row * LineHeight + TopMargin, 1000, LineHeight);
+				var lineRect = GetLineRect (row); 
 
 				var line = Line(row);
 				if (Repainting)
@@ -124,13 +123,13 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			if (cursorPosition.x < ViewPort.x || cursorPosition.x > ViewPort.xMax)
 				return;
 
-			var row = Mathf.FloorToInt(cursorPosition.y / LineHeight);
+			var row = GetRow (cursorPosition.y);
 			if (row >= LineCount)
 				return;
 
-			var rect = GetLineRect(row);
-			rect.x += 25f + Margins.TotalWidth;
-			var guiContent = MissingEngineAPI.GUIContent_Temp(Line(row).Text);
+			var rect = GetLineRect (row);
+			rect.x +=  Margins.TotalWidth;
+			GUIContent guiContent = new GUIContent (Line(row).Text);
 			var column = LineStyle.GetCursorStringIndex(rect, guiContent, cursorPosition);
 			_document.Caret.SetPosition(row, column);
 		}
@@ -170,9 +169,20 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			return new Rect(start.x, start.y, end.x - start.x, LineHeight);
 		}
 
+		int GetRow(float yPos)
+		{
+			return Mathf.Max(0, Mathf.FloorToInt( (yPos - TopMargin) / LineHeight));
+		}
+
 		Rect GetLineRect(int row)
 		{
-			return new Rect(0, row * LineHeight, 1000, LineHeight);
+			return new Rect(0, row * LineHeight  + TopMargin, 1000, LineHeight);
+		}
+
+		private void DebugDrawRowRect(int row)
+		{
+			if (row >= 0 && Event.current.type == EventType.repaint)
+				GUIUtils.DrawRect(GetLineRect(row), new Color(0.8f, 0.1f, 0.1f, 0.5f));
 		}
 
 		int CursorPos
