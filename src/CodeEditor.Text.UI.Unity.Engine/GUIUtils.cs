@@ -14,8 +14,7 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		{
 			var backup = GUI.color;
 			GUI.color = color;
-			GUI.Label(lineRect, "", Style);
-			Style.Draw(lineRect,GUIContent.none,false,true,false,false);
+			GUI.Label(lineRect, GUIContent.none, Style);
 			GUI.color = backup;
 		}
 
