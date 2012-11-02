@@ -123,7 +123,7 @@ task updateUnityProject {
 		def unityProjectDir = project.properties.get('unityProjectDir', '../UnityProject')
 
 		def destinationDir = project.file("$unityProjectDir/Assets/kaizen/lib/Editor")
-		config.incoming.files.collect { f ->
+		config.incoming.files.each { f ->
 			project.copy {
 				from project.zipTree(f)
 				into destinationDir
