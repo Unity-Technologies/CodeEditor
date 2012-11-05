@@ -10,6 +10,7 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		Rect SpanForCurrentCharacter();
 
 		Rect ViewPort { get; set; }
+		Vector2 ScrollOffset { get; set; }
 		void EnsureCursorIsVisible();
 
 		void OnGUI();
