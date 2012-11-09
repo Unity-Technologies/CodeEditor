@@ -13,8 +13,20 @@ buildscript {
 }
 
 allprojects {
-	apply plugin: 'vs2010' 
+	apply plugin: 'vs2010'
 }
+
+/*
+project(':CodeEditor.Text.UI.Unity.Editor') {
+	vs {
+		project {
+			postBuildEvent {
+				task ':updateUnityProject'
+			}
+		}
+	}
+}
+*/
 
 vs {
 	solutions {
