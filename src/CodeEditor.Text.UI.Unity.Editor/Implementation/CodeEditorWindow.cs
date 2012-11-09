@@ -178,9 +178,12 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		void BackupState ()
 		{
-			_backupData.caretRow = _textView.Document.Caret.Row;
-			_backupData.caretColumn = _textView.Document.Caret.Column;
-			_backupData.scrollOffset = _textView.ScrollOffset;
+			if (_textView != null)
+			{
+				_backupData.caretRow = _textView.Document.Caret.Row;
+				_backupData.caretColumn = _textView.Document.Caret.Column;
+				_backupData.scrollOffset = _textView.ScrollOffset;
+			}
 		}
 
 		public void StartCompletionSession(TextSpan completionSpan, ICompletionSet completions)
