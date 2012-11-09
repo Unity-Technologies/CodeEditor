@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -36,61 +36,61 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="UnityEngine">
-    	<SpecificVersion>False</SpecificVersion>
-    	<HintPath>build\Default\UnityEngine.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>build\Default\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor">
-    	<SpecificVersion>False</SpecificVersion>
-    	<HintPath>build\Default\UnityEditor.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>build\Default\UnityEditor.dll</HintPath>
     </Reference>
-    
   </ItemGroup>
   <ItemGroup>
-  	<Compile Include="Implementation\CodeEditorMenuItems.cs" />
-  	<Compile Include="Implementation\CodeEditorWindow.cs" />
-  	<Compile Include="Implementation\CodeView.cs" />
-  	<Compile Include="Implementation\CodeViewPopUp.cs" />
-  	<Compile Include="Implementation\CompletionSession.cs" />
-  	<Compile Include="Implementation\Main.cs" />
-  	<Compile Include="Implementation\MissingEditorAPI.cs" />
-  	<Compile Include="Implementation\TextViewAppearanceProvider.cs" />
-  	<Compile Include="Implementation\UnityEditorFile.cs" />
-  	<Compile Include="Implementation\UnityEditorFileSystem.cs" />
-  	<Compile Include="Properties\AssemblyInfo.cs" />
-  	
+    <Compile Include="Implementation\CodeEditorMenuItems.cs" />
+    <Compile Include="Implementation\CodeEditorWindow.cs" />
+    <Compile Include="Implementation\CodeView.cs" />
+    <Compile Include="Implementation\CodeViewPopUp.cs" />
+    <Compile Include="Implementation\CompletionSession.cs" />
+    <Compile Include="Implementation\Main.cs" />
+    <Compile Include="Implementation\MissingEditorAPI.cs" />
+    <Compile Include="Implementation\TextViewAppearanceProvider.cs" />
+    <Compile Include="Implementation\UnityEditorFile.cs" />
+    <Compile Include="Implementation\UnityEditorFileSystem.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-  	<ProjectReference Include="..\CodeEditor.Composition\CodeEditor.Composition.csproj">
-  		<Project>{58FB57AC-D851-1FC2-D877-123C5ED6EED6}</Project>
-  		<Name>CodeEditor.Composition</Name>
-  		<Private>True</Private>
-  	</ProjectReference>
-  	<ProjectReference Include="..\CodeEditor.IO\CodeEditor.IO.csproj">
-  		<Project>{8C1EC698-8F7D-54F4-7B6B-6ED15D8D18E7}</Project>
-  		<Name>CodeEditor.IO</Name>
-  		<Private>True</Private>
-  	</ProjectReference>
-  	<ProjectReference Include="..\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
-  		<Project>{5B2491E7-A751-C355-297F-509403E5A7BA}</Project>
-  		<Name>CodeEditor.Text.Data</Name>
-  		<Private>True</Private>
-  	</ProjectReference>
-  	<ProjectReference Include="..\CodeEditor.Text.Logic\CodeEditor.Text.Logic.csproj">
-  		<Project>{0086EDE0-4744-C2B7-520B-A15C15069463}</Project>
-  		<Name>CodeEditor.Text.Logic</Name>
-  		<Private>True</Private>
-  	</ProjectReference>
-  	<ProjectReference Include="..\CodeEditor.Text.UI\CodeEditor.Text.UI.csproj">
-  		<Project>{CA457554-4BEA-54AA-4F97-63D66F3970E6}</Project>
-  		<Name>CodeEditor.Text.UI</Name>
-  		<Private>True</Private>
-  	</ProjectReference>
-  	<ProjectReference Include="..\CodeEditor.Text.UI.Unity.Engine\CodeEditor.Text.UI.Unity.Engine.csproj">
-  		<Project>{3A6DB612-FB06-15B1-9095-E5EA56D0A612}</Project>
-  		<Name>CodeEditor.Text.UI.Unity.Engine</Name>
-  		<Private>True</Private>
-  	</ProjectReference>
-  	
+    <ProjectReference Include="..\CodeEditor.Composition\CodeEditor.Composition.csproj">
+      <Project>{58FB57AC-D851-1FC2-D877-123C5ED6EED6}</Project>
+      <Name>CodeEditor.Composition</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.IO\CodeEditor.IO.csproj">
+      <Project>{8C1EC698-8F7D-54F4-7B6B-6ED15D8D18E7}</Project>
+      <Name>CodeEditor.IO</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
+      <Project>{5B2491E7-A751-C355-297F-509403E5A7BA}</Project>
+      <Name>CodeEditor.Text.Data</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.Text.Logic\CodeEditor.Text.Logic.csproj">
+      <Project>{0086EDE0-4744-C2B7-520B-A15C15069463}</Project>
+      <Name>CodeEditor.Text.Logic</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.Text.UI\CodeEditor.Text.UI.csproj">
+      <Project>{CA457554-4BEA-54AA-4F97-63D66F3970E6}</Project>
+      <Name>CodeEditor.Text.UI</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.Text.UI.Unity.Engine\CodeEditor.Text.UI.Unity.Engine.csproj">
+      <Project>{3A6DB612-FB06-15B1-9095-E5EA56D0A612}</Project>
+      <Name>CodeEditor.Text.UI.Unity.Engine</Name>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /y/u "$(ProjectDir)$(OutDir)$(TargetFileName)" "$(SolutionDir)UnityProject\Assets\kaizen\lib\Editor\"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
