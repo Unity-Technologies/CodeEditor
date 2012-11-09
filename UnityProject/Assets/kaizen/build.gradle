@@ -1,0 +1,13 @@
+
+buildscript {
+	repositories {
+		ivy { url 'http://unity-technologies.github.com/kaizen/repositories/unstable' }
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'kaizen:kaizen:latest.integration'
+	}
+}
+
+apply plugin: 'kaizen-installation'
+

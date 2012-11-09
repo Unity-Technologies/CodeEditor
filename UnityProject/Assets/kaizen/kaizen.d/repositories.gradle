@@ -1,0 +1,3 @@
+repositories {
+	ivy { url 'http://unity-technologies.github.com/kaizen/repositories/unstable' }
+}
