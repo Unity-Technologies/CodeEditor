@@ -53,21 +53,6 @@ vs {
 	}
 }
 
-task dumpSolution <<{
-	project.extensions.vs.solutions.each {
-		println it.name
-		it.folders.each {
-			println "\t$it.name"
-			it.projects.each {
-				println "\t\t$it.name"
-			}
-		}
-		it.projects.each {
-			println it.path
-		}
-	}
-}
-
 allprojects {
 	repositories {
 		ivy { url 'http://unity-technologies.github.com/kaizen/repositories/unstable' }
