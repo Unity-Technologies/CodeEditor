@@ -91,6 +91,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /y/u "$(ProjectDir)$(OutDir)$(TargetFileName)" "$(SolutionDir)UnityProject\Assets\kaizen\lib\Editor\"</PostBuildEvent>
+    <PostBuildEvent>$(ProjectDir)/../../gradlew -p $(ProjectDir)/../.. :updateUnityProject</PostBuildEvent>
   </PropertyGroup>
 </Project>
