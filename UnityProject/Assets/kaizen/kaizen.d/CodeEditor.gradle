@@ -1,0 +1,3 @@
+dependencies {
+	editor group: 'CodeEditor', name: 'CodeEditor', version: 'latest.integration', configuration: 'editor'
+}

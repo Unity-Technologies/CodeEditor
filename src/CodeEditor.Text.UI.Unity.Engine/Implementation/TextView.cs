@@ -8,7 +8,6 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		const int TopMargin = 6;
 		readonly ITextViewDocument _document;
 		readonly ITextViewAppearance _appearance;
-		private Vector2 _scrollOffset;
 		private readonly ITextViewAdornments _adornments;
 
 		public TextView(ITextViewDocument document, ITextViewAppearance appearance, ITextViewAdornments adornments)
@@ -21,6 +20,8 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		public ITextViewMargins Margins { get; set; }
 
 		public Rect ViewPort { get; set; }
+
+		public Vector2 ScrollOffset { get; set; }
 
 		public ITextViewDocument Document
 		{
@@ -42,8 +43,9 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			if (Repainting)
 				EraseBackground();
 
-			_scrollOffset = GUI.BeginScrollView(ViewPort, _scrollOffset, ContentRect);
+			ScrollOffset = GUI.BeginScrollView(ViewPort, ScrollOffset, ContentRect);
 			{
+				//DebugDrawRowRect(CursorRow);
 				DoGUIOnElements();
 				MoveCaretOnMouseClick();
 			
@@ -63,7 +65,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		void DoGUIOnElements()
 		{
 			int firstRow, lastRow;
-			GetFirstAndLastRowVisible(LineCount, _scrollOffset.y, ViewPort.height, out firstRow, out lastRow);
+			GetFirstAndLastRowVisible(LineCount, ScrollOffset.y, ViewPort.height, out firstRow, out lastRow);
 
 			for (var row = firstRow; row <= lastRow; ++row)
 			{
@@ -95,7 +97,10 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			LineStyle.Draw(lineRect, MissingEngineAPI.GUIContent_Temp(line.RichText), controlID);
 
 			if (row == CursorRow)
+			{
 				LineStyle.DrawCursor(lineRect, MissingEngineAPI.GUIContent_Temp(line.Text), controlID, CursorPos);
+
+			}
 		}
 
 		private void DrawAdornments(ITextViewLine line, Rect lineRect)
@@ -136,22 +141,26 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		public void EnsureCursorIsVisible()
 		{
+			Vector2 scrollOffset = ScrollOffset;
+
 			var topPixelOfRow = LineHeight * CursorRow;
 			var scrollBottom = topPixelOfRow - ViewPort.height + 2 * LineHeight + 2 * TopMargin;
-			_scrollOffset.y = Mathf.Clamp(_scrollOffset.y, scrollBottom, topPixelOfRow);
+			scrollOffset.y = Mathf.Clamp(scrollOffset.y, scrollBottom, topPixelOfRow);
 			var lineRect = GetLineRect(CursorRow);
 			var cursorRect = GetTextSpanRect(lineRect, CurrentLine.Text, Mathf.Max(CursorPos - 2, 0), 1);
 
 			var scrollRight = Mathf.Max(cursorRect.x - ViewPort.width + 40f, 0f);
-			_scrollOffset.x = Mathf.Clamp(_scrollOffset.x, scrollRight, 1000);
+			scrollOffset.x = Mathf.Clamp(scrollOffset.x, scrollRight, 1000);
 
 			const float distToScroll = 20f;
 
-			if (cursorRect.x > ViewPort.width + _scrollOffset.x)
-				_scrollOffset.x = Mathf.Min(cursorRect.x - ViewPort.width + distToScroll, 1000f);
+			if (cursorRect.x > ViewPort.width + scrollOffset.x)
+				scrollOffset.x = Mathf.Min(cursorRect.x - ViewPort.width + distToScroll, 1000f);
 
-			if (cursorRect.x < _scrollOffset.x + distToScroll)
-				_scrollOffset.x = Mathf.Max(cursorRect.x - distToScroll, 0f);
+			if (cursorRect.x < scrollOffset.x + distToScroll)
+				scrollOffset.x = Mathf.Max(cursorRect.x - distToScroll, 0f);
+
+			ScrollOffset = scrollOffset;
 		}
 
 		Rect GetTextSpanRect(Rect lineRect, string text, int startPos, int length)

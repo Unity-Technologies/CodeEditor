@@ -1,4 +1,4 @@
-﻿using UnityEditor;
+using UnityEditor;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
@@ -7,13 +7,16 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		[MenuItem("Assets/Code Editor")]
 		public static void OpenActiveCodeFile()
 		{
-			CodeEditorWindow.OpenWindowFor(SelectedAssetPath);
+			CodeEditorWindow.OpenWindowFor("");
 		}
 
 		private static string SelectedAssetPath
 		{
 			get
 			{
+				if (Selection.activeInstanceID == 0)
+					return "";
+
 				var assetPath = AssetDatabase.GetAssetPath(Selection.activeInstanceID);
 				return System.IO.Path.GetFullPath(assetPath);
 			}

@@ -23,10 +23,20 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		public TextViewAppearance()
 		{
 			_background = "AnimationCurveEditorBackground";
-
-			_text = new GUIStyle(GUI.skin.label)
+			string userSkinPath = "Assets/kaizen/lib/CodeEditorSkin.guiskin";
+			GUISkin skin = UnityEditor.AssetDatabase.LoadAssetAtPath(userSkinPath, typeof(GUISkin)) as GUISkin;
+			if (skin == null)
 			{
-				fontSize = 14,
+				//Debug.Log ("Could not find user skin at: " + userSkinPath + ". Using default skin");
+				skin = GUI.skin;
+			}
+			else
+			{
+				//Debug.Log ("User skin found, font: " + skin.font.name);
+			}
+
+			_text = new GUIStyle(skin.label)
+			{
 				richText = true,
 				alignment = TextAnchor.UpperLeft,
 				padding = { left = 0, right = 0 }

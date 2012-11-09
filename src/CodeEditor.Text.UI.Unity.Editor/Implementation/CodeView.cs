@@ -43,6 +43,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			_textView.OnGUI();
 			HandleCompletionSession();
 			HandleKeyboard(true);
+
 		}
 
 		void SetKeyboardControl(Rect rect)
@@ -86,11 +87,13 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				Event.current.Use();
 				return;
 			}
-
+			
 			var c = Event.current.character;
 			if (!_font.HasCharacter(c) && c != '\t' && c != '\n')
+			{
+				Event.current.Use ();
 				return;
-
+			}
 			_document.Insert(_document.CurrentLine.Start + Caret.Column, c.ToString(CultureInfo.InvariantCulture));
 			if (c == '\n')
 				Caret.SetPosition(Caret.Row + 1, 0);
@@ -98,6 +101,10 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				Caret.MoveRight();
 
 			Event.current.Use();
+
+			// On tab we auto cycle to next guicontrol here we ensure to grab it back 
+			if (c == '\t')
+				m_GrabKeyboardControl = true;
 		}
 
 		void CodeCompletionCallback(string selectedText, int selectedIndex)

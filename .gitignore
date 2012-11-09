@@ -13,3 +13,5 @@ lib
 _ReSharper.*
 gradle.properties
 .DS_Store
+UnityProject/Library/
+UnityProject/Temp/
