@@ -3,18 +3,78 @@ using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 {
+	struct Vector2i 
+	{
+		public Vector2i (int X, int Y)
+		{
+			x = X;
+			y = Y;
+		}
+		public int x,y;
+
+		public override string ToString ()
+		{
+			return string.Format ("({0},{1})", x,y);
+		}
+		
+	}
+
+	class SelectionData
+	{
+		public Vector2i FixedPos {get; set;}
+		public Vector2i ActivePos {get; set;}
+
+		public Vector2i BeginDrawPos
+		{
+			get 
+			{
+				return new Vector2i (
+					(FixedPos.y < ActivePos.y || FixedPos.x < ActivePos.x) ? FixedPos.x : ActivePos.x,
+					FixedPos.y < ActivePos.y ? FixedPos.y : ActivePos.y);
+			}
+		}
+
+		public Vector2i EndDrawPos
+		{
+			get
+			{
+				return new Vector2i(
+					(ActivePos.y > FixedPos.y  || FixedPos.x < ActivePos.x) ? ActivePos.x : FixedPos.x,
+					ActivePos.y > FixedPos.y ? ActivePos.y : FixedPos.y);
+			}
+		}
+
+		public void Clear ()
+		{
+			FixedPos = ActivePos = new Vector2i(-1,-1);
+		}
+
+		public bool HasSelection ()
+		{
+			return FixedPos.y >= 0 && !(FixedPos.y == ActivePos.y && FixedPos.x == ActivePos.x);
+		}
+
+		public override string ToString ()
+		{
+			return string.Format ("draw {0} -> {1},  fixed: {2}, active {3}", BeginDrawPos, EndDrawPos, FixedPos, ActivePos);
+		}
+
+	}
 	class TextView : ITextView
 	{
 		const int TopMargin = 6;
 		readonly ITextViewDocument _document;
 		readonly ITextViewAppearance _appearance;
 		private readonly ITextViewAdornments _adornments;
+		readonly SelectionData _selection;
 
 		public TextView(ITextViewDocument document, ITextViewAppearance appearance, ITextViewAdornments adornments)
 		{
 			_appearance = appearance;
 			_adornments = adornments;
 			_document = document;
+			_selection = new SelectionData();
+			_selection.Clear ();
 		}
 
 		public ITextViewMargins Margins { get; set; }
@@ -45,9 +105,11 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 			ScrollOffset = GUI.BeginScrollView(ViewPort, ScrollOffset, ContentRect);
 			{
-				//DebugDrawRowRect(CursorRow);
+				if (ScrollOffset.y < 0) 
+					ScrollOffset = new Vector2(ScrollOffset.x, 0f);
+
 				DoGUIOnElements();
-				MoveCaretOnMouseClick();
+				HandleMouseDragSelection ();
 			
 			} GUI.EndScrollView();
 		}
@@ -66,6 +128,8 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		{
 			int firstRow, lastRow;
 			GetFirstAndLastRowVisible(LineCount, ScrollOffset.y, ViewPort.height, out firstRow, out lastRow);
+			
+			DrawSelection (firstRow, lastRow);
 
 			for (var row = firstRow; row <= lastRow; ++row)
 			{
@@ -80,6 +144,107 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				lineRect.x += Margins.TotalWidth;
 				if (Repainting)
 					DrawLine(lineRect, row, row + 110101010);
+			}
+		}
+
+		void HandleMouseDragSelection ()
+		{
+			int controlID = 666666;
+			Event evt = Event.current;
+			switch (evt.type)
+			{
+				case EventType.mouseDown:
+					if (GUIUtility.hotControl == 0 && evt.button == 0)
+					{
+						GUIUtility.hotControl = controlID;	// Grab mouse focus
+						Vector2i pos = GetCaretPositionUnderMouseCursor ();
+						_selection.Clear ();
+						if (pos.x >= 0)
+						{
+							_selection.FixedPos = pos;
+							_selection.ActivePos = pos;
+							_document.Caret.SetPosition(pos.y, pos.x);
+						}
+						evt.Use();
+					}
+					break;
+
+				case EventType.mouseDrag:
+					if (GUIUtility.hotControl == controlID)
+					{
+						Vector2i pos = GetCaretPositionUnderMouseCursor ();
+						if (pos.x >= 0)
+						{
+							_selection.ActivePos = pos;
+							if (_selection.FixedPos.y < 0)
+								_selection.FixedPos = pos; // init if dragging from outside into the text
+							_document.Caret.SetPosition(pos.y, pos.x);
+						}
+						GUI.changed = true;
+						evt.Use();
+					}
+					break;
+				case EventType.mouseUp:
+					if (GUIUtility.hotControl == controlID && evt.button == 0)
+					{
+						GUIUtility.hotControl = 0;
+						evt.Use();
+					}
+					break;
+			}
+		}
+
+		void DrawSelection (int firstRowVisible, int lastRowVisible)
+		{
+			if (!_selection.HasSelection())
+				return;
+
+			Color selectionColor = new Color(80/255f, 80/255f, 80/255f, 1f);
+
+			int startRow = _selection.BeginDrawPos.y;
+			int endRow = _selection.EndDrawPos.y;
+			int startCol = _selection.BeginDrawPos.x;
+			int endCol = _selection.EndDrawPos.x;
+
+			if (endRow < firstRowVisible || startRow > lastRowVisible)
+				return; // Selection outside view
+
+			int loopBegin = firstRowVisible > startRow ? firstRowVisible : startRow;
+			int loopEnd = lastRowVisible < endRow ? lastRowVisible : endRow;
+			if (loopBegin > loopEnd)
+			{
+				Debug.LogError("Invalid loop data " + loopBegin + " " + loopEnd);
+				return;
+			}
+
+			for (int row = loopBegin; row<=loopEnd; row++)
+			{
+				var line = Line(row);
+
+				Rect rowRect = GetLineRect(row);
+
+				Rect textSpanRect;
+				if (row == startRow && row == endRow)
+				{
+					textSpanRect = GetTextSpanRect(rowRect, line.Text, startCol, endCol - startCol);
+				}
+				else if (row == startRow)
+				{
+					textSpanRect  = GetTextSpanRect (rowRect, line.Text, startCol, line.Text.Length - startCol);
+				}
+				else if (row == endRow)
+				{
+					textSpanRect = GetTextSpanRect (rowRect, line.Text, 0, endCol);
+				}
+				else
+				{
+					textSpanRect = GetTextSpanRect(rowRect, line.Text, 0, line.Text.Length);
+				}
+
+				float extraWidth = (row != endRow) ? 8f : 0f;		// add extra width for all rows except the last to enhance selection
+				rowRect.x = textSpanRect.x + Margins.TotalWidth;
+				rowRect.width = textSpanRect.width + extraWidth; 	
+				GUIUtils.DrawRect (rowRect, selectionColor);
 			}
 		}
 
@@ -119,24 +284,23 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			lastRowVisible = Mathf.Min(firstRowVisible + (int)Mathf.Ceil(heightInPixels / LineHeight), numRows - 1);
 		}
 
-		void MoveCaretOnMouseClick()
+		Vector2i GetCaretPositionUnderMouseCursor ()
 		{
-			if (Event.current.type != EventType.MouseDown || Event.current.button != 0)
-				return;
-
 			var cursorPosition = Event.current.mousePosition;
 			if (cursorPosition.x < ViewPort.x || cursorPosition.x > ViewPort.xMax)
-				return;
+				return new Vector2i(-1,-1);
 
-			var row = GetRow (cursorPosition.y);
+			var row = GetRow(cursorPosition.y);
+			
 			if (row >= LineCount)
-				return;
+				row = LineCount-1;
 
-			var rect = GetLineRect (row);
-			rect.x +=  Margins.TotalWidth;
-			GUIContent guiContent = new GUIContent (Line(row).Text);
+			var rect = GetLineRect(row);
+			rect.x += Margins.TotalWidth;
+			GUIContent guiContent = new GUIContent(Line(row).Text);
+			cursorPosition.y = (rect.yMin + rect.yMax)*0.5f; // use center of row to fix issue with incorrect string index between rows
 			var column = LineStyle.GetCursorStringIndex(rect, guiContent, cursorPosition);
-			_document.Caret.SetPosition(row, column);
+			return new Vector2i(column, row);
 		}
 
 		public void EnsureCursorIsVisible()

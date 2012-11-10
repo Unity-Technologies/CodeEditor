@@ -124,8 +124,11 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			if (_selectedScriptIndex >= 0)
 			{
 				OpenFile (GetFileFromList (_selectedScriptIndex));
-				_textView.Document.Caret.SetPosition (_backupData.caretRow, _backupData.caretColumn);
-				_textView.ScrollOffset = _backupData.scrollOffset;
+				if (_textView != null)
+				{
+					_textView.Document.Caret.SetPosition(_backupData.caretRow, _backupData.caretColumn);
+					_textView.ScrollOffset = _backupData.scrollOffset;
+				}
 			}
 		}
 
