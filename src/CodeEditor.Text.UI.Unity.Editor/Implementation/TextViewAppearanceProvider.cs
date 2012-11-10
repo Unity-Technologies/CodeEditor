@@ -23,7 +23,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		public TextViewAppearance()
 		{
 			_background = "AnimationCurveEditorBackground";
-			string userSkinPath = "Assets/kaizen/lib/CodeEditorSkin.guiskin";
+			string userSkinPath = "Assets/Editor/CodeEditor/CodeEditorSkin.guiskin";
 			GUISkin skin = UnityEditor.AssetDatabase.LoadAssetAtPath(userSkinPath, typeof(GUISkin)) as GUISkin;
 			if (skin == null)
 			{
