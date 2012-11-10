@@ -4,7 +4,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	public static class CodeEditorMenuItems
 	{
-		[MenuItem("Assets/Code Editor")]
+		[MenuItem("Assets/Code Editor #w")]
 		public static void OpenActiveCodeFile()
 		{
 			CodeEditorWindow.OpenWindowFor("");
