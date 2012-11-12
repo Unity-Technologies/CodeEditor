@@ -3,78 +3,22 @@ using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 {
-	struct Vector2i 
-	{
-		public Vector2i (int X, int Y)
-		{
-			x = X;
-			y = Y;
-		}
-		public int x,y;
-
-		public override string ToString ()
-		{
-			return string.Format ("({0},{1})", x,y);
-		}
-		
-	}
-
-	class SelectionData
-	{
-		public Vector2i FixedPos {get; set;}
-		public Vector2i ActivePos {get; set;}
-
-		public Vector2i BeginDrawPos
-		{
-			get 
-			{
-				return new Vector2i (
-					(FixedPos.y < ActivePos.y || FixedPos.x < ActivePos.x) ? FixedPos.x : ActivePos.x,
-					FixedPos.y < ActivePos.y ? FixedPos.y : ActivePos.y);
-			}
-		}
-
-		public Vector2i EndDrawPos
-		{
-			get
-			{
-				return new Vector2i(
-					(ActivePos.y > FixedPos.y  || FixedPos.x < ActivePos.x) ? ActivePos.x : FixedPos.x,
-					ActivePos.y > FixedPos.y ? ActivePos.y : FixedPos.y);
-			}
-		}
-
-		public void Clear ()
-		{
-			FixedPos = ActivePos = new Vector2i(-1,-1);
-		}
-
-		public bool HasSelection ()
-		{
-			return FixedPos.y >= 0 && !(FixedPos.y == ActivePos.y && FixedPos.x == ActivePos.x);
-		}
-
-		public override string ToString ()
-		{
-			return string.Format ("draw {0} -> {1},  fixed: {2}, active {3}", BeginDrawPos, EndDrawPos, FixedPos, ActivePos);
-		}
-
-	}
 	class TextView : ITextView
 	{
 		const int TopMargin = 6;
 		readonly ITextViewDocument _document;
 		readonly ITextViewAppearance _appearance;
 		private readonly ITextViewAdornments _adornments;
-		readonly SelectionData _selection;
+		readonly TextViewSelection _selection;
+		public Action<int, int> DoubleClicked {get; set;}
 
 		public TextView(ITextViewDocument document, ITextViewAppearance appearance, ITextViewAdornments adornments)
 		{
 			_appearance = appearance;
 			_adornments = adornments;
 			_document = document;
-			_selection = new SelectionData();
-			_selection.Clear ();
+			_selection = new TextViewSelection(document);
+			_document.Caret.Moved += EnsureCursorIsVisible;
 		}
 
 		public ITextViewMargins Margins { get; set; }
@@ -82,6 +26,51 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		public Rect ViewPort { get; set; }
 
 		public Vector2 ScrollOffset { get; set; }
+
+		public bool HasSelection { get {return _selection.HasSelection();}}
+		public void SetSelectionAnchor(int row, int column)
+		{
+			_selection.Anchor = new TextViewPosition (column, row);
+		}
+		
+		public bool GetSelectionStart (out int row, out int column)
+		{
+			row = column = 0;
+			if (!HasSelection)
+				return false;
+
+			row = _selection.BeginDrawPos.row;
+			column = _selection.BeginDrawPos.column;
+			return true;
+		}
+
+		public bool GetSelectionEnd (out int row, out int column)
+		{
+			row = column = 0;
+			if (!HasSelection)
+				return false;
+
+			row = _selection.EndDrawPos.row;
+			column = _selection.EndDrawPos.column;
+			return true;
+		}
+
+		public bool GetSelectionInDocument (out int pos, out int length)
+		{
+			pos = length = 0;
+			if (!HasSelection)
+				return false;
+
+			TextViewPosition begin = _selection.BeginDrawPos;
+			TextViewPosition end = _selection.EndDrawPos;
+
+			int startPos = _document.Line (begin.row).Start + begin.column;
+			int endPos = _document.Line (end.row).Start + end.column;
+			
+			pos = startPos; 
+			length = endPos - startPos;
+			return true;
+		}
 
 		public ITextViewDocument Document
 		{
@@ -156,14 +145,25 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				case EventType.mouseDown:
 					if (GUIUtility.hotControl == 0 && evt.button == 0)
 					{
-						GUIUtility.hotControl = controlID;	// Grab mouse focus
-						Vector2i pos = GetCaretPositionUnderMouseCursor ();
-						_selection.Clear ();
-						if (pos.x >= 0)
+						if (evt.clickCount == 1)
 						{
-							_selection.FixedPos = pos;
-							_selection.ActivePos = pos;
-							_document.Caret.SetPosition(pos.y, pos.x);
+							GUIUtility.hotControl = controlID;	// Grab mouse focus
+							TextViewPosition pos = GetCaretPositionUnderMouseCursor();
+							_selection.Clear();
+							if (pos.column >= 0)
+							{
+								_selection.Anchor = pos;
+								_document.Caret.SetPosition(pos.row, pos.column);
+							}
+						}
+						if (evt.clickCount == 2)
+						{
+							if (DoubleClicked != null)
+							{
+								_selection.Clear ();
+								TextViewPosition pos = GetCaretPositionUnderMouseCursor();
+								DoubleClicked (pos.row, pos.column);
+							}
 						}
 						evt.Use();
 					}
@@ -172,13 +172,12 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				case EventType.mouseDrag:
 					if (GUIUtility.hotControl == controlID)
 					{
-						Vector2i pos = GetCaretPositionUnderMouseCursor ();
-						if (pos.x >= 0)
+						TextViewPosition pos = GetCaretPositionUnderMouseCursor ();
+						if (pos.column >= 0)
 						{
-							_selection.ActivePos = pos;
-							if (_selection.FixedPos.y < 0)
-								_selection.FixedPos = pos; // init if dragging from outside into the text
-							_document.Caret.SetPosition(pos.y, pos.x);
+							if (_selection.Anchor.row < 0)
+								_selection.Anchor = pos; // init if dragging from outside into the text
+							_document.Caret.SetPosition(pos.row, pos.column);
 						}
 						GUI.changed = true;
 						evt.Use();
@@ -201,10 +200,10 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 			Color selectionColor = new Color(80/255f, 80/255f, 80/255f, 1f);
 
-			int startRow = _selection.BeginDrawPos.y;
-			int endRow = _selection.EndDrawPos.y;
-			int startCol = _selection.BeginDrawPos.x;
-			int endCol = _selection.EndDrawPos.x;
+			int startRow = _selection.BeginDrawPos.row;
+			int endRow = _selection.EndDrawPos.row;
+			int startCol = _selection.BeginDrawPos.column;
+			int endCol = _selection.EndDrawPos.column;
 
 			if (endRow < firstRowVisible || startRow > lastRowVisible)
 				return; // Selection outside view
@@ -284,11 +283,11 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			lastRowVisible = Mathf.Min(firstRowVisible + (int)Mathf.Ceil(heightInPixels / LineHeight), numRows - 1);
 		}
 
-		Vector2i GetCaretPositionUnderMouseCursor ()
+		TextViewPosition GetCaretPositionUnderMouseCursor ()
 		{
 			var cursorPosition = Event.current.mousePosition;
 			if (cursorPosition.x < ViewPort.x || cursorPosition.x > ViewPort.xMax)
-				return new Vector2i(-1,-1);
+				return new TextViewPosition(-1,-1);
 
 			var row = GetRow(cursorPosition.y);
 			
@@ -300,7 +299,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			GUIContent guiContent = new GUIContent(Line(row).Text);
 			cursorPosition.y = (rect.yMin + rect.yMax)*0.5f; // use center of row to fix issue with incorrect string index between rows
 			var column = LineStyle.GetCursorStringIndex(rect, guiContent, cursorPosition);
-			return new Vector2i(column, row);
+			return new TextViewPosition(column, row);
 		}
 
 		public void EnsureCursorIsVisible()
