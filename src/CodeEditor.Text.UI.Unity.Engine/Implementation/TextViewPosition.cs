@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 {
-	struct TextViewPosition 
+	public struct TextViewPosition 
 	{
 		public TextViewPosition (int Column, int Row)
 		{

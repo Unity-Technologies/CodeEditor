@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 {
-	class TextViewSelection
+	public class TextViewSelection
 	{
 		public TextViewPosition Anchor {get; set;} 
 		readonly ITextViewDocument _document;
