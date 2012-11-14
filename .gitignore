@@ -16,3 +16,4 @@ gradle.properties
 UnityProject/Library/
 UnityProject/Temp/
 UnityProject/Assets/Scripts/
+UnityProject/Assets/Scripts.meta
