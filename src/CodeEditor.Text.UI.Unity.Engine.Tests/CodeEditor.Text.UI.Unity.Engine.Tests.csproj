@@ -47,7 +47,6 @@
   <ItemGroup>
     <Compile Include="TextViewDocumentFactoryTest.cs" />
     <Compile Include="TextViewDocumentTest.cs" />
-    <Compile Include="TextViewSelectionTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CodeEditor.Text.UI.Unity.Engine\CodeEditor.Text.UI.Unity.Engine.csproj">

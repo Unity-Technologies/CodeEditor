@@ -43,8 +43,6 @@
   <ItemGroup>
     <Compile Include="GUIUtils.cs" />
     <Compile Include="IClassificationStyler.cs" />
-    <Compile Include="Implementation\TextViewPosition.cs" />
-    <Compile Include="Implementation\TextViewSelection.cs" />
     <Compile Include="ITextView.cs" />
     <Compile Include="ITextViewAdornment.cs" />
     <Compile Include="ITextViewAdornments.cs" />

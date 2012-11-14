@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -36,37 +36,35 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="nunit.framework">
-    	<SpecificVersion>False</SpecificVersion>
-    	<HintPath>build\Default\nunit.framework.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>build\Default\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Moq">
-    	<SpecificVersion>False</SpecificVersion>
-    	<HintPath>build\Default\Moq.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>build\Default\Moq.dll</HintPath>
     </Reference>
-    
   </ItemGroup>
   <ItemGroup>
-  	<Compile Include="CaretTest.cs" />
-  	<Compile Include="DefaultTextStructureNavigatorTest.cs" />
-  	
+    <Compile Include="CaretTest.cs" />
+    <Compile Include="DefaultTextStructureNavigatorTest.cs" />
+    <Compile Include="SelectionTest.cs" />
   </ItemGroup>
   <ItemGroup>
-  	<ProjectReference Include="..\CodeEditor.Text.UI\CodeEditor.Text.UI.csproj">
-  		<Project>{CA457554-4BEA-54AA-4F97-63D66F3970E6}</Project>
-  		<Name>CodeEditor.Text.UI</Name>
-  		<Private>True</Private>
-  	</ProjectReference>
-  	<ProjectReference Include="..\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
-  		<Project>{5B2491E7-A751-C355-297F-509403E5A7BA}</Project>
-  		<Name>CodeEditor.Text.Data</Name>
-  		<Private>True</Private>
-  	</ProjectReference>
-  	<ProjectReference Include="..\CodeEditor.Text.Data.Tests\CodeEditor.Text.Data.Tests.csproj">
-  		<Project>{D60B8475-ADE9-0BDC-5FB9-AEC12B3CD645}</Project>
-  		<Name>CodeEditor.Text.Data.Tests</Name>
-  		<Private>True</Private>
-  	</ProjectReference>
-  	
+    <ProjectReference Include="..\CodeEditor.Text.UI\CodeEditor.Text.UI.csproj">
+      <Project>{CA457554-4BEA-54AA-4F97-63D66F3970E6}</Project>
+      <Name>CodeEditor.Text.UI</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.Text.Data\CodeEditor.Text.Data.csproj">
+      <Project>{5B2491E7-A751-C355-297F-509403E5A7BA}</Project>
+      <Name>CodeEditor.Text.Data</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CodeEditor.Text.Data.Tests\CodeEditor.Text.Data.Tests.csproj">
+      <Project>{D60B8475-ADE9-0BDC-5FB9-AEC12B3CD645}</Project>
+      <Name>CodeEditor.Text.Data.Tests</Name>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
