@@ -22,7 +22,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 	
 		// Serialized fields
 		// ---------------------
-		string _fileName;
+		string _filePath;
+		string _fileNameWithExtension;
 		BackupData _backupData;
 
 
@@ -33,16 +34,9 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		[System.NonSerialized]
 		ITextView _textView;
-	
-		[System.NonSerialized]
-		int _selectedScriptIndex;
 		
-		[System.NonSerialized]
-		MonoScript[] _allScripts;
-		
-		[System.NonSerialized]
-		string[] _allScriptNames;
-		
+
+
 		// Layout
 		// ---------------------
 		class Styles
@@ -58,78 +52,39 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			var window = GetWindow<CodeEditorWindow>();
 			window.title = "Code Editor";
 			window.minSize = new Vector2(200, 200);
-			window._fileName = file;
+			window.OpenFile (file);
 		}
 
 		private CodeEditorWindow()
 		{
 		}
 
-		string GetFileFromList (int index)
-		{
-			if (index < 0 || index >= _allScripts.Length)
-				return "";
-
-			var assetPath = AssetDatabase.GetAssetPath(_allScripts[index].GetInstanceID());
-			return System.IO.Path.GetFullPath(assetPath);
-		}
-
 		void OpenFile (string file)
 		{
 			_textView = null;
 			_codeView = null;
-			_fileName = file;
+			_filePath = file;
+			_fileNameWithExtension = "";
 
-			if (string.IsNullOrEmpty(_fileName))
+			if (string.IsNullOrEmpty(_filePath))
 				return;
 
-			_textView = TextViewFactory.ViewForFile(_fileName);
+			_textView = TextViewFactory.ViewForFile(_filePath);
 			_codeView = new CodeView(this, _textView);
+			_fileNameWithExtension = System.IO.Path.GetFileName(_filePath);
 		}
 
 		void InitIfNeeded()
 		{
-			if (_allScripts != null)
-				return;
-	
 			if (s_Styles == null)
 				s_Styles = new Styles ();
 
 			if (_backupData == null)
 				_backupData = new BackupData(); 
 
-			MonoScript[] allscripts = MonoImporter.GetAllRuntimeMonoScripts ();
-			List<string> scriptNames = new List<string>();
-			List<MonoScript> scripts= new List<MonoScript>();
-			_selectedScriptIndex = -1;
-
-			for (int i=0; i<allscripts.Length; ++i)
-			{
-				var script = allscripts[i];
-				string path = AssetDatabase.GetAssetPath (script.GetInstanceID ());
-				if (!string.IsNullOrEmpty (path))
-				{
-					// Scripts can have been removed so ensure index is recalculated based on file path
-					path = System.IO.Path.GetFullPath(path);
-					if (path == _fileName)
-						_selectedScriptIndex = i;
-					scriptNames.Add (System.IO.Path.GetFileName (path));
-					scripts.Add (script);
-				}
-			}
-			_allScriptNames = scriptNames.ToArray ();
-			_allScripts = scripts.ToArray ();
-
-			// Reconstruct state
-			if (_selectedScriptIndex >= 0)
-			{
-				OpenFile (GetFileFromList (_selectedScriptIndex));
-				if (_textView != null)
-				{
-					_textView.Document.Caret.SetPosition(_backupData.caretRow, _backupData.caretColumn);
-					_textView.ScrollOffset = _backupData.scrollOffset;
-				}
-			}
+			// Reconstruct state after domain reloading
+			if (_textView == null && !string.IsNullOrEmpty(_filePath))
+				OpenFile (_filePath);
 		}
 
 		void OnGUI()
@@ -139,6 +94,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			const float topAreaHeight = 30f;
 			Rect topAreaRect = new Rect (0,0, position.width, topAreaHeight);
 			Rect codeViewRect = new Rect(0, topAreaHeight, position.width, position.height - topAreaHeight);
+			
 			TopArea(topAreaRect);
 			CodeViewArea(codeViewRect);
 			
@@ -161,11 +117,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				{
 					GUILayout.Space(10f);
 					
-					EditorGUI.BeginChangeCheck ();
-					_selectedScriptIndex = EditorGUILayout.Popup(_selectedScriptIndex, _allScriptNames);
-					if (EditorGUI.EndChangeCheck())
-						OpenFile (GetFileFromList(_selectedScriptIndex));
-					
+					GUILayout.Label (_fileNameWithExtension);
+				
 					GUILayout.FlexibleSpace();
 
 					if (GUILayout.Button(s_Styles.saveText))
