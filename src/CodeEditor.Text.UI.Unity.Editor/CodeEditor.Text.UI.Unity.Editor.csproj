@@ -52,6 +52,7 @@
     <Compile Include="Implementation\CompletionSession.cs" />
     <Compile Include="Implementation\Main.cs" />
     <Compile Include="Implementation\MissingEditorAPI.cs" />
+    <Compile Include="Implementation\NavigateToFileWindow.cs" />
     <Compile Include="Implementation\TextViewAppearanceProvider.cs" />
     <Compile Include="Implementation\UnityEditorFile.cs" />
     <Compile Include="Implementation\UnityEditorFileSystem.cs" />
