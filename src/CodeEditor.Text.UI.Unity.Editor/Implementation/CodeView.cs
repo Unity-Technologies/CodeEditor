@@ -297,25 +297,49 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			get { return _document.Buffer.CurrentSnapshot; }
 		}
 
+		void MoveCaretToBeginingOfSelectionAndClear ()
+		{
+			int row, column;
+			if (_textView.GetSelectionStart(out row, out column))
+					Caret.SetPosition(row, column);
+			ClearSelection();
+		}
+
+		void MoveCaretToEndOfSelectionAndClear()
+		{
+			int row, column;
+			if (_textView.GetSelectionEnd(out row, out column))
+				Caret.SetPosition(row, column);
+			ClearSelection();
+		}
+
 		void PerformOperation(TextEditOp operation)
 		{
 			switch (operation)
 			{
 				case TextEditOp.MoveLeft:
-					ClearSelection();
-					Caret.MoveLeft();
+					if (HasSelection())
+						MoveCaretToBeginingOfSelectionAndClear ();
+					else
+						Caret.MoveLeft();
 					break;
 				case TextEditOp.MoveRight:
-					ClearSelection();
-					Caret.MoveRight();
+					if (HasSelection())
+						MoveCaretToEndOfSelectionAndClear();
+					else
+						Caret.MoveRight();
 					break;
 				case TextEditOp.MoveUp:
-					ClearSelection();
-					Caret.MoveUp(1);
+					if (HasSelection())
+						MoveCaretToBeginingOfSelectionAndClear();
+					else
+						Caret.MoveUp(1);
 					break;
 				case TextEditOp.MoveDown:
-					ClearSelection();
-					Caret.MoveDown(1);
+					if (HasSelection())
+						MoveCaretToEndOfSelectionAndClear();
+					else
+						Caret.MoveDown(1);
 					break;
 				case TextEditOp.MoveLineStart:
 					ClearSelection();
