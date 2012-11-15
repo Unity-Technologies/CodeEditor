@@ -17,9 +17,17 @@ namespace CodeEditor.Text.UI
 		{
 			get 
 			{
+				int column;
+				if (Anchor.Row == Caret.Row)
+					column = Math.Min(Anchor.Column, Caret.Column);
+				else if (Anchor.Row < Caret.Row)
+					column = Anchor.Column;
+				else
+					column = Caret.Column;
+
 				return new Position (
 					Anchor.Row < Caret.Row ? Anchor.Row : Caret.Row,
-					(Anchor.Row < Caret.Row || Anchor.Column < Caret.Column) ? Anchor.Column : Caret.Column
+					column
 					);
 			}
 		}
@@ -28,9 +36,17 @@ namespace CodeEditor.Text.UI
 		{
 			get
 			{
+				int column;
+				if (Anchor.Row == Caret.Row)
+					column = Math.Max(Anchor.Column, Caret.Column);
+				else if (Anchor.Row < Caret.Row)
+					column = Caret.Column;
+				else
+					column = Anchor.Column;
+
 				return new Position(
 					Caret.Row > Anchor.Row ? Caret.Row : Anchor.Row,
-					(Caret.Row > Anchor.Row  || Anchor.Column < Caret.Column) ? Caret.Column : Anchor.Column
+					column
 					);
 			}
 		}
@@ -53,7 +69,7 @@ namespace CodeEditor.Text.UI
 
 		public override string ToString ()
 		{
-			return string.Format ("{0} -> {1}", BeginDrawPos, EndDrawPos);
+			return string.Format ("{0} -> {1}, Anchor: {2}, Caret {3},{4}", BeginDrawPos, EndDrawPos, Anchor, Caret.Row, Caret.Column);
 		}
 
 	}
