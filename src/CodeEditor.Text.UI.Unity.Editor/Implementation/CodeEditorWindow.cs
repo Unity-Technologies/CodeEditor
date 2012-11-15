@@ -18,6 +18,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			// TextView state that should survive domain reloads
 			public int caretRow, caretColumn;
 			public Vector2 scrollOffset;
+			public Vector2 selectionAnchor; // argh: Unity cannot serialize Position since its a struct... so we store it as a Vector2
 		}
 	
 		// Serialized fields
@@ -45,13 +46,17 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		}
 		static Styles s_Styles;
 
-
-
-		static public void OpenWindowFor(string file)
+		static public CodeEditorWindow OpenOrFocusExistingWindow()
 		{
 			var window = GetWindow<CodeEditorWindow>();
 			window.title = "Code Editor";
 			window.minSize = new Vector2(200, 200);
+			return window;
+		}
+
+		static public void OpenWindowFor(string file)
+		{
+			var window = OpenOrFocusExistingWindow ();
 			window.OpenFile (file);
 		}
 
@@ -84,7 +89,12 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 			// Reconstruct state after domain reloading
 			if (_textView == null && !string.IsNullOrEmpty(_filePath))
+			{
 				OpenFile (_filePath);
+				_textView.Document.Caret.SetPosition(_backupData.caretRow, _backupData.caretColumn);
+				_textView.ScrollOffset = _backupData.scrollOffset;
+				_textView.SelectionAnchor = new Position((int)_backupData.selectionAnchor.y, (int)_backupData.selectionAnchor.x);
+			}
 		}
 
 		void OnGUI()
@@ -139,6 +149,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				_backupData.caretRow = _textView.Document.Caret.Row;
 				_backupData.caretColumn = _textView.Document.Caret.Column;
 				_backupData.scrollOffset = _textView.ScrollOffset;
+				_backupData.selectionAnchor = new Vector2(_textView.SelectionAnchor.Column, _textView.SelectionAnchor.Row);
 			}
 		}
 

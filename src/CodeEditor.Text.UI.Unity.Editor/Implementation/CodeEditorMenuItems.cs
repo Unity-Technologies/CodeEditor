@@ -5,9 +5,9 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 	public static class CodeEditorMenuItems
 	{
 		[MenuItem("Window/Code Editor %w")]
-		public static void OpenActiveCodeFile()
+		public static void OpenOrFocusCodeEditorWindow()
 		{
-			CodeEditorWindow.OpenWindowFor("");
+			CodeEditorWindow.OpenOrFocusExistingWindow ();
 		}
 
 		[MenuItem("Window/NavigateTo %e")]
