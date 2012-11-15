@@ -29,9 +29,10 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		public Vector2 ScrollOffset { get; set; }
 
 		public bool HasSelection { get {return _selection.HasSelection();}}
-		public void SetSelectionAnchor(int row, int column)
+		public Position SelectionAnchor 
 		{
-			_selection.Anchor = new Position (row, column);
+			get {return _selection.Anchor;}
+			set {_selection.Anchor = value;}
 		}
 		
 		public bool GetSelectionStart (out int row, out int column)

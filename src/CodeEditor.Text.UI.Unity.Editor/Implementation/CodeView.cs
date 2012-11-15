@@ -219,13 +219,13 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		{
 			if (!HasSelection())
 			{
-				_textView.SetSelectionAnchor(Caret.Row, Caret.Column);
+				_textView.SelectionAnchor = new Position(Caret.Row, Caret.Column);
 			}
 		}
 
 		void ClearSelection()
 		{
-			_textView.SetSelectionAnchor(-1, -1);
+			_textView.SelectionAnchor = new Position (-1, -1);
 		}
 
 		void PreviousWord()
