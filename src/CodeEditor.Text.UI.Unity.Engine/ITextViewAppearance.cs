@@ -8,5 +8,6 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		GUIStyle Text { get; }
 		GUIStyle LineNumber { get; }
 		Color LineNumberColor { get; }
+		Color SelectionColor { get; }
 	}
 }

@@ -19,6 +19,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		private readonly GUIStyle _text;
 		private readonly GUIStyle _lineNumber;
 		private readonly Color _lineNumberColor;
+		private readonly Color _selectionColor;
 
 		public TextViewAppearance()
 		{
@@ -50,6 +51,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			};
 
 			_lineNumberColor = new Color(1, 1, 1, 0.5f);
+
+			_selectionColor = new Color(80/255f, 80/255f, 80/255f, 1f);
 		}
 
 		public GUIStyle Background
@@ -70,6 +73,11 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		public Color LineNumberColor
 		{
 			get { return _lineNumberColor; }
+		}
+
+		public Color SelectionColor
+		{
+			get { return _selectionColor; }
 		}
 	}
 }

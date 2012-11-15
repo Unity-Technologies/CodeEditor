@@ -202,7 +202,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			if (!_selection.HasSelection())
 				return;
 
-			Color selectionColor = new Color(80/255f, 80/255f, 80/255f, 1f);
+			Color selectionColor = _appearance.SelectionColor;
 
 			int startRow = _selection.BeginDrawPos.Row;
 			int endRow = _selection.EndDrawPos.Row;
