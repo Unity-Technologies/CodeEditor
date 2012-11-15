@@ -228,7 +228,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			for (int row = loopBegin; row<=loopEnd; row++)
 			{
 				var line = Line(row);
-
+ 
 				Rect rowRect = GetLineRect(row);
 
 				Rect textSpanRect;
@@ -238,7 +238,19 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				}
 				else if (row == startRow)
 				{
-					textSpanRect  = GetTextSpanRect (rowRect, line.Text, startCol, line.Text.Length - startCol);
+					int len = line.Text.Length - startCol;
+					if (len > 0)
+					{
+						textSpanRect  = GetTextSpanRect (rowRect, line.Text, startCol, len);
+					}
+					else
+					{
+						// We are at end of line so we get the span for the previous character and
+						// use xMax from that character as startpos.
+						textSpanRect  = GetTextSpanRect (rowRect, line.Text, Mathf.Max(0,startCol-1), 1);
+						textSpanRect.x = textSpanRect.xMax;
+						textSpanRect.width = 0;
+					}
 				}
 				else if (row == endRow)
 				{
