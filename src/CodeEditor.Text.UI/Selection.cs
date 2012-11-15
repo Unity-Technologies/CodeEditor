@@ -17,18 +17,10 @@ namespace CodeEditor.Text.UI
 		{
 			get 
 			{
-				int column;
-				if (Anchor.Row == Caret.Row)
-					column = Math.Min(Anchor.Column, Caret.Column);
-				else if (Anchor.Row < Caret.Row)
-					column = Anchor.Column;
-				else
-					column = Caret.Column;
-
-				return new Position (
-					Anchor.Row < Caret.Row ? Anchor.Row : Caret.Row,
-					column
-					);
+				if (Caret.Column + Caret.Row*1000 > Anchor.Column + Anchor.Row*1000)
+					return Anchor;
+				
+				return new Position(Caret.Row, Caret.Column);
 			}
 		}
 
@@ -36,18 +28,10 @@ namespace CodeEditor.Text.UI
 		{
 			get
 			{
-				int column;
-				if (Anchor.Row == Caret.Row)
-					column = Math.Max(Anchor.Column, Caret.Column);
-				else if (Anchor.Row < Caret.Row)
-					column = Caret.Column;
-				else
-					column = Anchor.Column;
+				if (Caret.Column + Caret.Row * 1000 < Anchor.Column + Anchor.Row * 1000)
+					return Anchor;
 
-				return new Position(
-					Caret.Row > Anchor.Row ? Caret.Row : Anchor.Row,
-					column
-					);
+				return new Position(Caret.Row, Caret.Column);
 			}
 		}
 
