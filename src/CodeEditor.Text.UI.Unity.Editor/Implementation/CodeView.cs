@@ -96,7 +96,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				return;
 			}
 
-			if (_textView.HasSelection)
+			if (HasSelection ())
 				DeleteSelection ();
 
 			_document.Insert(_document.CurrentLine.Start + Caret.Column, c.ToString(CultureInfo.InvariantCulture));
@@ -171,7 +171,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		void Backspace()
 		{
-			if (_textView.HasSelection)
+			if (HasSelection ())
 			{
 				DeleteSelection ();
 				return;
@@ -186,7 +186,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		void Delete()
 		{
-			if (_textView.HasSelection)
+			if (HasSelection ())
 			{
 				DeleteSelection ();
 				return;
@@ -198,20 +198,35 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		void DeleteSelection()
 		{
-			if (_textView.HasSelection)
+			int pos, length;
+			if (_textView.GetSelectionInDocument(out pos, out length))
 			{
-				int pos, length;
-				if (_textView.GetSelectionInDocument(out pos, out length))
-				{
-					int row, column;
-					if (_textView.GetSelectionStart(out row, out column))
-						Caret.SetPosition(row, column);
+				int row, column;
+				if (_textView.GetSelectionStart(out row, out column))
+					Caret.SetPosition(row, column);
 
-					_document.Delete(pos, length);
-				}
+				_document.Delete(pos, length);
+				ClearSelection();
 			}
 		}
 
+		bool HasSelection()
+		{
+			return _textView.HasSelection;
+		}
+
+		void SetSelectionAnchorIfNeeded()
+		{
+			if (!HasSelection())
+			{
+				_textView.SetSelectionAnchor(Caret.Row, Caret.Column);
+			}
+		}
+
+		void ClearSelection()
+		{
+			_textView.SetSelectionAnchor(-1, -1);
+		}
 
 		void PreviousWord()
 		{
@@ -420,19 +435,6 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					Debug.Log("Unimplemented: " + operation);
 					break;
 			}
-		}
-
-		void SetSelectionAnchorIfNeeded ()
-		{
-			if (!_textView.HasSelection)
-			{
-				_textView.SetSelectionAnchor (Caret.Row, Caret.Column);
-			}
-		}
-
-		void ClearSelection ()
-		{
-			_textView.SetSelectionAnchor (-1,-1);
 		}
 
 		static void MapKey(string key, TextEditOp action)
