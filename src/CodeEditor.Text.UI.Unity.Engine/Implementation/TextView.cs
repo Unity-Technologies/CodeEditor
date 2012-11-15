@@ -144,12 +144,15 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			switch (evt.type)
 			{
 				case EventType.mouseDown:
-					if (GUIUtility.hotControl == 0 && evt.button == 0)
+					// If dragging outside window and releasing mousedown we do not get a MouseUp event so we 
+					// can clear the hotcontrol. We therefore check if we already have hotcontrol and allow mouse down action if so.
+					bool alreadyHotcontrol = GUIUtility.hotControl == controlID; 
+					if ((GUIUtility.hotControl == 0 || alreadyHotcontrol) && evt.button == 0)
 					{
 						if (evt.clickCount == 1)
 						{
 							GUIUtility.hotControl = controlID;	// Grab mouse focus
-							Position pos = GetCaretPositionUnderMouseCursor();
+							Position pos = GetCaretPositionUnderMouseCursor(Event.current.mousePosition);
 							_selection.Clear();
 							if (pos.Column >= 0)
 							{
@@ -162,7 +165,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 							if (DoubleClicked != null)
 							{
 								_selection.Clear ();
-								Position pos = GetCaretPositionUnderMouseCursor();
+								Position pos = GetCaretPositionUnderMouseCursor(Event.current.mousePosition);
 								DoubleClicked (pos.Row, pos.Column);
 							}
 						}
@@ -173,21 +176,22 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				case EventType.mouseDrag:
 					if (GUIUtility.hotControl == controlID)
 					{
-						Position pos = GetCaretPositionUnderMouseCursor ();
+						var cursorPosition = Event.current.mousePosition;
+						cursorPosition.x = Mathf.Clamp (cursorPosition.x, ViewPort.xMin, ViewPort.xMax); // clamp in x so we drag select while having cursor outside view rect
+						Position pos = GetCaretPositionUnderMouseCursor (cursorPosition);
 						if (pos.Column >= 0)
 						{
 							if (_selection.Anchor.Row < 0)
 								_selection.Anchor = pos; // init if dragging from outside into the text
 							_document.Caret.SetPosition(pos.Row, pos.Column);
+							evt.Use();
 						}
-						GUI.changed = true;
-						evt.Use();
 					}
 					break;
 				case EventType.mouseUp:
 					if (GUIUtility.hotControl == controlID && evt.button == 0)
 					{
-						Position pos = GetCaretPositionUnderMouseCursor();
+						Position pos = GetCaretPositionUnderMouseCursor(Event.current.mousePosition);
 						if (_selection.Anchor == pos)
 							_selection.Clear ();
 						GUIUtility.hotControl = 0;
@@ -287,9 +291,8 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			lastRowVisible = Mathf.Min(firstRowVisible + (int)Mathf.Ceil(heightInPixels / LineHeight), numRows - 1);
 		}
 
-		Position GetCaretPositionUnderMouseCursor ()
+		Position GetCaretPositionUnderMouseCursor (Vector2 cursorPosition)
 		{
-			var cursorPosition = Event.current.mousePosition;
 			if (cursorPosition.x < ViewPort.x || cursorPosition.x > ViewPort.xMax)
 				return new Position(-1,-1);
 
