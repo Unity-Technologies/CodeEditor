@@ -187,6 +187,9 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				case EventType.mouseUp:
 					if (GUIUtility.hotControl == controlID && evt.button == 0)
 					{
+						Position pos = GetCaretPositionUnderMouseCursor();
+						if (_selection.Anchor == pos)
+							_selection.Clear ();
 						GUIUtility.hotControl = 0;
 						evt.Use();
 					}
