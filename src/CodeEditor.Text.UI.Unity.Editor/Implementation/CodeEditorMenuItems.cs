@@ -4,20 +4,26 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	public static class CodeEditorMenuItems
 	{
-		[MenuItem("Assets/Code Editor")]
-		public static void OpenActiveCodeFile()
+		[MenuItem("Window/Code Editor %w")]
+		public static void OpenOrFocusCodeEditorWindow()
 		{
-			CodeEditorWindow.OpenWindowFor("");
+			CodeEditorWindow.OpenOrFocusExistingWindow ();
+		}
+
+		[MenuItem("Window/NavigateTo %e")]
+		public static void OpenNavigateToFileWindow()
+		{
+			NavigateToFileWindow.Open (typeof(ScriptFilePathProvider));
 		}
 
 		private static string SelectedAssetPath
 		{
 			get
 			{
-				if (Selection.activeInstanceID == 0)
+				if (UnityEditor.Selection.activeInstanceID == 0)
 					return "";
 
-				var assetPath = AssetDatabase.GetAssetPath(Selection.activeInstanceID);
+				var assetPath = AssetDatabase.GetAssetPath(UnityEditor.Selection.activeInstanceID);
 				return System.IO.Path.GetFullPath(assetPath);
 			}
 		}

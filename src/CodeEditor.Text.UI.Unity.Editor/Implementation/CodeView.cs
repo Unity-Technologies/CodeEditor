@@ -29,6 +29,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			_font = textFont ? textFont : GUI.skin.font;
 			_navigator = new DefaultTextStructureNavigator();
 			Caret.Moved += EnsureCursorIsVisible;
+			_textView.DoubleClicked = DoubleClickedDocument;
 		}
 
 		public void Repaint()
@@ -94,6 +95,10 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				Event.current.Use ();
 				return;
 			}
+
+			if (HasSelection ())
+				DeleteSelection ();
+
 			_document.Insert(_document.CurrentLine.Start + Caret.Column, c.ToString(CultureInfo.InvariantCulture));
 			if (c == '\n')
 				Caret.SetPosition(Caret.Row + 1, 0);
@@ -166,6 +171,12 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		void Backspace()
 		{
+			if (HasSelection ())
+			{
+				DeleteSelection ();
+				return;
+			}
+
 			if (AtTopLeft())
 				return;
 
@@ -175,8 +186,46 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		void Delete()
 		{
+			if (HasSelection ())
+			{
+				DeleteSelection ();
+				return;
+			}
+
 			var line = _document.CurrentLine;
 			_document.Delete(line.Start + Caret.Column, 1);
+		}
+
+		void DeleteSelection()
+		{
+			int pos, length;
+			if (_textView.GetSelectionInDocument(out pos, out length))
+			{
+				int row, column;
+				if (_textView.GetSelectionStart(out row, out column))
+					Caret.SetPosition(row, column);
+
+				_document.Delete(pos, length);
+				ClearSelection();
+			}
+		}
+
+		bool HasSelection()
+		{
+			return _textView.HasSelection;
+		}
+
+		void SetSelectionAnchorIfNeeded()
+		{
+			if (!HasSelection())
+			{
+				_textView.SelectionAnchor = new Position(Caret.Row, Caret.Column);
+			}
+		}
+
+		void ClearSelection()
+		{
+			_textView.SelectionAnchor = new Position (-1, -1);
 		}
 
 		void PreviousWord()
@@ -192,6 +241,14 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			var span = _navigator.GetSpanFor(AbsoluteCaretPosition, CurrentSnapshot);
 			var next = _navigator.GetNextSpanFor(span);
 			MoveToPosition(next.Start);
+		}
+
+		void DoubleClickedDocument (int row, int column)
+		{
+			PreviousWord(); 
+			SetSelectionAnchorIfNeeded ();
+			NextWord();
+
 		}
 
 		void MoveToPosition(int position)
@@ -240,74 +297,147 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			get { return _document.Buffer.CurrentSnapshot; }
 		}
 
+		void MoveCaretToBeginingOfSelectionAndClear ()
+		{
+			int row, column;
+			if (_textView.GetSelectionStart(out row, out column))
+					Caret.SetPosition(row, column);
+			ClearSelection();
+		}
+
+		void MoveCaretToEndOfSelectionAndClear()
+		{
+			int row, column;
+			if (_textView.GetSelectionEnd(out row, out column))
+				Caret.SetPosition(row, column);
+			ClearSelection();
+		}
+
 		void PerformOperation(TextEditOp operation)
 		{
 			switch (operation)
 			{
 				case TextEditOp.MoveLeft:
-					Caret.MoveLeft();
+					if (HasSelection())
+						MoveCaretToBeginingOfSelectionAndClear ();
+					else
+						Caret.MoveLeft();
 					break;
 				case TextEditOp.MoveRight:
-					Caret.MoveRight();
+					if (HasSelection())
+						MoveCaretToEndOfSelectionAndClear();
+					else
+						Caret.MoveRight();
 					break;
 				case TextEditOp.MoveUp:
-					Caret.MoveUp(1);
+					if (HasSelection())
+						MoveCaretToBeginingOfSelectionAndClear();
+					else
+						Caret.MoveUp(1);
 					break;
 				case TextEditOp.MoveDown:
-					Caret.MoveDown(1);
+					if (HasSelection())
+						MoveCaretToEndOfSelectionAndClear();
+					else
+						Caret.MoveDown(1);
 					break;
 				case TextEditOp.MoveLineStart:
+					ClearSelection();
 					Caret.MoveToRowStart();
 					break;
 				case TextEditOp.MoveLineEnd:
+					ClearSelection();
 					Caret.MoveToRowEnd();
 					break;
 				//case TextEditOp.MoveWordRight: MoveWordRight(); break;
 				case TextEditOp.MoveToStartOfNextWord:
+					ClearSelection();
 					NextWord();
 					break;
 				case TextEditOp.MoveToEndOfPreviousWord:
+					ClearSelection();
 					PreviousWord();
 					break;
 				//case TextEditOp.MoveWordLeft: MoveWordLeft(); break;
 				case TextEditOp.MoveTextStart:
+					ClearSelection();
 					Caret.MoveToStart();
 					break;
 				case TextEditOp.MoveTextEnd:
+					ClearSelection();
 					Caret.MoveToEnd();
 					break;
 				//case TextEditOp.MoveParagraphForward: MoveParagraphForward(); break;
 				//case TextEditOp.MoveParagraphBackward: MoveParagraphBackward(); break;
 				case TextEditOp.MovePageUp:
+					ClearSelection();
 					Caret.MoveUp(VisibleLines - 2);
 					break;
 				case TextEditOp.MovePageDown:
+					ClearSelection();
 					Caret.MoveDown(VisibleLines - 2);
 					break;
 				case TextEditOp.MoveGraphicalLineStart:
+					ClearSelection();
 					Caret.MoveToRowStart();
 					break;
 				case TextEditOp.MoveGraphicalLineEnd:
+					ClearSelection();
 					Caret.MoveToRowEnd();
 					break;
-				//case TextEditOp.SelectLeft: SelectLeft(); break;
-				//case TextEditOp.SelectRight: SelectRight(); break;
-				//case TextEditOp.SelectUp: SelectUp(); break;
-				//case TextEditOp.SelectDown: SelectDown(); break;
-				//case TextEditOp.SelectWordRight: SelectWordRight(); break;
-				//case TextEditOp.SelectWordLeft: SelectWordLeft(); break;
-				//case TextEditOp.SelectToEndOfPreviousWord: SelectToEndOfPreviousWord(); break;
-				//case TextEditOp.SelectToStartOfNextWord: SelectToStartOfNextWord(); break;
-				//case TextEditOp.SelectTextStart: SelectTextStart(); break;
-				//case TextEditOp.SelectTextEnd: SelectTextEnd(); break;
+				case TextEditOp.SelectLeft: 
+					SetSelectionAnchorIfNeeded ();
+					Caret.MoveLeft();
+					break;
+				case TextEditOp.SelectRight: 
+					SetSelectionAnchorIfNeeded ();
+					Caret.MoveRight();
+					break;
+				case TextEditOp.SelectUp: 
+					SetSelectionAnchorIfNeeded ();
+					Caret.MoveUp(1);
+					break;
+				case TextEditOp.SelectDown: 
+					SetSelectionAnchorIfNeeded ();
+					Caret.MoveDown(1);
+					break;
+				case TextEditOp.SelectToStartOfNextWord:
+					SetSelectionAnchorIfNeeded();
+					NextWord();
+					break;
+				case TextEditOp.SelectToEndOfPreviousWord:
+					SetSelectionAnchorIfNeeded();
+					PreviousWord();
+					break;
+				case TextEditOp.SelectTextStart:
+					SetSelectionAnchorIfNeeded();
+					Caret.MoveToStart();
+					break;
+				case TextEditOp.SelectTextEnd:
+					SetSelectionAnchorIfNeeded();
+					Caret.MoveToEnd();
+					break;
+				case TextEditOp.SelectPageUp:
+					SetSelectionAnchorIfNeeded();
+					Caret.MoveUp(VisibleLines - 2);
+					break;
+				case TextEditOp.SelectPageDown:
+					SetSelectionAnchorIfNeeded();
+					Caret.MoveDown(VisibleLines - 2);
+					break;
+				case TextEditOp.SelectGraphicalLineStart:
+					SetSelectionAnchorIfNeeded();
+					Caret.MoveToRowStart();
+					break;
+				case TextEditOp.SelectGraphicalLineEnd:
+					SetSelectionAnchorIfNeeded();
+					Caret.MoveToRowEnd();
+					break;
+
 				//case TextEditOp.ExpandSelectGraphicalLineStart: ExpandSelectGraphicalLineStart(); break;
 				//case TextEditOp.ExpandSelectGraphicalLineEnd: ExpandSelectGraphicalLineEnd(); break;
 				//case TextEditOp.SelectParagraphForward: SelectParagraphForward(); break;
 				//case TextEditOp.SelectParagraphBackward: SelectParagraphBackward(); break;
-				//case TextEditOp.SelectGraphicalLineStart: SelectGraphicalLineStart(); break;
-				//case TextEditOp.SelectGraphicalLineEnd: SelectGraphicalLineEnd(); break;
-				//case TextEditOp.SelectPageUp: return SelectPageUp(); break;
-				//case TextEditOp.SelectPageDown: return SelectPageDown(); break;
 				case TextEditOp.Delete:
 					Delete();
 					return;
@@ -337,6 +467,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		}
 
 		/// Set up a platform independant keyboard->Edit action map. This varies depending on whether we are on mac or windows.
+		/// Info: # is shift, % is (cmd osx)/(windows key? win), ^ control, & is alt
 		void InitKeyActions()
 		{
 			if (s_Keyactions != null)
@@ -449,6 +580,9 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 				MapKey("#home", TextEditOp.SelectGraphicalLineStart);
 				MapKey("#end", TextEditOp.SelectGraphicalLineEnd);
+				MapKey("#^home", TextEditOp.SelectTextStart);
+				MapKey("#^end", TextEditOp.SelectTextEnd);
+
 				// TODO			MapKey ("#page up", TextEditOp.SelectPageUp);
 				// TODO			MapKey ("#page down", TextEditOp.SelectPageDown);
 
