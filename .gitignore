@@ -15,3 +15,7 @@ gradle.properties
 .DS_Store
 UnityProject/Library/
 UnityProject/Temp/
+UnityProject/Assets/Scripts/
+UnityProject/Assets/Scripts.meta
+UnityProject/Assembly*
+UnityProject/UnityProject*

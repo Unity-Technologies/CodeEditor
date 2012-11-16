@@ -25,7 +25,7 @@ namespace CodeEditor.Text.UI.Unity.Engine
 				if (_style != null)
 					return _style;
 
-				_style = new GUIStyle(GUI.skin.label);
+				_style = new GUIStyle();
 				_style.normal.background = DummyTexture();
 				_style.normal.textColor = Color.white;
 
@@ -37,6 +37,7 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		{
 			var dummyTexture = new Texture2D(1, 1);
 			dummyTexture.SetPixel(0,0,Color.white);
+			dummyTexture.hideFlags = HideFlags.HideAndDontSave;
 			return dummyTexture;
 		}
 	}
