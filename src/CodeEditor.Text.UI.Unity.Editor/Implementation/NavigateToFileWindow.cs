@@ -6,36 +6,50 @@ using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
-	// Open with shortcut
-	// Use visual asset style fixed size window
-	//	ScrollArea with all files
-	//	Search field with focus at startup (all the time), up and down goes to the listarea
-	// Enter uses selection, esc closes window
-	// Enter feeds selected file to the	 CodeEditor that is opened if not already
-
-
 	public partial class NavigateToFileWindow : EditorWindow
 	{
 		const float kSearchBarHeight = 17;
 		const float kMargin = 10f;
 		const float kLineHeight = 16f;
+		
+		IFilePathProvider _filePathProvider;
+		List<FilePathProviderItem> _currentItems;
+		FilePathProviderItem _selectedItem;
 		string _searchFilter = "";
-		ProjectFiles _projectFiles;
-		List<FileAndID> _currentNames;
-		FileAndID _selectedName;
+		private Vector2 _scrollPosition;
+		string _filePathProviderQualifiedName; // stored as string so we can serialize and reconstruct a filePathProvider after domain reloads
+
+		[NonSerialized]
+		bool _readyToInit = false;
 
 		class Styles
 		{
 			public GUIStyle resultsLabel = new GUIStyle ("PR Label");
+			public Styles()
+			{
+				resultsLabel.padding.left = 5;
+			}
 		}
 		static Styles s_Styles;
-		private UnityEngine.Vector2 _scrollPosition;
-		
 
-		public static void Open ()
+
+		public static void Open (IFilePathProvider filePathProvider)
 		{
 			var window = GetWindow<NavigateToFileWindow>();
 			window.title = "Navigate To";
+			window._filePathProviderQualifiedName = filePathProvider.GetType().AssemblyQualifiedName;
+		}
+
+		static IFilePathProvider CreateProvider(string assemblyQualifiedName)
+		{
+			IFilePathProvider provider = null;
+			Type t = Type.GetType(assemblyQualifiedName);
+			if (t != null)
+				provider = Activator.CreateInstance(t) as IFilePathProvider;
+
+			if (provider == null)
+				Debug.LogError ("Could not create a FilePathProvider from " + assemblyQualifiedName);
+			return provider;
 		}
 
 		void InitIfNeeded ()
@@ -43,18 +57,25 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			if (s_Styles == null)
 				s_Styles = new Styles();
 
-			if (_projectFiles == null)
-			{	
-				_projectFiles = new ProjectFiles();
-				_projectFiles.Init ();
+			if (_filePathProvider == null)
+				_filePathProvider = CreateProvider(_filePathProviderQualifiedName);
+		}
 
-				_currentNames = _projectFiles.Filter (_searchFilter);
+		void DelayExpensiveInit ()
+		{
+			if (_currentItems == null && Event.current.type == EventType.Repaint)
+			{
+				if (_readyToInit)
+					_currentItems = _filePathProvider.GetItems(_searchFilter);
+				_readyToInit = true;
+				Repaint();
 			}
 		}
 
 		void OnGUI ()
 		{
 			InitIfNeeded ();
+			DelayExpensiveInit ();
 
 			Rect searchAreaRect = new Rect (0,position.height-kSearchBarHeight-kMargin, position.width, kSearchBarHeight);
 			Rect listAreaRect = new Rect (0, kMargin, position.width, position.height - kSearchBarHeight - 3*kMargin);
@@ -66,14 +87,14 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		void OffsetSelection (int offset)
 		{
-			int index = _currentNames.IndexOf(_selectedName);
+			int index = _currentItems.IndexOf(_selectedItem);
 			if (index >= 0)
 			{
 				index += offset;
 			}
 
-			index = Mathf.Clamp(index, 0, _currentNames.Count-1);
-			Select (_currentNames[index]);
+			index = Mathf.Clamp(index, 0, _currentItems.Count-1);
+			Select (_currentItems[index]);
 		}
 
 		void HandleKeyboard ()
@@ -93,7 +114,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 							evt.Use();
 							break;
 						case KeyCode.Return:
-							CloseWindow(_selectedName); // close window
+							CloseWindow(_selectedItem); // close window
 							evt.Use();
 							break;
 						case KeyCode.Escape:
@@ -105,15 +126,15 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			}
 		}
 
-		void CloseWindow (FileAndID fileToOpen)
+		void CloseWindow (FilePathProviderItem selectedItem)
 		{
-			if (fileToOpen != null)
+			if (selectedItem != null)
 			{
-				string path = AssetDatabase.GetAssetPath(fileToOpen.InstanceID);
-				if (!string.IsNullOrEmpty (path))
+				string filePath;
+				int lineNumber;
+				if (_filePathProvider.GetFileAndLineNumber (selectedItem.UserData, out filePath, out lineNumber))
 				{
-					path = System.IO.Path.GetFullPath(path);
-					CodeEditorWindow.OpenWindowFor(path);
+					CodeEditorWindow.OpenWindowFor(filePath); 
 				}
 			}
 			Close ();
@@ -121,18 +142,22 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		void ListAreaRect (Rect rect)
 		{
-			Event evt = Event.current;
-
-			int firstItem = 0;
-			int lastItem = _currentNames.Count-1;
-
-			
-			int styleBorder = -1;
+			// Background
 			Rect scrollRect = new Rect(rect.x + kMargin, rect.y, rect.width - 2 * kMargin, rect.height);
-			GUI.Label (scrollRect, GUIContent.none, GUI.skin.textField);
+			GUI.Label(scrollRect, GUIContent.none, GUI.skin.textField);
+
+			if (_currentItems == null)
+				return;
+
+			// ScrollArea
+			int firstItem = 0;
+			int lastItem = _currentItems.Count-1;
+			int styleBorder = -1;
 
 			scrollRect = new RectOffset (styleBorder,styleBorder,styleBorder,styleBorder).Add (scrollRect);
-			Rect contentRect = new Rect(0, 0, 1, kLineHeight * _currentNames.Count);
+			Rect contentRect = new Rect(0, 0, 1, kLineHeight * _currentItems.Count);
+
+			Event evt = Event.current;
 			_scrollPosition = GUI.BeginScrollView (scrollRect, _scrollPosition, contentRect);
 			{
 				for (int i=firstItem; i<=lastItem; i++)
@@ -142,12 +167,12 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					switch (evt.type)
 					{
 						case EventType.Repaint:
-							bool selected = _currentNames[i] == _selectedName;
-							s_Styles.resultsLabel.Draw (itemRect, _currentNames[i].FileName, false, selected, selected, true);
+							bool selected = _currentItems[i] == _selectedItem;
+							s_Styles.resultsLabel.Draw (itemRect, _currentItems[i].DisplayText, false, selected, selected, true);
 							break;
 						case EventType.MouseDown:
 							if (itemRect.Contains (evt.mousePosition))
-								Select (_currentNames[i]);
+								Select (_currentItems[i]);
 							break;
 					}
 				}
@@ -156,23 +181,23 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		}
 
-		void Select (FileAndID name)
+		void Select (FilePathProviderItem name)
 		{
-			_selectedName = name;
+			_selectedItem = name;
 			Repaint ();
 		}
 
 		void FilterChanged ()
 		{
-			_currentNames = _projectFiles.Filter (_searchFilter);
-			if (_currentNames.Count > 0)
+			_currentItems = _filePathProvider.GetItems (_searchFilter);
+			if (_currentItems.Count > 0)
 			{
-				if (_currentNames.IndexOf (_selectedName) < 0)
-					_selectedName = _currentNames[0];
+				if (_currentItems.IndexOf (_selectedItem) < 0)
+					_selectedItem = _currentItems[0];
 			}
 			else
 			{
-				_selectedName = null;
+				_selectedItem = null;
 			}
 		}
 
@@ -192,53 +217,4 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			GUI.FocusControl ("SearchFilter");
 		}
 	}
-
-	public partial class NavigateToFileWindow
-	{
-		[Serializable]
-		class FileAndID 
-		{
-			public FileAndID(string filename, int instanceID)
-			{
-				FileName = filename;
-				InstanceID = instanceID;
-			}
-			public string FileName { get; set; }
-			public int InstanceID { get; set; }
-		}
-
-
-		class ProjectFiles
-		{
-			List<FileAndID> _allScripts = new List<FileAndID>();
-
-			public List<FileAndID> AllScripts { get { return _allScripts; } }
-
-			public List<FileAndID> Filter(string filter)
-			{
-				if (string.IsNullOrEmpty(filter))
-					return AllScripts;
-
-				return AllScripts.Where(script => script.FileName.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0).ToList();
-			}
-
-			public void Init()
-			{
-				MonoScript[] allscripts = MonoImporter.GetAllRuntimeMonoScripts();
-
-				_allScripts.Clear();
-				for (int i = 0; i < allscripts.Length; ++i)
-				{
-					var script = allscripts[i];
-					string path = AssetDatabase.GetAssetPath(script.GetInstanceID());
-					if (!string.IsNullOrEmpty(path))
-					{
-						// Scripts can have been removed so ensure index is recalculated based on file path
-						path = System.IO.Path.GetFullPath(path);
-						_allScripts.Add(new FileAndID(System.IO.Path.GetFileName(path), script.GetInstanceID()));
-					}
-				}
-			}
-		}
-	} // NavigateToFileWindow
 } // namespace 

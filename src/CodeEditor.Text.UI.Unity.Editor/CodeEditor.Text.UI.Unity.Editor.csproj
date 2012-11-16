@@ -50,6 +50,7 @@
     <Compile Include="Implementation\CodeView.cs" />
     <Compile Include="Implementation\CodeViewPopUp.cs" />
     <Compile Include="Implementation\CompletionSession.cs" />
+    <Compile Include="Implementation\ScriptFilePathProvider.cs" />
     <Compile Include="Implementation\Main.cs" />
     <Compile Include="Implementation\MissingEditorAPI.cs" />
     <Compile Include="Implementation\NavigateToFileWindow.cs" />
