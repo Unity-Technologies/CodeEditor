@@ -33,11 +33,14 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		static Styles s_Styles;
 
 
-		public static void Open (IFilePathProvider filePathProvider)
+		public static void Open (Type filePathProviderType)
 		{
+			if (!typeof(IFilePathProvider).IsAssignableFrom(filePathProviderType))
+				throw new ArgumentException("Invalid Type as argument: " + filePathProviderType + " cannot be assigned to " + typeof(IFilePathProvider));
+
 			var window = GetWindow<NavigateToFileWindow>();
 			window.title = "Navigate To";
-			window._filePathProviderQualifiedName = filePathProvider.GetType().AssemblyQualifiedName;
+			window._filePathProviderQualifiedName = filePathProviderType.AssemblyQualifiedName;
 		}
 
 		static IFilePathProvider CreateProvider(string assemblyQualifiedName)
