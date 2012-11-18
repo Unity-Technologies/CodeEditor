@@ -13,7 +13,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		[MenuItem("Window/NavigateTo %e")]
 		public static void OpenNavigateToFileWindow()
 		{
-			NavigateToFileWindow.Open (typeof(ScriptFilePathProvider));
+			NavigatorWindow.Open (typeof(ScriptNavigatorItemProvider));
 		}
 
 		private static string SelectedAssetPath

@@ -50,10 +50,11 @@
     <Compile Include="Implementation\CodeView.cs" />
     <Compile Include="Implementation\CodeViewPopUp.cs" />
     <Compile Include="Implementation\CompletionSession.cs" />
-    <Compile Include="Implementation\ScriptFilePathProvider.cs" />
+    <Compile Include="Implementation\ScriptNavigatorItem.cs" />
+    <Compile Include="Implementation\ScriptNavigatorItemProvider.cs" />
     <Compile Include="Implementation\Main.cs" />
     <Compile Include="Implementation\MissingEditorAPI.cs" />
-    <Compile Include="Implementation\NavigateToFileWindow.cs" />
+    <Compile Include="Implementation\NavigatorWindow.cs" />
     <Compile Include="Implementation\TextViewAppearanceProvider.cs" />
     <Compile Include="Implementation\UnityEditorFile.cs" />
     <Compile Include="Implementation\UnityEditorFileSystem.cs" />
