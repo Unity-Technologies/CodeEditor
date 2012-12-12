@@ -5,20 +5,21 @@ using CodeEditor.Text.Data;
 using CodeEditor.Text.UI.Implementation;
 using CodeEditor.Text.UI.Unity.Engine;
 using UnityEngine;
+using UnityEditor;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	internal partial class CodeView
 	{
-		CompletionSession m_Session;
-		int m_KeyboardControlID;
-		bool m_GrabKeyboardControl = true;
+		private CompletionSession m_Session;
+		private int m_KeyboardControlID;
+		private bool m_GrabKeyboardControl = true;
 
-		readonly CodeEditorWindow m_Owner;
-		readonly ITextViewDocument _document;
-		readonly ITextView _textView;
-		readonly Font _font;
-		readonly ITextStructureNavigator _navigator;
+		private readonly CodeEditorWindow m_Owner;
+		private readonly ITextViewDocument _document;
+		private readonly ITextView _textView;
+		private readonly Font _font;
+		private readonly ITextStructureNavigator _navigator;
 
 		public CodeView(CodeEditorWindow owner, ITextView textView)
 		{
@@ -40,18 +41,18 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		public void OnGUI(Rect rect)
 		{
 			SetKeyboardControl(rect);
+			HandleCommandEvents();
 			_textView.ViewPort = rect;
 			_textView.OnGUI();
 			HandleCompletionSession();
 			HandleKeyboard(true);
-
 		}
 
-		void SetKeyboardControl(Rect rect)
+		private void SetKeyboardControl(Rect rect)
 		{
 			m_KeyboardControlID = GUIUtility.GetControlID(FocusType.Keyboard);
 
-			if (m_GrabKeyboardControl || Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
+			if(m_GrabKeyboardControl || Event.current.type == EventType.MouseDown && rect.Contains(Event.current.mousePosition))
 			{
 				m_GrabKeyboardControl = false;
 				GUIUtility.keyboardControl = m_KeyboardControlID;
@@ -59,9 +60,9 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			}
 		}
 
-		void HandleCompletionSession()
+		private void HandleCompletionSession()
 		{
-			if (m_Session == null)
+			if(m_Session == null)
 				return;
 
 			var state = new CodeViewPopUp.PopUpState();
@@ -77,30 +78,31 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		public void HandleKeyboard(bool requireKeyboardFocus)
 		{
-			if (Event.current.type != EventType.keyDown)
+			//if (Event.current.GetTypeForControl (m_KeyboardControlID) != EventType.keyDown)
+			if(Event.current.type != EventType.keyDown)
 				return;
 
-			if (requireKeyboardFocus && (GUIUtility.keyboardControl != m_KeyboardControlID || !GUI.enabled))
+			if(requireKeyboardFocus && (GUIUtility.keyboardControl != m_KeyboardControlID || !GUI.enabled))
 				return;
 
-			if (HandleKeyEvent(Event.current))
+			if(HandleKeyEvent(Event.current))
 			{
 				Event.current.Use();
 				return;
 			}
-			
+
 			var c = Event.current.character;
-			if (!_font.HasCharacter(c) && c != '\t' && c != '\n')
+			if(!_font.HasCharacter(c) && c != '\t' && c != '\n')
 			{
-				Event.current.Use ();
+				Event.current.Use();
 				return;
 			}
 
-			if (HasSelection ())
-				DeleteSelection ();
+			if(HasSelection())
+				DeleteSelection();
 
 			_document.Insert(_document.CurrentLine.Start + Caret.Column, c.ToString(CultureInfo.InvariantCulture));
-			if (c == '\n')
+			if(c == '\n')
 				Caret.SetPosition(Caret.Row + 1, 0);
 			else
 				Caret.MoveRight();
@@ -108,11 +110,11 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			Event.current.Use();
 
 			// On tab we auto cycle to next guicontrol here we ensure to grab it back 
-			if (c == '\t')
+			if(c == '\t')
 				m_GrabKeyboardControl = true;
 		}
 
-		void CodeCompletionCallback(string selectedText, int selectedIndex)
+		private void CodeCompletionCallback(string selectedText, int selectedIndex)
 		{
 			m_GrabKeyboardControl = true;
 			var line = _document.CurrentLine;
@@ -129,7 +131,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			Repaint();
 		}
 
-		ICaret Caret
+		private ICaret Caret
 		{
 			get { return _document.Caret; }
 		}
@@ -137,30 +139,69 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 	internal partial class CodeView
 	{
-		static Hashtable s_Keyactions;
+		private static Hashtable s_Keyactions;
 
-		enum TextEditOp
+		private enum TextEditOp
 		{
-			MoveLeft, MoveRight, MoveUp, MoveDown, MoveLineStart, MoveLineEnd, MoveTextStart, MoveTextEnd, MovePageUp, MovePageDown,
-			MoveGraphicalLineStart, MoveGraphicalLineEnd, MoveWordLeft, MoveWordRight,
-			MoveParagraphForward, MoveParagraphBackward, MoveToStartOfNextWord, MoveToEndOfPreviousWord,
-			SelectLeft, SelectRight, SelectUp, SelectDown, SelectTextStart, SelectTextEnd, SelectPageUp, SelectPageDown,
-			ExpandSelectGraphicalLineStart, ExpandSelectGraphicalLineEnd, SelectGraphicalLineStart, SelectGraphicalLineEnd,
-			SelectWordLeft, SelectWordRight, SelectToEndOfPreviousWord, SelectToStartOfNextWord,
-			SelectParagraphBackward, SelectParagraphForward,
-			Delete, Backspace, DeleteWordBack, DeleteWordForward,
-			Cut, Copy, Paste, SelectAll, SelectNone,
-			ScrollStart, ScrollEnd, ScrollPageUp, ScrollPageDown
+			MoveLeft,
+			MoveRight,
+			MoveUp,
+			MoveDown,
+			MoveLineStart,
+			MoveLineEnd,
+			MoveTextStart,
+			MoveTextEnd,
+			MovePageUp,
+			MovePageDown,
+			MoveGraphicalLineStart,
+			MoveGraphicalLineEnd,
+			MoveWordLeft,
+			MoveWordRight,
+			MoveParagraphForward,
+			MoveParagraphBackward,
+			MoveToStartOfNextWord,
+			MoveToEndOfPreviousWord,
+			SelectLeft,
+			SelectRight,
+			SelectUp,
+			SelectDown,
+			SelectTextStart,
+			SelectTextEnd,
+			SelectPageUp,
+			SelectPageDown,
+			ExpandSelectGraphicalLineStart,
+			ExpandSelectGraphicalLineEnd,
+			SelectGraphicalLineStart,
+			SelectGraphicalLineEnd,
+			SelectWordLeft,
+			SelectWordRight,
+			SelectToEndOfPreviousWord,
+			SelectToStartOfNextWord,
+			SelectParagraphBackward,
+			SelectParagraphForward,
+			Delete,
+			Backspace,
+			DeleteWordBack,
+			DeleteWordForward,
+			Cut,
+			Copy,
+			Paste,
+			SelectAll,
+			SelectNone,
+			ScrollStart,
+			ScrollEnd,
+			ScrollPageUp,
+			ScrollPageDown
 		};
 
-		bool HandleKeyEvent(Event e)
+		private bool HandleKeyEvent(Event e)
 		{
 			InitKeyActions();
 			var m = e.modifiers;
 			e.modifiers &= ~EventModifiers.CapsLock;
-			if (s_Keyactions.Contains(e))
+			if(s_Keyactions.Contains(e))
 			{
-				var op = (TextEditOp)s_Keyactions[e];
+				var op = (TextEditOp) s_Keyactions[e];
 				PerformOperation(op);
 				e.modifiers = m;
 				return true;
@@ -169,26 +210,26 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			return false;
 		}
 
-		void Backspace()
+		private void Backspace()
 		{
-			if (HasSelection ())
+			if(HasSelection())
 			{
-				DeleteSelection ();
+				DeleteSelection();
 				return;
 			}
 
-			if (AtTopLeft())
+			if(AtTopLeft())
 				return;
 
 			Caret.MoveLeft();
 			Delete();
 		}
 
-		void Delete()
+		private void Delete()
 		{
-			if (HasSelection ())
+			if(HasSelection())
 			{
-				DeleteSelection ();
+				DeleteSelection();
 				return;
 			}
 
@@ -196,13 +237,13 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			_document.Delete(line.Start + Caret.Column, 1);
 		}
 
-		void DeleteSelection()
+		private void DeleteSelection()
 		{
 			int pos, length;
-			if (_textView.GetSelectionInDocument(out pos, out length))
+			if(_textView.GetSelectionInDocument(out pos, out length))
 			{
 				int row, column;
-				if (_textView.GetSelectionStart(out row, out column))
+				if(_textView.GetSelectionStart(out row, out column))
 					Caret.SetPosition(row, column);
 
 				_document.Delete(pos, length);
@@ -210,79 +251,78 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			}
 		}
 
-		bool HasSelection()
+		private bool HasSelection()
 		{
 			return _textView.HasSelection;
 		}
 
-		void SetSelectionAnchorIfNeeded()
+		private void SetSelectionAnchorIfNeeded()
 		{
-			if (!HasSelection())
+			if(!HasSelection())
 			{
 				_textView.SelectionAnchor = new Position(Caret.Row, Caret.Column);
 			}
 		}
 
-		void ClearSelection()
+		private void ClearSelection()
 		{
-			_textView.SelectionAnchor = new Position (-1, -1);
+			_textView.SelectionAnchor = new Position(-1, -1);
 		}
 
-		void PreviousWord()
+		private void PreviousWord()
 		{
 			var span = _navigator.GetSpanFor(AbsoluteCaretPosition, CurrentSnapshot);
-			if (span.Start == AbsoluteCaretPosition)
+			if(span.Start == AbsoluteCaretPosition)
 				span = _navigator.GetPreviousSpanFor(span);
 			MoveToPosition(span.Start);
 		}
 
-		void NextWord()
+		private void NextWord()
 		{
 			var span = _navigator.GetSpanFor(AbsoluteCaretPosition, CurrentSnapshot);
 			var next = _navigator.GetNextSpanFor(span);
 			MoveToPosition(next.Start);
 		}
 
-		void DoubleClickedDocument (int row, int column)
+		private void DoubleClickedDocument(int row, int column)
 		{
-			PreviousWord(); 
-			SetSelectionAnchorIfNeeded ();
+			PreviousWord();
+			SetSelectionAnchorIfNeeded();
 			NextWord();
-
 		}
 
-		void MoveToPosition(int position)
+		private void MoveToPosition(int position)
 		{
 			var line = LineNumberForPosition(position);
 			Caret.SetPosition(line, position - LineStart(line));
 		}
 
-		int AbsoluteCaretPosition
+		private int AbsoluteCaretPosition
 		{
 			get { return CurrentLineStart + Caret.Column; }
 		}
 
-		int LineStart(int line)
+		private int LineStart(int line)
 		{
 			return CurrentSnapshot.Lines[line].Start;
 		}
 
-		int LineNumberForPosition(int position)
+		private int LineNumberForPosition(int position)
 		{
 			return CurrentSnapshot.LineNumberForPosition(position);
 		}
 
-		int CurrentLineStart
+		private int CurrentLineStart
 		{
 			get { return LineStart(Caret.Row); }
 		}
 
-		void EnsureCursorIsVisible()
+		private void EnsureCursorIsVisible()
 		{
 			_textView.EnsureCursorIsVisible();
 		}
 
-		int VisibleLines
+		private int VisibleLines
 		{
 			get { return _textView.VisibleLines(); }
 		}
@@ -292,51 +332,51 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			return Caret.Row == 0 && Caret.Column == 0;
 		}
 
-		ITextSnapshot CurrentSnapshot
+		private ITextSnapshot CurrentSnapshot
 		{
 			get { return _document.Buffer.CurrentSnapshot; }
 		}
 
-		void MoveCaretToBeginingOfSelectionAndClear ()
+		private void MoveCaretToBeginingOfSelectionAndClear()
 		{
 			int row, column;
-			if (_textView.GetSelectionStart(out row, out column))
-					Caret.SetPosition(row, column);
-			ClearSelection();
-		}
-
-		void MoveCaretToEndOfSelectionAndClear()
-		{
-			int row, column;
-			if (_textView.GetSelectionEnd(out row, out column))
+			if(_textView.GetSelectionStart(out row, out column))
 				Caret.SetPosition(row, column);
 			ClearSelection();
 		}
 
-		void PerformOperation(TextEditOp operation)
+		private void MoveCaretToEndOfSelectionAndClear()
 		{
-			switch (operation)
+			int row, column;
+			if(_textView.GetSelectionEnd(out row, out column))
+				Caret.SetPosition(row, column);
+			ClearSelection();
+		}
+
+		private void PerformOperation(TextEditOp operation)
+		{
+			switch(operation)
 			{
 				case TextEditOp.MoveLeft:
-					if (HasSelection())
-						MoveCaretToBeginingOfSelectionAndClear ();
+					if(HasSelection())
+						MoveCaretToBeginingOfSelectionAndClear();
 					else
 						Caret.MoveLeft();
 					break;
 				case TextEditOp.MoveRight:
-					if (HasSelection())
+					if(HasSelection())
 						MoveCaretToEndOfSelectionAndClear();
 					else
 						Caret.MoveRight();
 					break;
 				case TextEditOp.MoveUp:
-					if (HasSelection())
+					if(HasSelection())
 						MoveCaretToBeginingOfSelectionAndClear();
 					else
 						Caret.MoveUp(1);
 					break;
 				case TextEditOp.MoveDown:
-					if (HasSelection())
+					if(HasSelection())
 						MoveCaretToEndOfSelectionAndClear();
 					else
 						Caret.MoveDown(1);
@@ -349,7 +389,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					ClearSelection();
 					Caret.MoveToRowEnd();
 					break;
-				//case TextEditOp.MoveWordRight: MoveWordRight(); break;
+					//case TextEditOp.MoveWordRight: MoveWordRight(); break;
 				case TextEditOp.MoveToStartOfNextWord:
 					ClearSelection();
 					NextWord();
@@ -358,7 +398,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					ClearSelection();
 					PreviousWord();
 					break;
-				//case TextEditOp.MoveWordLeft: MoveWordLeft(); break;
+					//case TextEditOp.MoveWordLeft: MoveWordLeft(); break;
 				case TextEditOp.MoveTextStart:
 					ClearSelection();
 					Caret.MoveToStart();
@@ -367,8 +407,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					ClearSelection();
 					Caret.MoveToEnd();
 					break;
-				//case TextEditOp.MoveParagraphForward: MoveParagraphForward(); break;
-				//case TextEditOp.MoveParagraphBackward: MoveParagraphBackward(); break;
+					//case TextEditOp.MoveParagraphForward: MoveParagraphForward(); break;
+					//case TextEditOp.MoveParagraphBackward: MoveParagraphBackward(); break;
 				case TextEditOp.MovePageUp:
 					ClearSelection();
 					Caret.MoveUp(VisibleLines - 2);
@@ -385,20 +425,20 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					ClearSelection();
 					Caret.MoveToRowEnd();
 					break;
-				case TextEditOp.SelectLeft: 
-					SetSelectionAnchorIfNeeded ();
+				case TextEditOp.SelectLeft:
+					SetSelectionAnchorIfNeeded();
 					Caret.MoveLeft();
 					break;
-				case TextEditOp.SelectRight: 
-					SetSelectionAnchorIfNeeded ();
+				case TextEditOp.SelectRight:
+					SetSelectionAnchorIfNeeded();
 					Caret.MoveRight();
 					break;
-				case TextEditOp.SelectUp: 
-					SetSelectionAnchorIfNeeded ();
+				case TextEditOp.SelectUp:
+					SetSelectionAnchorIfNeeded();
 					Caret.MoveUp(1);
 					break;
-				case TextEditOp.SelectDown: 
-					SetSelectionAnchorIfNeeded ();
+				case TextEditOp.SelectDown:
+					SetSelectionAnchorIfNeeded();
 					Caret.MoveDown(1);
 					break;
 				case TextEditOp.SelectToStartOfNextWord:
@@ -434,43 +474,47 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					Caret.MoveToRowEnd();
 					break;
 
-				//case TextEditOp.ExpandSelectGraphicalLineStart: ExpandSelectGraphicalLineStart(); break;
-				//case TextEditOp.ExpandSelectGraphicalLineEnd: ExpandSelectGraphicalLineEnd(); break;
-				//case TextEditOp.SelectParagraphForward: SelectParagraphForward(); break;
-				//case TextEditOp.SelectParagraphBackward: SelectParagraphBackward(); break;
+					//case TextEditOp.ExpandSelectGraphicalLineStart: ExpandSelectGraphicalLineStart(); break;
+					//case TextEditOp.ExpandSelectGraphicalLineEnd: ExpandSelectGraphicalLineEnd(); break;
+					//case TextEditOp.SelectParagraphForward: SelectParagraphForward(); break;
+					//case TextEditOp.SelectParagraphBackward: SelectParagraphBackward(); break;
 				case TextEditOp.Delete:
 					Delete();
 					return;
 				case TextEditOp.Backspace:
 					Backspace();
 					return;
-				//case TextEditOp.Cut: return Cut();
-				//case TextEditOp.Copy: Copy(); break;
-				//case TextEditOp.Paste: return Paste();
-				//case TextEditOp.SelectAll: SelectAll(); break;
-				//case TextEditOp.SelectNone: SelectNone(); break;
-				//case TextEditOp.ScrollStart: return ScrollStart(); break;
-				//case TextEditOp.ScrollEnd: return ScrollEnd(); break;
-				//case TextEditOp.ScrollPageUp: return ScrollPageUp(); break;
-				//case TextEditOp.ScrollPageDown: return ScrollPageDown(); break;
-				//case TextEditOp.DeleteWordBack: return DeleteWordBack(); // break; // The uncoditional return makes the "break;" issue a warning about unreachable code
-				//case TextEditOp.DeleteWordForward: return DeleteWordForward(); // break; // The uncoditional return makes the "break;" issue a warning about unreachable code
+					//case TextEditOp.Cut: return Cut();
+				case TextEditOp.Copy:
+					Copy();
+					return;
+				case TextEditOp.Paste:
+					Paste();
+					return;
+					//case TextEditOp.SelectAll: SelectAll(); break;
+					//case TextEditOp.SelectNone: SelectNone(); break;
+					//case TextEditOp.ScrollStart: return ScrollStart(); break;
+					//case TextEditOp.ScrollEnd: return ScrollEnd(); break;
+					//case TextEditOp.ScrollPageUp: return ScrollPageUp(); break;
+					//case TextEditOp.ScrollPageDown: return ScrollPageDown(); break;
+					//case TextEditOp.DeleteWordBack: return DeleteWordBack(); // break; // The uncoditional return makes the "break;" issue a warning about unreachable code
+					//case TextEditOp.DeleteWordForward: return DeleteWordForward(); // break; // The uncoditional return makes the "break;" issue a warning about unreachable code
 				default:
 					Debug.Log("Unimplemented: " + operation);
 					break;
 			}
 		}
 
-		static void MapKey(string key, TextEditOp action)
+		private static void MapKey(string key, TextEditOp action)
 		{
 			s_Keyactions[Event.KeyboardEvent(key)] = action;
 		}
 
 		/// Set up a platform independant keyboard->Edit action map. This varies depending on whether we are on mac or windows.
-		/// Info: # is shift, % is (cmd osx)/(windows key? win), ^ control, & is alt
-		void InitKeyActions()
+		/// Info: # is shift, % is command, ^ is control, & is alt
+		private void InitKeyActions()
 		{
-			if (s_Keyactions != null)
+			if(s_Keyactions != null)
 				return;
 			s_Keyactions = new Hashtable();
 
@@ -489,7 +533,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			MapKey("backspace", TextEditOp.Backspace);
 			MapKey("#backspace", TextEditOp.Backspace);
 
-			if (Application.platform != RuntimePlatform.WindowsPlayer && Application.platform != RuntimePlatform.WindowsWebPlayer && Application.platform != RuntimePlatform.WindowsEditor)
+			if(Application.platform != RuntimePlatform.WindowsPlayer && Application.platform != RuntimePlatform.WindowsWebPlayer &&
+			   Application.platform != RuntimePlatform.WindowsEditor)
 			{
 				// Keyboard mappings for mac
 				MapKey("home", TextEditOp.ScrollStart);
@@ -558,8 +603,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				// Windows keymappings
 				MapKey("home", TextEditOp.MoveGraphicalLineStart);
 				MapKey("end", TextEditOp.MoveGraphicalLineEnd);
-				MapKey ("page up", TextEditOp.MovePageUp);
-				MapKey ("page down", TextEditOp.MovePageDown);
+				MapKey("page up", TextEditOp.MovePageUp);
+				MapKey("page down", TextEditOp.MovePageDown);
 				MapKey("^home", TextEditOp.MoveTextStart);
 				MapKey("^end", TextEditOp.MoveTextEnd);
 
@@ -596,6 +641,106 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				MapKey("#delete", TextEditOp.Cut);
 				MapKey("^insert", TextEditOp.Copy);
 				MapKey("#insert", TextEditOp.Paste);
+			}
+		}
+
+		private string GetText(int pos, int length)
+		{
+			// TODO: Document should have interface for getting text... (like it has for insert)
+			return _document.Buffer.CurrentSnapshot.GetText(pos, length);
+		}
+
+		private void Copy()
+		{
+			int pos, length;
+			if(_textView.GetSelectionInDocument(out pos, out length))
+				EditorGUIUtility.systemCopyBuffer = GetText(pos, length);
+		}
+
+		private void Cut()
+		{
+			int pos, length;
+			if(_textView.GetSelectionInDocument(out pos, out length))
+			{
+				EditorGUIUtility.systemCopyBuffer = GetText(pos, length);
+				DeleteSelection();
+			}
+		}
+
+		private void Paste()
+		{
+			string pasteText = EditorGUIUtility.systemCopyBuffer;
+			if(pasteText != "")
+			{
+				ReplaceSelection(pasteText);
+
+				// We need interface for moving the caret
+				for(int i = 0; i < pasteText.Length; ++i)
+					Caret.MoveRight();
+			}
+		}
+
+		public void ReplaceSelection(string replace)
+		{
+			DeleteSelection();
+			_document.Insert(_document.CurrentLine.Start + Caret.Column, replace);
+		}
+
+
+		private void HandleCommandEvents()
+		{
+			Event evt = Event.current;
+			switch(evt.GetTypeForControl(m_KeyboardControlID))
+			{
+				case EventType.ValidateCommand:
+					if(GUIUtility.keyboardControl == m_KeyboardControlID)
+					{
+						switch(evt.commandName)
+						{
+							case "Cut":
+							case "Copy":
+								if(HasSelection())
+									evt.Use();
+								break;
+							case "Paste":
+								evt.Use();
+								break;
+							case "SelectAll":
+								evt.Use();
+								break;
+							case "UndoRedoPerformed":
+								Debug.Log("Not implemented: (UndoRedoPerformed)");
+								evt.Use();
+								break;
+						}
+					}
+					break;
+				case EventType.ExecuteCommand:
+					if(GUIUtility.keyboardControl == m_KeyboardControlID)
+					{
+						switch(evt.commandName)
+						{
+							case "Cut":
+								if(HasSelection())
+									Cut();
+								evt.Use();
+								break;
+							case "Copy":
+								if(HasSelection())
+									Copy();
+								evt.Use();
+								break;
+							case "Paste":
+								Paste();
+								evt.Use();
+								break;
+							case "SelectAll":
+								//SelectAll ();
+								evt.Use();
+								break;
+						}
+					}
+					break;
 			}
 		}
 	}
