@@ -1,5 +1,5 @@
 
-version = '0.1.1'
+version = '0.2.0'
 
 buildscript {
 	repositories {
@@ -8,13 +8,25 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'kaizen:kaizen:0.2.2'
+		classpath 'kaizen:kaizen:0.2.7'
 	}
 }
 
 allprojects {
-	apply plugin: 'vs2010' 
+	apply plugin: 'vs2010'
 }
+
+/*
+project(':CodeEditor.Text.UI.Unity.Editor') {
+	vs {
+		project {
+			postBuildEvent {
+				task ':updateUnityProject'
+			}
+		}
+	}
+}
+*/
 
 vs {
 	solutions {
@@ -49,21 +61,6 @@ vs {
 			remainingProjects.each {
 				project(it)
 			}
-		}
-	}
-}
-
-task dumpSolution <<{
-	project.extensions.vs.solutions.each {
-		println it.name
-		it.folders.each {
-			println "\t$it.name"
-			it.projects.each {
-				println "\t\t$it.name"
-			}
-		}
-		it.projects.each {
-			println it.path
 		}
 	}
 }
@@ -112,6 +109,41 @@ task publish {
 	}
 }
 
+def unityProjectDir = project.properties.get('unityProjectDir', 'UnityProject')
+
+task updateUnityProject {
+
+	description 'Builds and copies required assemblies to the configured Unity project (unityProjectDir)'
+
+	def config = project.configurations.editor
+	dependsOn config
+
+	doFirst {
+		def destinationDir = project.file("$unityProjectDir/Assets/kaizen/lib/Editor")
+
+		logger.info("Updating $destinationDir")
+
+		config.incoming.files.each { f ->
+			project.copy {
+				from project.zipTree(f)
+				into destinationDir
+				include '*.dll'
+        exclude 'UnityE*'
+			}
+		}
+	}
+}
+
+task open {
+	dependsOn updateUnityProject
+	doFirst {
+		project.exec {
+			executable rootProject.extensions.unity.executable
+			args '-projectPath'
+			args file(unityProjectDir)
+		}
+	}
+}
 nunit {
 	version = '2.6+'
 }
