@@ -15,7 +15,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		static Main()
 		{
 			CodeEditorWindow.TextViewFactory = new LazyTextViewFactory();
-			NavigatorWindow.ProviderFactory = () => CompositionContainer.GetExportedValue<INavigateToItemProvider>();
+			NavigatorWindow.ProviderFactory = () => CompositionContainer.GetExportedValue<INavigateToItemProviderAggregator>();
 		}
 
 		private class LazyTextViewFactory : ITextViewFactory

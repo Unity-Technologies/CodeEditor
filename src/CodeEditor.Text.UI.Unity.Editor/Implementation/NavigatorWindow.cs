@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,7 +7,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	public partial class NavigatorWindow : EditorWindow
 	{
-		internal static System.Func<INavigateToItemProvider> ProviderFactory;
+		internal static System.Func<INavigateToItemProviderAggregator> ProviderFactory;
 	
 		private const float kSearchBarHeight = 17;
 		private const float kMargin = 10f;

@@ -40,8 +40,10 @@
     <Compile Include="ICaret.cs" />
     <Compile Include="ICaretBounds.cs" />
     <Compile Include="ICaretFactory.cs" />
+    <Compile Include="Implementation\NavigateToItemProviderAggregator.cs" />
     <Compile Include="INavigateToItemProvider.cs" />
     <Compile Include="INavigateToItem.cs" />
+    <Compile Include="INavigateToItemProviderAggregator.cs" />
     <Compile Include="ITextStructureNavigator.cs" />
     <Compile Include="Completion\ICompletionProvider.cs" />
     <Compile Include="Completion\ICompletionTrigger.cs" />
