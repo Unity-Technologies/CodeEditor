@@ -8,15 +8,15 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	public partial class NavigatorWindow : EditorWindow
 	{
-		internal static System.Func<INavigatorWindowItemProvider> ProviderFactory;
+		internal static System.Func<INavigateToItemProvider> ProviderFactory;
 	
 		private const float kSearchBarHeight = 17;
 		private const float kMargin = 10f;
 		private const float kLineHeight = 16f;
 
-		[NonSerialized] private INavigatorWindowItemProvider _filePathProvider;
-		[NonSerialized] private List<INavigatorWindowItem> _currentItems;
-		[NonSerialized] private INavigatorWindowItem _selectedItem;
+		[NonSerialized] private INavigateToItemProvider _filePathProvider;
+		[NonSerialized] private List<INavigateToItem> _currentItems;
+		[NonSerialized] private INavigateToItem _selectedItem;
 		private string _searchFilter = "";
 		private Vector2 _scrollPosition;
 
@@ -115,7 +115,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			}
 		}
 
-		private void CloseWindow(INavigatorWindowItem selectedItem)
+		private void CloseWindow(INavigateToItem selectedItem)
 		{
 			if(selectedItem != null)
 			{
@@ -169,7 +169,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			GUI.EndScrollView();
 		}
 
-		private void Select(INavigatorWindowItem name)
+		private void Select(INavigateToItem name)
 		{
 			_selectedItem = name;
 			Repaint();

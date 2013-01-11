@@ -6,12 +6,12 @@ using UnityEditor;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
-	[Export(typeof(INavigatorWindowItemProvider))]
-	internal class ScriptNavigatorItemProvider : INavigatorWindowItemProvider
+	[Export(typeof(INavigateToItemProvider))]
+	internal class ScriptNavigatorItemProvider : INavigateToItemProvider
 	{
-		private List<INavigatorWindowItem> _allScripts;
+		private List<INavigateToItem> _allScripts;
 
-		public List<INavigatorWindowItem> Search(string filter)
+		public List<INavigateToItem> Search(string filter)
 		{
 			InitIfNeeded();
 
@@ -30,7 +30,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 			MonoScript[] allscripts = MonoImporter.GetAllRuntimeMonoScripts();
 
-			_allScripts = new List<INavigatorWindowItem>();
+			_allScripts = new List<INavigateToItem>();
 			for(int i = 0; i < allscripts.Length; ++i)
 			{
 				var script = allscripts[i];

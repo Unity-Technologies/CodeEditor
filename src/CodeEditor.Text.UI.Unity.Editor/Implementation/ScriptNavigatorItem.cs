@@ -2,7 +2,7 @@ using UnityEditor;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
-	public class ScriptNavigatorItem : INavigatorWindowItem
+	public class ScriptNavigatorItem : INavigateToItem
 	{
 		public ScriptNavigatorItem(string displayText, int instanceID)
 		{
