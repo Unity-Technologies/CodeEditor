@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CodeEditor.Composition;
 using UnityEditor;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
+	[Export(typeof(INavigatorWindowItemProvider))]
 	internal class ScriptNavigatorItemProvider : INavigatorWindowItemProvider
 	{
 		private List<INavigatorWindowItem> _allScripts;

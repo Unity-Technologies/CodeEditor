@@ -8,6 +8,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	public partial class NavigatorWindow : EditorWindow
 	{
+		internal static System.Func<INavigatorWindowItemProvider> ProviderFactory;
+	
 		private const float kSearchBarHeight = 17;
 		private const float kMargin = 10f;
 		private const float kLineHeight = 16f;
@@ -17,9 +19,6 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		[NonSerialized] private INavigatorWindowItem _selectedItem;
 		private string _searchFilter = "";
 		private Vector2 _scrollPosition;
-
-		private string _filePathProviderQualifiedName;
-		               // stored as string so we can serialize and reconstruct a filePathProvider after domain reloads
 
 		[NonSerialized] private bool _readyToInit = false;
 
@@ -36,27 +35,10 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		private static Styles s_Styles;
 
 
-		public static void Open(Type filePathProviderType)
+		public static void Open()
 		{
-			if(!typeof(INavigatorWindowItemProvider).IsAssignableFrom(filePathProviderType))
-				throw new ArgumentException("Invalid Type as argument: " + filePathProviderType + " cannot be assigned to " +
-				                            typeof(INavigatorWindowItemProvider));
-
 			var window = GetWindow<NavigatorWindow>();
 			window.title = "Navigate To";
-			window._filePathProviderQualifiedName = filePathProviderType.AssemblyQualifiedName;
-		}
-
-		private static INavigatorWindowItemProvider CreateProvider(string assemblyQualifiedName)
-		{
-			INavigatorWindowItemProvider provider = null;
-			Type t = Type.GetType(assemblyQualifiedName);
-			if(t != null)
-				provider = Activator.CreateInstance(t) as INavigatorWindowItemProvider;
-
-			if(provider == null)
-				Debug.LogError("Could not create a FilePathProvider from " + assemblyQualifiedName);
-			return provider;
 		}
 
 		private void InitIfNeeded()
@@ -65,7 +47,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				s_Styles = new Styles();
 
 			if(_filePathProvider == null)
-				_filePathProvider = CreateProvider(_filePathProviderQualifiedName);
+				_filePathProvider = ProviderFactory();
 		}
 
 		private void DelayExpensiveInit()
