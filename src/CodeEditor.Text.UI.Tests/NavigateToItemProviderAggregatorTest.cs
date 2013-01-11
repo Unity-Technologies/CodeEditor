@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using CodeEditor.Composition;
-using CodeEditor.Composition.Hosting;
+﻿using System.Collections.Generic;
 using CodeEditor.Testing;
 using CodeEditor.Text.UI.Implementation;
 using NUnit.Framework;
