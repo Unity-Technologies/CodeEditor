@@ -7,7 +7,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	public partial class NavigatorWindow : EditorWindow
 	{
-		internal static System.Func<INavigateToItemProviderAggregator> ProviderFactory;
+		internal static Func<INavigateToItemProviderAggregator> ProviderAggregatorFactory;
 	
 		private const float kSearchBarHeight = 17;
 		private const float kMargin = 10f;
@@ -46,7 +46,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				s_Styles = new Styles();
 
 			if(_filePathProvider == null)
-				_filePathProvider = ProviderFactory();
+				_filePathProvider = ProviderAggregatorFactory();
 		}
 
 		private void DelayExpensiveInit()

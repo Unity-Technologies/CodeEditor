@@ -14,26 +14,20 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 	{
 		static Main()
 		{
-			CodeEditorWindow.TextViewFactory = new LazyTextViewFactory();
-			NavigatorWindow.ProviderFactory = () => CompositionContainer.GetExportedValue<INavigateToItemProviderAggregator>();
+			CodeEditorWindow.TextViewFactory = ViewForFile;
+			NavigatorWindow.ProviderAggregatorFactory = GetExportedValue<INavigateToItemProviderAggregator>;
 		}
 
-		private class LazyTextViewFactory : ITextViewFactory
+		private static ITextView ViewForFile(string fileName)
 		{
-			public ITextView ViewForFile(string fileName)
-			{
-				return ActualTextViewFactory.ViewForFile(fileName);
-			}
+			return GetExportedValue<ITextViewFactory>().ViewForFile(fileName);
+		}
 
-			public ITextView CreateView()
-			{
-				throw new NotImplementedException();
-			}
-
-			ITextViewFactory ActualTextViewFactory
-			{
-				get { return CodeTimer.LoggingTime("GetExportedValue<ITextViewFactory>()", () => CompositionContainer.GetExportedValue<ITextViewFactory>()); }
-			}
+		private static T GetExportedValue<T>()
+		{
+			return CodeTimer.LoggingTime(
+				string.Format("GetExportedValue<{0}>()", typeof(T).Name),
+				() => CompositionContainer.GetExportedValue<T>());
 		}
 
 		private static CompositionContainer CompositionContainer
@@ -41,13 +35,13 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			get { return _container.Value; }
 		}
 
+		private static readonly Lazy<CompositionContainer> _container = new Lazy<CompositionContainer>(CreateCompositionContainer);
+
 		private static CompositionContainer CreateCompositionContainer()
 		{
 			var container = new CompositionContainer(AppDomain.CurrentDomain.GetAssemblies().ToArray());
 			container.AddExportedValue<IFileSystem>(new UnityEditorFileSystem());
 			return container;
 		}
-
-		private static readonly Lazy<CompositionContainer> _container = new Lazy<CompositionContainer>(CreateCompositionContainer);
 	}
 }

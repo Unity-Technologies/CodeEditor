@@ -1,8 +1,6 @@
 using CodeEditor.Text.Data;
 using CodeEditor.Text.UI.Completion;
 using CodeEditor.Text.UI.Unity.Engine;
-using CodeEditor.Text.UI.Unity.Engine.Implementation;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,7 +8,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	internal class CodeEditorWindow : EditorWindow, ICompletionSessionProvider
 	{
-		public static ITextViewFactory TextViewFactory;
+		public static System.Func<string, ITextView> TextViewFactory;
 		
 		[System.Serializable]
 		class BackupData 
@@ -74,7 +72,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			if (string.IsNullOrEmpty(_filePath))
 				return;
 
-			_textView = TextViewFactory.ViewForFile(_filePath);
+			_textView = TextViewFactory(_filePath);
 			_codeView = new CodeView(this, _textView);
 			_fileNameWithExtension = System.IO.Path.GetFileName(_filePath);
 		}
