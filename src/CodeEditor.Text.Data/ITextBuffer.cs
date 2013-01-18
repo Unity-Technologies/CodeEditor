@@ -11,7 +11,7 @@ namespace CodeEditor.Text.Data
 		event TextChange Changed;
 	}
 
-	public static class ITextBufferExtensions
+	public static class TextBufferExtensions
 	{
 		public static void Append(this ITextBuffer buffer, string text)
 		{

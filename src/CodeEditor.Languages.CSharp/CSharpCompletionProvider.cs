@@ -1,7 +1,4 @@
-using System;
 using CodeEditor.Text.Data;
-using System.Linq;
-using System.IO;
 using CodeEditor.Text.UI.Completion;
 using CodeEditor.Text.UI.Completion.Implementation;
 

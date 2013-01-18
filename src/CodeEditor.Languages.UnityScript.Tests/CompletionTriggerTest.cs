@@ -5,7 +5,7 @@ using CodeEditor.Text.UI.Completion;
 using Moq;
 using NUnit.Framework;
 
-namespace CodeEditor.Languages.Tests
+namespace CodeEditor.Languages.UnityScript.Tests
 {
 	[TestFixture]
 	public class CompletionTriggerTest : TextBufferBasedTest

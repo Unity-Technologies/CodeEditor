@@ -9,7 +9,7 @@ namespace CodeEditor.Languages.CSharp
 	class CSharpClassifierProvider : IClassifierProvider
 	{
 		[Import]
-		IStandardClassificationRegistry ClassificationRegistry { get; set; }
+		public IStandardClassificationRegistry ClassificationRegistry { get; set; }
 
 		public IClassifier ClassifierFor(ITextBuffer buffer)
 		{

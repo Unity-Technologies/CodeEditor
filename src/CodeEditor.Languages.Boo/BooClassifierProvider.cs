@@ -9,7 +9,7 @@ namespace CodeEditor.Languages.Boo
 	class BooClassifierProvider : IClassifierProvider
 	{
 		[Import]
-		IStandardClassificationRegistry ClassificationRegistry { get; set; }
+		public IStandardClassificationRegistry ClassificationRegistry { get; set; }
 
 		public IClassifier ClassifierFor(ITextBuffer buffer)
 		{

@@ -1,5 +1,3 @@
-using System;
-
 namespace CodeEditor.Text.UI
 {
 	public struct Position 
