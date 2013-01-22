@@ -2,6 +2,7 @@ using System;
 
 namespace CodeEditor.Composition
 {
+	[Serializable]
 	public class CompositionError
 	{
 		public CompositionError(Type contractType, string message)
