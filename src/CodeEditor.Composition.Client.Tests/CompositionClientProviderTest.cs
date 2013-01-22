@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
+using CodeEditor.Composition.Client.Tests.Fixtures;
 using CodeEditor.Composition.Hosting;
 using NUnit.Framework;
 
@@ -36,10 +37,12 @@ namespace CodeEditor.Composition.Client.Tests
 			{
 				var subject = CreateCompositionClientProvider();
 				var client = subject.CompositionClientFor("tcp://localhost:8888/IServiceProvider");
+
 				var callbackWaitHandle = new ManualResetEvent(false);
 				var callback = new RemoteCallback<int>(_ => callbackWaitHandle.Set());
 				var service = client.GetService<IRemoteService>();
 				service.CallMeBackAt(callback, CurrentProcessId);
+
 				Assert.IsTrue(callbackWaitHandle.WaitOne(TimeSpan.FromSeconds(1)));
 				Assert.AreEqual(CurrentProcessId, callback.LastValue);
 			}
@@ -51,12 +54,12 @@ namespace CodeEditor.Composition.Client.Tests
 
 		public class RemoteCallback<T> : MarshalByRefObject, ICallback<T>
 		{
-			private readonly Action<T> _func;
+			private readonly Action<T> _action;
 			private T _lastValue;
 
-			public RemoteCallback(Action<T> func)
+			public RemoteCallback(Action<T> action)
 			{
-				_func = func;
+				_action = action;
 			}
 
 			public T LastValue
@@ -67,11 +70,10 @@ namespace CodeEditor.Composition.Client.Tests
 			public void OnNext(T value)
 			{
 				_lastValue = value;
-				_func(value);
+				_action(value);
 			}
 		}
 
-		/*
 		[Test]
 		public void RemotableObservable()
 		{
@@ -101,7 +103,6 @@ namespace CodeEditor.Composition.Client.Tests
 				StopCompositionServer(serverProcess);
 			}
 		}
-		*/
 
 		private static int CurrentProcessId
 		{

@@ -70,6 +70,7 @@ vs {
 
 allprojects {
 	repositories {
+		ivy { url rootProject.file(rootProject.properties.rxRepository) }
 		ivy { url 'http://unity-technologies.github.com/kaizen/repositories/unstable' }
 	}
 }
@@ -152,11 +153,12 @@ nunit {
 }
 
 ext {
-    references = [
+		references = [
 			'nunitFramework': "nunit:nunit.framework:${nunit.version}",
 			'moq': 'Moq:Moq:4.0+',
 			'adt': 'boo-extensions:Boo.Adt:0.1.1+',
-			'ometa': 'boo-extensions:Boo.OMeta:0.1.1+',  
-    ]
+			'ometa': 'boo-extensions:Boo.OMeta:0.1.1+',
+			'rx': { name -> "Rx:$name:1.0.2856.0" }
+		]
 }
 

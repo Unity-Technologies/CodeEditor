@@ -1,3 +1,6 @@
+// evaluate CodeEditor.Composition.Server first
+// so the assembly plugin has time to realize
+// it's an .exe
 evaluationDependsOn ':CodeEditor.Composition.Server'
 
 assembly {
@@ -9,17 +12,17 @@ dependencies {
 		'CodeEditor.Composition',
 		'CodeEditor.Composition.Client',
 		'CodeEditor.Composition.Server',
-		//'CodeEditor.Composition.Client.Tests.Fixtures'
+		'CodeEditor.Composition.Client.Tests.Fixtures'
 	]
 	projectReferences.each { 
 		'default' project(":$it")
 	}
 
-	/*def rxReferences = [
+	def rxReferences = [
 		'System.Observable',
 		'System.Reactive',
 	]
 	rxReferences.each {
 		'default' rootProject.references.rx(it)
-	}*/
+	}
 }
