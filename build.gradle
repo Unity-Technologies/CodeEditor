@@ -144,9 +144,6 @@ task open {
 		}
 	}
 }
-nunit {
-	version = '2.6+'
-}
 
 ext {
     references = [
