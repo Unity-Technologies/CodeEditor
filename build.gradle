@@ -8,7 +8,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'kaizen:kaizen:0.2.8'
+		classpath 'kaizen:kaizen:0.3.0'
 	}
 }
 
@@ -70,9 +70,9 @@ vs {
 
 allprojects {
 	repositories {
-		ivy { url rootProject.file(rootProject.properties.rxRepository) }
 		ivy { url 'http://unity-technologies.github.com/kaizen/repositories/unstable' }
 	}
+	apply plugin: 'nuget'
 }
 
 configurations {
@@ -82,13 +82,19 @@ configurations {
 	tests {
 		description "Configuration for testing artifacts."
 	}
+	daemon {
+		description "Configuration for daemon artifacts."
+	}
 }
 
-apply plugin: 'kaizen-bundle'
+apply plugin: 'assembly-bundle'
 apply plugin: 'nunit'
 apply plugin: 'idea'
 
-def bundleDependencies = project.dependencies
+def bundleDependency(configuration, subProject) {
+  dependencies.add(configuration, dependencies.project(path: subProject.path))
+}
+
 subprojects { subProject ->
 	switch (subProject.name) {
 	case ~/.+\.Tests$/:
@@ -97,12 +103,15 @@ subprojects { subProject ->
 			// Foo.Bar.Tests depends on Foo.Bar
 			'default' project(subProject.path[0..-('.Tests'.length() + 1)])
 		}
-		bundleDependencies.add('tests', bundleDependencies.project(path: subProject.path))
+		bundleDependency('tests', subProject)
 		break
-	case ~/.+\.Testing$/:
+	case ~/.+\.Server$/:
+		bundleDependency('daemon', subProject)
+		break
+	case ~/.+\.(Testing|Fixtures)$/:
 		break
 	default:
-		bundleDependencies.add('editor', bundleDependencies.project(path: subProject.path))
+		bundleDependency('editor', subProject)
 	}
 }
 
@@ -148,17 +157,33 @@ task open {
 		}
 	}
 }
+
 nunit {
 	version = '2.6+'
 }
 
+def rxDependency(rxPackage, rxAssembly, rxConfiguration) {
+	['group': rxPackage, 'name': rxAssembly, 'version': '1.0.2856.0', 'configuration': rxConfiguration]
+}
+
 ext {
-		references = [
-			'nunitFramework': "nunit:nunit.framework:${nunit.version}",
-			'moq': 'Moq:Moq:4.0+',
-			'adt': 'boo-extensions:Boo.Adt:0.1.1+',
-			'ometa': 'boo-extensions:Boo.OMeta:0.1.1+',
-			'rx': { name -> "Rx:$name:1.0.2856.0" }
+	rxCore = { assemblyName, configuration = 'Net35' -> rxDependency('Rx-Core-old', assemblyName, configuration) }
+	rxMain = { assemblyName, configuration = 'Net35' -> rxDependency('Rx-Main', assemblyName, configuration) }
+	references = [
+		'nunitFramework': "nunit:nunit.framework:${nunit.version}",
+		'moq': 'Moq:Moq:4.0+',
+		'adt': 'boo-extensions:Boo.Adt:0.1.1+',
+		'ometa': 'boo-extensions:Boo.OMeta:0.1.1+',
+		'rx35': [
+			rxMain('System.Reactive'),
+			rxCore('System.Observable'),
+			rxCore('System.CoreEx'),
+			rxCore('System.Threading'),
+		],
+		'rx40': [
+			rxMain('System.Reactive', 'Net4'),
+			rxCore('System.CoreEx', 'Net4'),
 		]
+	]
 }
 

@@ -17,8 +17,6 @@ dependencies {
 
 assembly {
 	references {
-		'default' {
-			frameworkAssembly 'System.Runtime.Remoting'
-		}
+		frameworkAssembly 'System.Runtime.Remoting'
 	}
 }

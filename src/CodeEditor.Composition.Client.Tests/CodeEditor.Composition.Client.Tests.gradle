@@ -17,12 +17,5 @@ dependencies {
 	projectReferences.each { 
 		'default' project(":$it")
 	}
-
-	def rxReferences = [
-		'System.Observable',
-		'System.Reactive',
-	]
-	rxReferences.each {
-		'default' rootProject.references.rx(it)
-	}
+	'default' rootProject.references.rx40
 }
