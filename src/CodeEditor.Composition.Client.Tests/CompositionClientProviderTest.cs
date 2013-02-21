@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using CodeEditor.Composition.Client.Tests.Fixtures;
@@ -15,25 +16,19 @@ namespace CodeEditor.Composition.Client.Tests
 		[Test]
 		public void GetService_Activates_Service_On_Server_Process()
 		{
-			var serverProcess = StartCompositionServer();
-			try
+			using (var serverProcess = StartCompositionServer())
 			{
 				var subject = CreateCompositionClientProvider();
 				var client = subject.CompositionClientFor("tcp://localhost:8888/IServiceProvider");
 				var service = client.GetService<IRemoteService>();
 				Assert.AreEqual(serverProcess.Id, service.ProcessId);
 			}
-			finally
-			{
-				StopCompositionServer(serverProcess);
-			}
 		}
 
 		[Test]
 		public void CallbacksAreSupported()
 		{
-			var serverProcess = StartCompositionServer();
-			try
+			using (var serverProcess = StartCompositionServer())
 			{
 				var subject = CreateCompositionClientProvider();
 				var client = subject.CompositionClientFor("tcp://localhost:8888/IServiceProvider");
@@ -45,10 +40,6 @@ namespace CodeEditor.Composition.Client.Tests
 
 				Assert.IsTrue(callbackWaitHandle.WaitOne(TimeSpan.FromSeconds(1)));
 				Assert.AreEqual(CurrentProcessId, callback.LastValue);
-			}
-			finally
-			{
-				StopCompositionServer(serverProcess);
 			}
 		}
 
@@ -77,8 +68,7 @@ namespace CodeEditor.Composition.Client.Tests
 		[Test]
 		public void RemotableObservable()
 		{
-			var serverProcess = StartCompositionServer();
-			try
+			using (var serverProcess = StartCompositionServer())
 			{
 				var subject = CreateCompositionClientProvider();
 				var client = subject.CompositionClientFor("tcp://localhost:8888/IServiceProvider");
@@ -98,10 +88,6 @@ namespace CodeEditor.Composition.Client.Tests
 				service.Ping(CurrentProcessId);
 				Assert.AreEqual(0, pongs.Count);
 			}
-			finally
-			{
-				StopCompositionServer(serverProcess);
-			}
 		}
 
 		private static int CurrentProcessId
@@ -109,19 +95,9 @@ namespace CodeEditor.Composition.Client.Tests
 			get { return Process.GetCurrentProcess().Id; }
 		}
 
-		private static Process StartCompositionServer()
+		private static CompositionServerController StartCompositionServer()
 		{
-			return Process.Start(new ProcessStartInfo(CompositionServerExe)
-			{
-				RedirectStandardInput = true,
-				UseShellExecute = false
-			});
-		}
-
-		private static void StopCompositionServer(Process serverProcess)
-		{
-			serverProcess.StandardInput.WriteLine("quit");
-			Assert.IsTrue(serverProcess.WaitForExit(2000));
+			return CompositionServerController.StartCompositionServerAt(Path.GetDirectoryName(CompositionServerExe));
 		}
 
 		private ICompositionClientProvider CreateCompositionClientProvider()
