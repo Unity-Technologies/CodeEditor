@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using NUnit.Framework;
 
 namespace CodeEditor.Testing
@@ -13,7 +13,7 @@ namespace CodeEditor.Testing
 
 		protected Mock<T> MockFor<T>() where T : class
 		{
-			return MockFor<T>(MockBehavior.Default);
+			return MockFor<T>(MockBehavior.Strict);
 		}
 
 		protected Mock<T> MockFor<T>(MockBehavior mockBehavior) where T : class
