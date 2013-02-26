@@ -9,5 +9,10 @@ namespace CodeEditor.IO.Implementation
 		{
 			return new File(file);
 		}
+
+		public IFolder FolderFor(string folder)
+		{
+			return new Folder(folder, this);
+		}
 	}
 }
