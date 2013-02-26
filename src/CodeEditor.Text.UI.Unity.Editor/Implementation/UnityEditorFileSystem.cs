@@ -1,4 +1,5 @@
 using CodeEditor.IO;
+using CodeEditor.IO.Implementation;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
@@ -7,6 +8,11 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		public IFile FileFor(string file)
 		{
 			return new UnityEditorFile(file);
+		}
+
+		public IFolder FolderFor(string folder)
+		{
+			return new Folder(folder, this);
 		}
 	}
 }
