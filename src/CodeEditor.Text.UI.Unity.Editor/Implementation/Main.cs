@@ -32,10 +32,10 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		private static CompositionContainer CompositionContainer
 		{
-			get { return _container.Value; }
+			get { return Container.Value; }
 		}
 
-		private static readonly Lazy<CompositionContainer> _container = new Lazy<CompositionContainer>(CreateCompositionContainer);
+		private static readonly Lazy<CompositionContainer> Container = new Lazy<CompositionContainer>(CreateCompositionContainer);
 
 		private static CompositionContainer CreateCompositionContainer()
 		{
