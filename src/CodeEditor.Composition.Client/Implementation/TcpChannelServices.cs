@@ -9,10 +9,11 @@ namespace CodeEditor.Composition.Client.Implementation
 	{
 		public static void RegisterTcpChannelOnPort(int port)
 		{
-			var serverProvider = new BinaryServerFormatterSinkProvider { TypeFilterLevel = TypeFilterLevel.Full };
-			var clientProvider = new BinaryClientFormatterSinkProvider();
-			var properties = new Hashtable { { "port", port } };
-			ChannelServices.RegisterChannel(new TcpChannel(properties, clientProvider, serverProvider), false);
+			var serverProperties = new Hashtable { { "includeVersions", false }, { "strictBinding", false } };
+			var serverProvider = new BinaryServerFormatterSinkProvider(serverProperties, null) { TypeFilterLevel = TypeFilterLevel.Full };
+			var clientProvider = new BinaryClientFormatterSinkProvider((IDictionary) serverProperties.Clone(), null);
+			var channelProperties = new Hashtable { {"port", port} };
+			ChannelServices.RegisterChannel(new TcpChannel(channelProperties, clientProvider, serverProvider), false);
 		}
 	}
 }
