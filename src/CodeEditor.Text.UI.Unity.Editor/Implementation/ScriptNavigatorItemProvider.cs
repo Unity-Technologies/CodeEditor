@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CodeEditor.Composition;
+using CodeEditor.Reactive;
 using UnityEditor;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
@@ -9,40 +10,39 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 	[Export(typeof(INavigateToItemProvider))]
 	internal class ScriptNavigatorItemProvider : INavigateToItemProvider
 	{
-		private List<INavigateToItem> _allScripts;
-
-		public List<INavigateToItem> Search(string filter)
+		public IObservableX<INavigateToItem> Search(string filter)
 		{
-			InitIfNeeded();
-
-			if(string.IsNullOrEmpty(filter))
-				return _allScripts;
-
 			return
-				_allScripts.Where(script => script.DisplayText.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0).
-					ToList();
+				NavigateToItems()
+				.ToObservableX()
+				.Where(script => script.DisplayText.IndexOf(filter, StringComparison.CurrentCultureIgnoreCase) >= 0);
 		}
 
-		public void InitIfNeeded()
+		public IEnumerable<INavigateToItem> NavigateToItems()
 		{
-			if(_allScripts != null)
-				return;
+			return (from script in AllMonoScripts()
+							let path = AssetPathFor(script)
+							where !string.IsNullOrEmpty(path)
+							select ScriptNavigatorItemFor(script, path)).Cast<INavigateToItem>();
+		}
 
-			MonoScript[] allscripts = MonoImporter.GetAllRuntimeMonoScripts();
+		private static string AssetPathFor(MonoScript script)
+		{
+			return AssetDatabase.GetAssetPath(script.GetInstanceID());
+		}
 
-			_allScripts = new List<INavigateToItem>();
-			for(int i = 0; i < allscripts.Length; ++i)
-			{
-				var script = allscripts[i];
-				string path = AssetDatabase.GetAssetPath(script.GetInstanceID());
-				if(!string.IsNullOrEmpty(path))
-				{
-					path = System.IO.Path.GetFullPath(path); // get extension
-					string fileName = System.IO.Path.GetFileName(path);
-					int instanceID = script.GetInstanceID();
-					_allScripts.Add(new ScriptNavigatorItem(fileName, instanceID));
-				}
-			}
+		private static MonoScript[] AllMonoScripts()
+		{
+			return MonoImporter.GetAllRuntimeMonoScripts();
+		}
+
+		private static ScriptNavigatorItem ScriptNavigatorItemFor(MonoScript script, string path)
+		{
+			var fullPath = System.IO.Path.GetFullPath(path); // get extension
+			string fileName = System.IO.Path.GetFileName(fullPath);
+			int instanceID = script.GetInstanceID();
+			var scriptNavigatorItem = new ScriptNavigatorItem(fileName, instanceID);
+			return scriptNavigatorItem;
 		}
 	}
 }

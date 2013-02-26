@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Event = UnityEngine.Event;
+using CodeEditor.Reactive;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
@@ -15,6 +17,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		[NonSerialized] private INavigateToItemProvider _filePathProvider;
 		[NonSerialized] private List<INavigateToItem> _currentItems;
+		[NonSerialized] private IDisposable _searchSubscription;
 		[NonSerialized] private INavigateToItem _selectedItem;
 		private string _searchFilter = "";
 		private Vector2 _scrollPosition;
@@ -32,7 +35,6 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		}
 
 		private static Styles s_Styles;
-
 
 		public static void Open()
 		{
@@ -54,10 +56,26 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			if(_currentItems == null && Event.current.type == EventType.Repaint)
 			{
 				if(_readyToInit)
-					_currentItems = _filePathProvider.Search(_searchFilter);
+					StartSearch();
 				_readyToInit = true;
 				Repaint();
 			}
+		}
+
+		private void StartSearch()
+		{
+			if (_searchSubscription != null) _searchSubscription.Dispose();
+			_selectedItem = null;
+			_currentItems = new List<INavigateToItem>();
+			_searchSubscription = _filePathProvider.Search(_searchFilter).Subscribe(OnNextItem);
+		}
+
+		private void OnNextItem(INavigateToItem item)
+		{
+			if (_selectedItem == null)
+				_selectedItem = item;
+			_currentItems.Add(item);
+			Repaint();
 		}
 
 		private void OnGUI()
@@ -176,16 +194,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		private void FilterChanged()
 		{
-			_currentItems = _filePathProvider.Search(_searchFilter);
-			if(_currentItems.Count > 0)
-			{
-				if(_currentItems.IndexOf(_selectedItem) < 0)
-					_selectedItem = _currentItems[0];
-			}
-			else
-			{
-				_selectedItem = null;
-			}
+			StartSearch();
 		}
 
 		// This is our search field

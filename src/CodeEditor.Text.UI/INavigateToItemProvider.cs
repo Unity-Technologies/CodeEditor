@@ -1,9 +1,9 @@
-using System.Collections.Generic;
+using CodeEditor.Reactive;
 
 namespace CodeEditor.Text.UI
 {
 	public interface INavigateToItemProvider
 	{
-		List<INavigateToItem> Search(string filter);
+		IObservableX<INavigateToItem> Search(string filter);
 	}
 }

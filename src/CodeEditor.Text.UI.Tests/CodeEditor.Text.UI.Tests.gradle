@@ -4,4 +4,5 @@ dependencies {
 	'default' project(':CodeEditor.Text.Data')
 	'default' project(':CodeEditor.Text.Data.Tests')
 	'default' project(':CodeEditor.Testing')
+	'default' project(':CodeEditor.Reactive')
 }

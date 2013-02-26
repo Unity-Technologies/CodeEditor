@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
 using System.Linq;
 using CodeEditor.Composition;
+using CodeEditor.Reactive;
 
 namespace CodeEditor.Text.UI.Implementation
 {
@@ -10,9 +10,9 @@ namespace CodeEditor.Text.UI.Implementation
 		[ImportMany]
 		public INavigateToItemProvider[] Providers { get; set; }
 
-		public List<INavigateToItem> Search(string filter)
+		public IObservableX<INavigateToItem> Search(string filter)
 		{
-			return Providers.SelectMany(provider => provider.Search(filter)).ToList();
+			return Providers.Select(provider => provider.Search(filter)).Merge();
 		}
 	}
 }

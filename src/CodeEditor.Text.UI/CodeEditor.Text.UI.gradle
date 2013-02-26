@@ -5,6 +5,7 @@ dependencies {
 	def projectReferences = [
 		'CodeEditor.Composition',
 		'CodeEditor.Text.Data',
+		'CodeEditor.Reactive'
 	]
 	projectReferences.each {
 		'default' project(":$it")
