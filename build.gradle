@@ -82,8 +82,8 @@ configurations {
 	tests {
 		description "Configuration for testing artifacts."
 	}
-	daemon {
-		description "Configuration for daemon artifacts."
+	server {
+		description "Configuration for server artifacts."
 	}
 }
 
@@ -92,7 +92,7 @@ apply plugin: 'nunit'
 apply plugin: 'idea'
 
 def bundleDependency(configuration, subProject) {
-  dependencies.add(configuration, dependencies.project(path: subProject.path))
+	dependencies.add(configuration, dependencies.project(path: subProject.path))
 }
 
 subprojects { subProject ->
@@ -106,7 +106,7 @@ subprojects { subProject ->
 		bundleDependency('tests', subProject)
 		break
 	case ~/.+\.Server$/:
-		bundleDependency('daemon', subProject)
+		bundleDependency('server', subProject)
 		break
 	case ~/.+\.(Testing|Fixtures)$/:
 		break
@@ -122,30 +122,49 @@ task publish {
 	}
 }
 
-def unityProjectDir = project.properties.get('unityProjectDir', 'UnityProject')
+class UpdateDir extends DefaultTask {
 
-task updateUnityProject {
+	def destinationDir
 
-	description 'Builds and copies required assemblies to the configured Unity project (unityProjectDir)'
+	def setDestinationDir(destinationDir) {
+		this.destinationDir = project.file(destinationDir)
+		outputs.dir this.destinationDir
+	}
 
-	def config = project.configurations.editor
-	dependsOn config
-
-	doFirst {
-		def destinationDir = project.file("$unityProjectDir/Assets/kaizen/lib/Editor")
-
+	@TaskAction
+	def update() {
 		logger.info("Updating $destinationDir")
-
-		config.incoming.files.each { f ->
+		def destDir = destinationDir
+		inputs.sourceFiles.each { f ->
 			project.copy {
 				from project.zipTree(f)
-				into destinationDir
+				into destDir
 				include '*.dll'
 				exclude 'UnityE*'
 			}
 		}
 	}
 }
+
+def unityProjectDir = project.properties.get('unityProjectDir', 'UnityProject')
+
+task updateUnityProjectEditorConfig(type: UpdateDir) {
+	description 'Builds and copies required assemblies to the configured Unity project (unityProjectDir)'
+	inputs.source project.configurations.editor
+	destinationDir = "$unityProjectDir/Assets/kaizen/lib/Editor"
+}
+
+task updateUnityProjectServerConfig(type: UpdateDir) {
+	description 'Builds and copies required assemblies to the configured Unity project (unityProjectDir)'
+	inputs.source project.configurations.server
+	destinationDir = "$unityProjectDir/Library/CodeEditor/Server"
+}
+
+task updateUnityProject {
+	dependsOn updateUnityProjectEditorConfig
+	dependsOn updateUnityProjectServerConfig
+}
+
 
 task open {
 	dependsOn updateUnityProject
