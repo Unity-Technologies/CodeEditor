@@ -17,6 +17,7 @@ namespace CodeEditor.IO
 		string Extension { get; }
 		string ReadAllText();
 		void WriteAllText(string text);
+		void Delete();
 	}
 
 	public interface IFolder

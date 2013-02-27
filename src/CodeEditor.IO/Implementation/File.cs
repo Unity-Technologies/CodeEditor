@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 namespace CodeEditor.IO.Implementation
 {
@@ -29,6 +29,11 @@ namespace CodeEditor.IO.Implementation
 		public virtual void WriteAllText(string text)
 		{
 			System.IO.File.WriteAllText(_fullName, text);
+		}
+
+		public void Delete()
+		{
+			System.IO.File.Delete(_fullName);
 		}
 	}
 }
