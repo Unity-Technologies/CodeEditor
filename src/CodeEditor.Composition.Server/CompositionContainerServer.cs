@@ -17,7 +17,10 @@ namespace CodeEditor.Composition.Server
 		public object GetService(Type serviceType)
 		{
 			Trace.WriteLine(string.Format("GetService({0})", serviceType));
-			return _container.GetExportedValue(serviceType);
+			var exportedValue = _container.GetExportedValue(serviceType);
+			if (!(exportedValue is MarshalByRefObject))
+				throw new InvalidOperationException(string.Format("Type '{0}' must inherit from System.MarshalByRefObject to be served.", exportedValue.GetType()));
+			return exportedValue;
 		}
 	}
 }
