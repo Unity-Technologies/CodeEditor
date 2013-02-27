@@ -12,7 +12,7 @@ namespace CodeEditor.Text.UI.Implementation
 
 		public IObservableX<INavigateToItem> Search(string filter)
 		{
-			return Providers.Select(provider => provider.Search(filter)).Merge();
+			return Providers.Select(provider => provider.Search(filter).Catch(ObservableX.Empty<INavigateToItem>())).Merge();
 		}
 	}
 }
