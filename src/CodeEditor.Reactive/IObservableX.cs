@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,6 +18,31 @@ namespace CodeEditor.Reactive
 
 	public static class ObservableX
 	{
+		public static IObservableX<T> Empty<T>()
+		{
+			return Observable.Empty<T>().ToObservableX();
+		}
+
+		public static IObservableX<T> Start<T>(Func<T> func)
+		{
+			return Observable.Start(func).ToObservableX();
+		}
+
+		public static IObservableX<T> Return<T>(T value)
+		{
+			return Observable.Return(value).ToObservableX();
+		}
+
+		public static IObservableX<T> Throw<T>(Exception exception)
+		{
+			return Observable.Throw<T>(exception).ToObservableX();
+		}
+
+		public static IObservableX<T> Catch<T>(this IObservableX<T> source, IObservableX<T> second)
+		{
+			return source.ToObservable().Catch(second.ToObservable()).ToObservableX();
+		}
+
 		public static IDisposable Subscribe<T>(this IObservableX<T> source, Action<T> onNext)
 		{
 			return source.ToObservable().Subscribe(onNext);
@@ -91,16 +116,6 @@ namespace CodeEditor.Reactive
 		public static T FirstOrTimeout<T>(this IObservableX<T> source, TimeSpan timeout)
 		{
 			return source.ToObservable().Timeout(timeout, Observable.Throw<T>(new TimeoutException())).First();
-		}
-
-		public static IObservableX<T> Start<T>(Func<T> func)
-		{
-			return Observable.Start(func).ToObservableX();
-		}
-
-		public static IObservableX<T> Return<T>(T value)
-		{
-			return Observable.Return(value).ToObservableX();
 		}
 
 		public static IObservableX<IList<T>> ToList<T>(this IObservableX<T> source)
