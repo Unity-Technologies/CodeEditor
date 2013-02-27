@@ -84,6 +84,11 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			{
 				throw new InvalidOperationException();
 			}
+
+			public void Delete()
+			{
+				throw new InvalidOperationException();
+			}
 		}
 	}
 }
