@@ -5,5 +5,5 @@ assembly {
 dependencies {
   'default' rootProject.references.nunitFramework
   'default' project(':CodeEditor.Composition')
-  'default' rootProject.references.rx40
+  'default' project(':CodeEditor.Reactive')
 }

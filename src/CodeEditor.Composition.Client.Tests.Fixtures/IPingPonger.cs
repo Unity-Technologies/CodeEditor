@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System;
+using CodeEditor.Reactive;
+using CodeEditor.Reactive.Subjects;
 
 namespace CodeEditor.Composition.Client.Tests.Fixtures
 {
 	public interface IPingPonger
 	{
 		void Ping(int pingerId);
-		IObservable<Pong> Pong { get; }
+		IObservableX<Pong> Pong { get; }
 	}
 	
 	[Serializable]
@@ -20,15 +20,15 @@ namespace CodeEditor.Composition.Client.Tests.Fixtures
 	[Export(typeof(IPingPonger))]
 	class PingPonger : MarshalByRefObject, IPingPonger
 	{
-		private readonly Subject<Pong> _pongSubject;
+		private readonly ISubjectX<Pong> _pongSubject;
 
 		public PingPonger()
 		{
-			_pongSubject = new Subject<Pong>();
+			_pongSubject = SubjectX.Create<Pong>();
 			Pong = _pongSubject.Remotable();
 		}
 
-		public IObservable<Pong> Pong { get; private set; }
+		public IObservableX<Pong> Pong { get; private set; }
 
 		public void Ping(int pingerId)
 		{
