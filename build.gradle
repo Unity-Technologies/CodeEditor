@@ -141,6 +141,7 @@ class UpdateDir extends DefaultTask {
 				from project.zipTree(f)
 				into destDir
 				include '*.dll'
+				include '*.exe'
 				exclude 'UnityE*'
 			}
 		}
