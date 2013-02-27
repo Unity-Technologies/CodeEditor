@@ -13,14 +13,14 @@ namespace CodeEditor.Composition
 	/// <typeparam name="TMetadata">the metadata type (must be compatible with a metadata attribute)</typeparam>
 	public class Lazy<T, TMetadata> : Lazy<T> where T: class
 	{
+		public static Lazy<T, TMetadata> FromUntypedWithMetadata(Func<object> untyped, TMetadata metadata)
+		{
+			return new Lazy<T, TMetadata>(() => (T)untyped(), metadata);
+		}
+
 		private readonly TMetadata _metadata;
 
 		public Lazy(Func<T> valueFactory, TMetadata metadata) : base(valueFactory)
-		{
-			_metadata = metadata;
-		}
-
-		public Lazy(Func<object> valueFactory, TMetadata metadata) : base(() => (T)valueFactory())
 		{
 			_metadata = metadata;
 		}
@@ -33,6 +33,11 @@ namespace CodeEditor.Composition
 
 	public class Lazy<T> where T : class
 	{
+		public static Lazy<T> FromUntyped(Func<object> untyped)
+		{
+			return new Lazy<T>(() => (T)untyped());
+		}
+
 		private Func<T> _valueFactory;
 		private bool _hasValue;
 		private T _value;

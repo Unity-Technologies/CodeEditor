@@ -76,7 +76,7 @@ namespace CodeEditor.Composition.Primitives
 
 		private Func<Export, bool> Constraint()
 		{
-			if (_isLazyType)
+			if (_isLazyType && MetadataType != null)
 				return MetadataConstraintFor(MetadataType);
 			return _ => true;
 		}
@@ -100,7 +100,11 @@ namespace CodeEditor.Composition.Primitives
 
 		private Type MetadataType
 		{
-			get { return _elementType.GetGenericArguments()[1]; }
+			get
+			{
+				var genericArguments = _elementType.GetGenericArguments();
+				return genericArguments.Length == 2 ? genericArguments[1] : null;
+			}
 		}
 
 		private static Action<Export[], object> LazySetterFor(Type elementType, Action<object, object> setter, ImportCardinality cardinality, Type metadataType)
@@ -128,8 +132,10 @@ namespace CodeEditor.Composition.Primitives
 		private static object LazyInstanceFor(Type lazyType, Type metadataType, Export export)
 		{
 			Func<object> factory = () => export.Value;
+			if (metadataType == null)
+				return lazyType.GetMethod("FromUntyped").Invoke(null, new object[] { factory });
 			var metadata = export.Metadata.Single(metadataType.IsInstanceOfType);
-			return Activator.CreateInstance(lazyType, new[] { factory, metadata });
+			return lazyType.GetMethod("FromUntypedWithMetadata").Invoke(null, new object[] { factory, metadata });
 		}
 
 		private Type ContractType()
@@ -153,7 +159,10 @@ namespace CodeEditor.Composition.Primitives
 
 		private static bool IsLazyType(Type t)
 		{
-			return t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Lazy<,>);
+			if (!t.IsGenericType)
+				return false;
+			var definition = t.GetGenericTypeDefinition();
+			return definition == typeof(Lazy<,>) || definition == typeof(Lazy<>);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using CodeEditor.Composition.Primitives;
 using NUnit.Framework;
 
@@ -7,6 +7,15 @@ namespace CodeEditor.Composition.Tests
 	[TestFixture]
 	public class ImportDefinitionProviderTest
 	{
+		[Test]
+		public void LazyImportWithMetadata()
+		{
+			var provider = new ImportDefinitionProvider();
+			var import = provider.ImportsFor(typeof(ClassWithLazyImportWithMetadata)).Single();
+			Assert.AreEqual(typeof(IService), import.ContractType);
+			Assert.AreEqual(ImportCardinality.One, import.Cardinality);
+		}
+
 		[Test]
 		public void LazyImport()
 		{
@@ -25,10 +34,16 @@ namespace CodeEditor.Composition.Tests
 			Assert.AreEqual(ImportCardinality.Many, import.Cardinality);
 		}
 
-		public class ClassWithLazyImport
+		public class ClassWithLazyImportWithMetadata
 		{
 			[Import]
 			public Lazy<IService, IServiceMetadata> Service;
+		}
+
+		public class ClassWithLazyImport
+		{
+			[Import]
+			public Lazy<IService> Service;
 		}
 
 		public class ClassWithLazyImportMany
