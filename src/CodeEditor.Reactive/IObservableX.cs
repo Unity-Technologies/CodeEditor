@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Concurrency;
 using System.Linq;
 
 namespace CodeEditor.Reactive
@@ -18,6 +19,11 @@ namespace CodeEditor.Reactive
 
 	public static class ObservableX
 	{
+		public static IObservableX<T> ObserveOnThreadPool<T>(this IObservableX<T> source)
+		{
+			return source.Map(_ => _.ObserveOn(Scheduler.ThreadPool));
+		}
+
 		public static IObservableX<T> Empty<T>()
 		{
 			return Observable.Empty<T>().ToObservableX();
@@ -40,7 +46,7 @@ namespace CodeEditor.Reactive
 
 		public static IObservableX<T> Catch<T>(this IObservableX<T> source, IObservableX<T> second)
 		{
-			return source.ToObservable().Catch(second.ToObservable()).ToObservableX();
+			return source.Map(_ => _.Catch(second.ToObservable()));
 		}
 
 		public static IDisposable Subscribe<T>(this IObservableX<T> source, Action<T> onNext)
@@ -50,22 +56,28 @@ namespace CodeEditor.Reactive
 
 		public static IObservableX<TResult> Select<T, TResult>(this IObservableX<T> source, Func<T, TResult> selector)
 		{
-			return source.ToObservable().Select(selector).ToObservableX();
+			return source.Map(_ => _.Select(selector));
 		}
 
 		public static IObservableX<TResult> SelectMany<T, TResult>(this IObservableX<T> source, Func<T, IEnumerable<TResult>> selector)
 		{
-			return source.ToObservable().SelectMany(selector).ToObservableX();
+			return source.Map(_ => _.SelectMany(selector));
+		}
+
+		public static IObservableX<TResult> SelectMany<T, TResult>(this IObservableX<T> source, Func<T, IObservableX<TResult>> selector)
+		{
+			Func<T, IObservable<TResult>> observableSelector = t => selector(t).ToObservable();
+			return source.Map(_ => _.SelectMany(observableSelector));
 		}
 
 		public static IObservableX<T> Where<T>(this IObservableX<T> source, Func<T, bool> predicate)
 		{
-			return source.ToObservable().Where(predicate).ToObservableX();
+			return source.Map(_ => _.Where(predicate));
 		}
 
 		public static IObservableX<T> Do<T>(this IObservableX<T> source, Action<T> action)
 		{
-			return source.ToObservable().Do(action).ToObservableX();
+			return source.Map(_ => _.Do(action));
 		}
 
 		public static IObservableX<T> Remotable<T>(this IObservableX<T> source)
@@ -120,12 +132,17 @@ namespace CodeEditor.Reactive
 
 		public static IObservableX<IList<T>> ToList<T>(this IObservableX<T> source)
 		{
-			return source.ToObservable().ToList().ToObservableX();
+			return source.Map(_ => _.ToList());
 		}
 
 		public static IObservableX<T> ToObservableX<T>(this IEnumerable<T> source)
 		{
 			return source.ToObservable().ToObservableX();
+		}
+
+		public static IObservableX<TResult> Map<T, TResult>(this IObservableX<T> source, Func<IObservable<T>, IObservable<TResult>> selector)
+		{
+			return selector(source.ToObservable()).ToObservableX();
 		}
 	}
 }

@@ -1,0 +1,10 @@
+assembly {
+	targetFrameworkVersion 'v4.0'
+}
+
+dependencies {
+	'default' rootProject.references.moq
+	[':CodeEditor.Server.Interface', ':CodeEditor.Testing', ':CodeEditor.IO', ':CodeEditor.Composition', ':CodeEditor.Reactive'].each {
+		'default' project(it)
+	}
+}

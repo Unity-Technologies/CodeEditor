@@ -4,14 +4,18 @@ version = '0.1.1'
 dependencies {
 	def projectReferences = [
 		'CodeEditor.Composition',
+		'CodeEditor.Composition.Client',
+		'CodeEditor.IO',
+		'CodeEditor.Reactive',
 		'CodeEditor.Text.Data',
 		'CodeEditor.Text.Logic',
 		'CodeEditor.Text.UI',
 		'CodeEditor.Grammars',
 		'CodeEditor.Collections',
+		'CodeEditor.Server.Interface',
 	]
 	projectReferences.each {
 		'default' project(":$it")
 	}
-	'default' rootProject.references.ometa 
+	'default' rootProject.references.ometa
 }

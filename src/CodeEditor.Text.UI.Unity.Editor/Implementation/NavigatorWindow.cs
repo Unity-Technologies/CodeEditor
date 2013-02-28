@@ -15,7 +15,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		private const float kMargin = 10f;
 		private const float kLineHeight = 16f;
 
-		[NonSerialized] private INavigateToItemProvider _filePathProvider;
+		[NonSerialized] private INavigateToItemProvider _navigateToItemProvider;
 		[NonSerialized] private List<INavigateToItem> _currentItems;
 		[NonSerialized] private IDisposable _searchSubscription;
 		[NonSerialized] private INavigateToItem _selectedItem;
@@ -47,8 +47,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			if(s_Styles == null)
 				s_Styles = new Styles();
 
-			if(_filePathProvider == null)
-				_filePathProvider = ProviderAggregatorFactory();
+			if(_navigateToItemProvider == null)
+				_navigateToItemProvider = ProviderAggregatorFactory();
 		}
 
 		private void DelayExpensiveInit()
@@ -67,7 +67,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			if (_searchSubscription != null) _searchSubscription.Dispose();
 			_selectedItem = null;
 			_currentItems = new List<INavigateToItem>();
-			_searchSubscription = _filePathProvider.Search(_searchFilter).Subscribe(OnNextItem);
+			_searchSubscription = _navigateToItemProvider.Search(_searchFilter).ObserveOnThreadPool().Subscribe(OnNextItem);
 		}
 
 		private void OnNextItem(INavigateToItem item)

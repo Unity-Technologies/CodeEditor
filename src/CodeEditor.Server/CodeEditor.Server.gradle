@@ -1,0 +1,12 @@
+version = '0.1.0'
+
+assembly {
+	targetFrameworkVersion 'v4.0'
+}
+
+dependencies {
+	'default' project(':CodeEditor.Server.Interface')
+	'default' project(':CodeEditor.Composition')
+	'default' project(':CodeEditor.Reactive')
+	'default' project(':CodeEditor.IO')
+}

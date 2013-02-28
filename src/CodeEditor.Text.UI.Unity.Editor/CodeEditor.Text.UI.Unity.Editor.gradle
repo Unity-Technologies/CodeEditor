@@ -10,6 +10,7 @@ dependencies {
 		'CodeEditor.Text.Logic',
 		'CodeEditor.Text.UI',
 		'CodeEditor.Text.UI.Unity.Engine',
+		'CodeEditor.Languages.Common',
 	]
 	projectReferences.each {
 		'default' project(":$it")

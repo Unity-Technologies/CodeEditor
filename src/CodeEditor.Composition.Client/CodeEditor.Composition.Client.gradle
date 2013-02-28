@@ -2,6 +2,7 @@ version = '0.1.0'
 
 dependencies {
 	'default' project(':CodeEditor.Composition')
+	'default' project(':CodeEditor.IO')
 }
 
 assembly {
