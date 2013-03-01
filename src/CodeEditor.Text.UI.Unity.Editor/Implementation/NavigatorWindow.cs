@@ -35,6 +35,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		}
 
 		private static Styles s_Styles;
+		private UnityEditorScheduler _unityScheduler;
 
 		public static void Open()
 		{
@@ -47,8 +48,11 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			if(s_Styles == null)
 				s_Styles = new Styles();
 
-			if(_navigateToItemProvider == null)
+			if (_navigateToItemProvider == null)
+			{
 				_navigateToItemProvider = ProviderAggregatorFactory();
+				_unityScheduler = new UnityEditorScheduler();
+			}
 		}
 
 		private void DelayExpensiveInit()
@@ -72,10 +76,13 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		private void OnNextItem(INavigateToItem item)
 		{
-			if (_selectedItem == null)
-				_selectedItem = item;
-			_currentItems.Add(item);
-			Repaint();
+			_unityScheduler.Schedule(() =>
+			{
+				if (_selectedItem == null)
+					_selectedItem = item;
+				_currentItems.Add(item);
+				Repaint();
+			});
 		}
 
 		private void OnGUI()

@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using CodeEditor.Composition.Client;
 using CodeEditor.IO;
-using CodeEditor.Server.Interface;
 using CodeEditor.Testing;
 using NUnit.Framework;
 
@@ -39,30 +38,13 @@ namespace CodeEditor.Languages.Common.Tests
 			pidFile
 				.Setup(_ => _.ReadAllText())
 				.Returns(serverAddress);
-
-			var clientProvider = MockFor<ICompositionClientProvider>();
-			var client = MockFor<IServiceProvider>();
-			clientProvider
-				.Setup(_ => _.CompositionClientFor(serverAddress))
-				.Returns(client.Object);
-
-			var projectServer = MockFor<IUnityProjectServer>();
-			client
-				.Setup(_ => _.GetService(typeof(IUnityProjectServer)))
-				.Returns(projectServer.Object);
-
-			var project = MockFor<IUnityProject>();
-			projectServer
-				.Setup(_ => _.ProjectForFolder(projectFolder))
-				.Returns(project.Object);
-
-			var subject = new UnityProjectProvider
+			
+			var subject = new ObservableServiceClientProvider
 			{
 				ProjectPathProvider = projectPathProvider.Object,
-				FileSystem = fileSystem.Object,
-				ClientProvider = clientProvider.Object,
+				FileSystem = fileSystem.Object
 			};
-			Assert.AreSame(project.Object, subject.Project);
+			Assert.IsNotNull(subject.Client);
 
 			VerifyAllMocks();
 		}

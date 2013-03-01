@@ -183,6 +183,10 @@ def rxDependency(rxPackage, rxAssembly, rxConfiguration) {
 	['group': rxPackage, 'name': rxAssembly, 'version': '1.0.2856.0', 'configuration': rxConfiguration]
 }
 
+def serviceStack(assembly, pkg = 'ServiceStack') {
+		['group': pkg, 'name': assembly, 'version':	'3.9.37', 'configuration': 'net35']
+}
+
 ext {
 	rxCore = { assemblyName, configuration = 'Net35' -> rxDependency('Rx-Core-old', assemblyName, configuration) }
 	rxMain = { assemblyName, configuration = 'Net35' -> rxDependency('Rx-Main', assemblyName, configuration) }
@@ -200,7 +204,23 @@ ext {
 		'rx40': [
 			rxMain('System.Reactive', 'Net4'),
 			rxCore('System.CoreEx', 'Net4'),
-		]
+		],
+		'serviceStack': [
+			serviceStack('ServiceStack'),
+			serviceStack('ServiceStack.ServiceInterface'),
+			serviceStack('ServiceStack.Common', 'ServiceStack.Common'),
+			serviceStack('ServiceStack.Interfaces', 'ServiceStack.Common'),
+			serviceStack('ServiceStack.Text', 'ServiceStack.Text')
+		],
+		'serviceStackInterfaces': [
+			serviceStack('ServiceStack.Interfaces', 'ServiceStack.Common'),
+		],
+		'serviceStackClient': [
+			serviceStack('ServiceStack.Interfaces', 'ServiceStack.Common'),
+			serviceStack('ServiceStack.Text', 'ServiceStack.Text'),
+			serviceStack('ServiceStack.Common', 'ServiceStack.Common')
+		],
+
 	]
 }
 

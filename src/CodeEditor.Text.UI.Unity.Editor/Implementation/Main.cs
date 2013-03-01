@@ -41,7 +41,21 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		{
 			var container = new CompositionContainer(AppDomain.CurrentDomain.GetAssemblies().ToArray());
 			container.AddExportedValue<IFileSystem>(new UnityEditorFileSystem());
+			container.AddExportedValue<ILogger>(new UnityLogger());
 			return container;
+		}
+
+		private class UnityLogger : ILogger
+		{
+			public void Log(object value)
+			{
+				UnityEngine.Debug.Log(value);
+			}
+
+			public void LogError(Exception exception)
+			{
+				UnityEngine.Debug.LogException(exception);
+			}
 		}
 	}
 }

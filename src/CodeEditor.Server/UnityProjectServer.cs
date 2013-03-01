@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,11 +7,68 @@ using CodeEditor.Composition;
 using CodeEditor.IO;
 using CodeEditor.Reactive;
 using CodeEditor.Server.Interface;
+using ServiceStack.ServiceInterface;
 
 namespace CodeEditor.Server
 {
+	public class SymbolService : Service
+	{
+		private readonly ICompositionContainer _container;
+
+		public SymbolService(ICompositionContainer container)
+		{
+			_container = container;
+		}
+
+		public IEnumerable<Interface.Symbol> Any(SymbolSearch request)
+		{
+			var server = (IUnityProjectServer)_container.GetExports(typeof(IUnityProjectServer)).Single().Value;
+			return server
+				.ProjectForFolder("c:/Users/bamboo/code/kaizen/CodeEditor/UnityProject/Assets")
+				.SearchSymbol(request.Filter)
+				.Select(_ => new Interface.Symbol { Line = _.Line, Column = _.Column, DisplayText = _.DisplayText })
+				.ToList()
+				.FirstOrTimeout(TimeSpan.FromSeconds(3));
+		}
+	}
+
+	public interface IUnityProjectServer
+	{
+		IUnityProject ProjectForFolder(string projectFolder);
+	}
+
+	public interface IUnityProject
+	{
+		IObservableX<ISymbol> SearchSymbol(string pattern);
+	}
+
+	public interface ISymbol
+	{
+		int Line { get; }
+		int Column { get; }
+		string DisplayText { get; }
+	}
+
+	public class Symbol : ISymbol
+	{
+		public int Line
+		{
+			get { return 1; }
+		}
+
+		public int Column
+		{
+			get { return 7; }
+		}
+
+		public string DisplayText
+		{
+			get { return "Foo"; }
+		}
+	}
+
 	[Export(typeof(IUnityProjectServer))]
-	public class UnityProjectServer : MarshalByRefObject, IUnityProjectServer
+	public class UnityProjectServer : IUnityProjectServer
 	{
 		[Import]
 		public IFileSystem FileSystem { get; set; }
@@ -20,10 +78,17 @@ namespace CodeEditor.Server
 
 		public IUnityProject ProjectForFolder(string projectFolder)
 		{
+			return _projects.GetOrAdd(Path.GetFullPath(projectFolder), CreateProjectForFolder);
+		}
+
+		private IUnityProject CreateProjectForFolder(string projectFolder)
+		{
 			var project = new UnityProject(FileSystem.FolderFor(projectFolder), SymbolParser);
 			project.Start();
 			return project;
 		}
+
+		readonly ConcurrentDictionary<string, IUnityProject> _projects = new ConcurrentDictionary<string, IUnityProject>();
 	}
 
 	class UnityProject : MarshalByRefObject, IUnityProject
@@ -41,10 +106,11 @@ namespace CodeEditor.Server
 
 		public IObservableX<ISymbol> SearchSymbol(string pattern)
 		{
+			if (string.IsNullOrEmpty(pattern))
+				return AllSymbols;
 			return AllSymbols
 				.Where(symbol => symbol.DisplayText.Contains(pattern))
-				.Do(_ => Console.Error.WriteLine("seen symbol {0}", _))
-				.Remotable();
+				.Do(_ => Console.Error.WriteLine("seen symbol {0}", _));
 		}
 
 		public void Start()

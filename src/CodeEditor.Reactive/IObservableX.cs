@@ -24,6 +24,11 @@ namespace CodeEditor.Reactive
 			return source.Map(_ => _.ObserveOn(Scheduler.ThreadPool));
 		}
 
+		public static IObservableX<T> SubscribeOnThreadPool<T>(this IObservableX<T> source)
+		{
+			return source.Map(_ => _.SubscribeOn(Scheduler.ThreadPool));
+		}
+
 		public static IObservableX<T> Empty<T>()
 		{
 			return Observable.Empty<T>().ToObservableX();
@@ -80,41 +85,6 @@ namespace CodeEditor.Reactive
 			return source.Map(_ => _.Do(action));
 		}
 
-		public static IObservableX<T> Remotable<T>(this IObservableX<T> source)
-		{
-			return new MarshalByRefObservableX<T>(source);
-		}
-
-		public class MarshalByRefObservableX<T> : MarshalByRefObject, IObservableX<T>
-		{
-			private readonly IObservableX<T> _source;
-
-			public MarshalByRefObservableX(IObservableX<T> source)
-			{
-				_source = source;
-			}
-
-			public IDisposable Subscribe(IObserverX<T> observer)
-			{
-				return new MarshalByRefDisposable(_source.Subscribe(observer));
-			}
-		}
-
-		internal class MarshalByRefDisposable : MarshalByRefObject, IDisposable
-		{
-			private readonly IDisposable _disposable;
-
-			public MarshalByRefDisposable(IDisposable disposable)
-			{
-				_disposable = disposable;
-			}
-
-			public void Dispose()
-			{
-				_disposable.Dispose();
-			}
-		}
-
 		public static IObservableX<T> Merge<T>(this IEnumerable<IObservableX<T>> sources)
 		{
 			return sources.Select(_ => _.ToObservable()).Merge().ToObservableX();
@@ -127,7 +97,7 @@ namespace CodeEditor.Reactive
 
 		public static T FirstOrTimeout<T>(this IObservableX<T> source, TimeSpan timeout)
 		{
-			return source.ToObservable().Timeout(timeout, Observable.Throw<T>(new TimeoutException())).First();
+			return source.ToObservable().Timeout(timeout).First();
 		}
 
 		public static IObservableX<IList<T>> ToList<T>(this IObservableX<T> source)

@@ -18,4 +18,5 @@ dependencies {
 		'default' project(":$it")
 	}
 	'default' rootProject.references.ometa
+	'default' rootProject.references.serviceStackClient
 }

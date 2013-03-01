@@ -21,7 +21,7 @@ namespace CodeEditor.Composition.Hosting
 			return _catalog.GetExports(contractType);
 		}
 
-		private static Assembly[] AllAssembliesIn(string directory)
+		public static Assembly[] AllAssembliesIn(string directory)
 		{
 			return Directory.GetFiles(directory, "*.dll").Select(s => Assembly.LoadFrom(s)).ToArray();
 		}

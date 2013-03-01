@@ -9,4 +9,5 @@ dependencies {
 	'default' project(':CodeEditor.Composition')
 	'default' project(':CodeEditor.Reactive')
 	'default' project(':CodeEditor.IO')
+	'default' rootProject.references.serviceStack
 }

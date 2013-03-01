@@ -24,8 +24,7 @@ namespace CodeEditor.Composition.Client.Tests.Fixtures
 
 		public PingPonger()
 		{
-			_pongSubject = SubjectX.Create<Pong>();
-			Pong = _pongSubject.Remotable();
+			Pong = _pongSubject = SubjectX.Create<Pong>();
 		}
 
 		public IObservableX<Pong> Pong { get; private set; }

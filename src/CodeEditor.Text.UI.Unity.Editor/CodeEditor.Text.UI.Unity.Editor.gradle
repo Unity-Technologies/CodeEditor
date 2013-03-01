@@ -19,4 +19,5 @@ dependencies {
 	unityReferences.each {
 		'default' group: 'Unity', name: it, version: '4.0+', configuration: 'editor'
 	}
+	'default' rootProject.references.serviceStackClient
 }

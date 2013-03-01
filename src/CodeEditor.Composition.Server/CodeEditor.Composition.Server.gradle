@@ -13,10 +13,6 @@ dependencies {
 	projectReferences.each {
 		'default' project(":$it")
 	}
+	'default' rootProject.references.serviceStack
 }
 
-assembly {
-	references {
-		frameworkAssembly 'System.Runtime.Remoting'
-	}
-}

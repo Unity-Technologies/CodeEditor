@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using CodeEditor.Composition;
 using CodeEditor.Languages.Common;
-using UnityEditor;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
@@ -12,9 +11,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		{
 			get
 			{
-				var location = Path.GetDirectoryName(UnityEngine.Application.dataPath);
-				UnityEngine.Debug.Log("IUnityProjectPathProvider.Location -> " + location);
-				return location;
+				return Path.GetDirectoryName(UnityEngine.Application.dataPath);
 			}
 		}
 	}

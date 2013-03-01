@@ -2,6 +2,7 @@ using CodeEditor.Composition;
 using CodeEditor.Reactive;
 using CodeEditor.Server.Interface;
 using CodeEditor.Text.UI;
+using ServiceStack.Text;
 
 namespace CodeEditor.Languages.Common
 {
@@ -9,23 +10,27 @@ namespace CodeEditor.Languages.Common
 	internal class SymbolNavigateToItemProvider : INavigateToItemProvider
 	{
 		[Import]
-		public Lazy<IUnityProjectProvider> UnityProjectProvider;
+		public IObservableServiceClientProvider ServiceClientProvider;
+
+		[Import]
+		public ILogger Logger;
 
 		public IObservableX<INavigateToItem> Search(string filter)
 		{
-			return Project.SearchSymbol(filter).Select(symbol => new SymbolItem(symbol));
+			Logger.Log("SymbolNavigateToItemProvider.Search({0})".Fmt(filter));
+			return ServiceClient.ObserveMany(new SymbolSearch {Filter = filter}).Select(_ => (INavigateToItem)new SymbolItem(_));
 		}
 
-		private IUnityProject Project
+		private IObservableServiceClient ServiceClient
 		{
-			get { return UnityProjectProvider.Value.Project; }
+			get { return ServiceClientProvider.Client; }
 		}
 
 		internal class SymbolItem : INavigateToItem
 		{
-			private readonly ISymbol _symbol;
+			private readonly Symbol _symbol;
 
-			public SymbolItem(ISymbol symbol)
+			public SymbolItem(Symbol symbol)
 			{
 				_symbol = symbol;
 			}
