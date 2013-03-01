@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Threading;
 using CodeEditor.Composition.Hosting;
 using CodeEditor.IO;
 using CodeEditor.Reactive;
@@ -17,7 +19,7 @@ namespace CodeEditor.Server.Tests
 			var fileSystem = MockFor<IFileSystem>();
 			var projectFolder = MockFor<IFolder>();
 			fileSystem
-				.Setup(_ => _.FolderFor("UnityProject"))
+				.Setup(_ => _.FolderFor(Path.GetFullPath("UnityProject")))
 				.Returns(projectFolder.Object);
 
 			var sourceFile = MockFor<IFile>();
@@ -26,13 +28,13 @@ namespace CodeEditor.Server.Tests
 				.Returns(new[] {sourceFile.Object});
 
 			var parser = MockFor<ISymbolParser>();
+
+			var parseWaitEvent = new AutoResetEvent(false);
 			var symbol = MockFor<ISymbol>();
 			parser
 				.Setup(_ => _.Parse(sourceFile.Object))
+				.Callback(() => parseWaitEvent.Set())
 				.Returns(new[] {symbol.Object});
-			symbol
-				.SetupGet(_ => _.DisplayText)
-				.Returns("");
 
 			var container = new CompositionContainer(typeof(UnityProjectServer).Assembly);
 			container.AddExportedValue(fileSystem.Object);
@@ -40,7 +42,9 @@ namespace CodeEditor.Server.Tests
 
 			var subject = container.GetExportedValue<IUnityProjectServer>();
 			var project = subject.ProjectForFolder("UnityProject");
-			Assert.AreSame(symbol.Object, project.SearchSymbol("").FirstOrDefault());
+
+			// TODO: replace by injecting immediate scheduler
+			parseWaitEvent.WaitOne(TimeSpan.FromSeconds(1));
 
 			VerifyAllMocks();
 		}
