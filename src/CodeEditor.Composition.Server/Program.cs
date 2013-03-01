@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -16,19 +15,17 @@ namespace CodeEditor.Composition.Server
 	{
 		static void Main()
 		{
-			Trace.Listeners.Add(new ConsoleTraceListener(true));
-			
 			using (var pidFileWriter = new StreamWriter(File.Open(PidFile, FileMode.Create, FileAccess.Write, FileShare.Read)))
 			{
-				var urlBase = "http://127.0.0.1:8888/";
+				var baseUri = "http://127.0.0.1:8888/";
 				
-				pidFileWriter.Write(urlBase);
+				pidFileWriter.Write(baseUri);
 				pidFileWriter.Flush();
 
 				using (var appHost = new AppHost(DirectoryCatalog.AllAssembliesIn(ServerDirectory)))
 				{
 					appHost.Init();
-					appHost.Start(urlBase);
+					appHost.Start(baseUri);
 
 					Console.WriteLine("Press <ENTER> to quit");
 					Console.ReadLine();
@@ -38,12 +35,17 @@ namespace CodeEditor.Composition.Server
 
 		private static string ServerDirectory
 		{
-			get { return Path.GetDirectoryName(typeof(Program).Module.FullyQualifiedName); }
+			get { return Path.GetDirectoryName(FullyQualifiedName); }
 		}
 
 		protected static string PidFile
 		{
-			get { return Path.ChangeExtension(typeof(Program).Module.FullyQualifiedName, "pid"); }
+			get { return Path.ChangeExtension(FullyQualifiedName, "pid"); }
+		}
+
+		private static string FullyQualifiedName
+		{
+			get { return typeof(Program).Module.FullyQualifiedName; }
 		}
 
 		public class AppHost : AppHostHttpListenerBase
@@ -73,10 +75,10 @@ namespace CodeEditor.Composition.Server
 
 				public T TryResolve<T>()
 				{
-					var singleOrDefault = _compositionContainer.GetExports(typeof(T)).SingleOrDefault();
-					if (singleOrDefault == null)
+					var singleOrDefaultExport = _compositionContainer.GetExports(typeof(T)).SingleOrDefault();
+					if (singleOrDefaultExport == null)
 						return default(T);
-					return (T) singleOrDefault.Value;
+					return (T) singleOrDefaultExport.Value;
 				}
 
 				public T Resolve<T>()

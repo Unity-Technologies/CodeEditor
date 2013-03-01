@@ -1,6 +1,5 @@
 using CodeEditor.Composition;
 using CodeEditor.IO;
-using CodeEditor.Server.Interface;
 
 namespace CodeEditor.Server
 {
