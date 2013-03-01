@@ -23,7 +23,8 @@ namespace CodeEditor.IO.Implementation
 
 		public string ReadAllText()
 		{
-			return System.IO.File.ReadAllText(_fullName);
+			using (var reader = new StreamReader(System.IO.File.Open(_fullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+				return reader.ReadToEnd();
 		}
 
 		public virtual void WriteAllText(string text)
