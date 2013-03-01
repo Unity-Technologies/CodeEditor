@@ -2,8 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Threading;
-using CodeEditor.Composition.Hosting;
 using NUnit.Framework;
 
 namespace CodeEditor.Composition.Client.Tests
@@ -18,94 +16,6 @@ namespace CodeEditor.Composition.Client.Tests
 		{
 			_serverFolder = CreateTempDirectory();
 			CopyServerAssembliesTo(_serverFolder);
-		}
-
-		[Test]
-		public void GetService_Activates_Service_On_Server_Process()
-		{
-			using (var serverProcess = StartCompositionServerAtFolder(_serverFolder))
-			{
-				var subject = CreateCompositionClientProvider();
-				var client = subject.CompositionClientFor("tcp://localhost:8888/IServiceProvider");
-				var service = client.GetService<IRemoteService>();
-				Assert.AreEqual(serverProcess.Id, service.ProcessId);
-			}
-		}
-
-		[Test]
-		public void CallbacksAreSupported()
-		{
-			using (var serverProcess = StartCompositionServerAtFolder(_serverFolder))
-			{
-				var subject = CreateCompositionClientProvider();
-				var client = subject.CompositionClientFor("tcp://localhost:8888/IServiceProvider");
-
-				var callbackWaitHandle = new ManualResetEvent(false);
-				var callback = new RemoteCallback(_ => callbackWaitHandle.Set());
-				var service = client.GetService<IRemoteService>();
-				service.CallMeBackAt(callback, CurrentProcessId);
-
-				Assert.IsTrue(callbackWaitHandle.WaitOne(TimeSpan.FromSeconds(1)));
-				Assert.AreEqual(CurrentProcessId, callback.LastValue);
-			}
-		}
-
-		public class RemoteCallback : MarshalByRefObject, ICallback
-		{
-			private readonly Action<int> _action;
-			private int _lastValue;
-
-			public RemoteCallback(Action<int> action)
-			{
-				_action = action;
-			}
-
-			public int LastValue
-			{
-				get { return _lastValue; }
-			}
-
-			public void OnNext(int value)
-			{
-				_lastValue = value;
-				_action(value);
-			}
-		}
-		/*
-		[Test]
-		public void RemotableObservable()
-		{
-			using (var serverProcess = StartCompositionServer())
-			{
-				var subject = CreateCompositionClientProvider();
-				var client = subject.CompositionClientFor("tcp://localhost:8888/IServiceProvider");
-				var service = client.GetService<IPingPonger>();
-				var pongs = new ConcurrentBag<Pong>();
-				using (service.Pong.Subscribe(pongs.Add))
-				{
-					Assert.AreEqual(0, pongs.Count);
-
-					service.Ping(CurrentProcessId);
-
-					Pong pong;
-					Assert.IsTrue(pongs.TryTake(out pong));
-					Assert.AreEqual(CurrentProcessId, pong.PingerId);
-					Assert.AreEqual(serverProcess.Id, pong.PongerId);
-				}
-				service.Ping(CurrentProcessId);
-				Assert.AreEqual(0, pongs.Count);
-			}
-		}*/
-
-		private static int CurrentProcessId
-		{
-			get { return Process.GetCurrentProcess().Id; }
-		}
-
-		private ICompositionClientProvider CreateCompositionClientProvider()
-		{
-			return new CompositionContainer(AssemblyOf<ICompositionClientProvider>())
-				.GetExportedValue<ICompositionClientProvider>();
 		}
 
 		private Assembly AssemblyOf<T>()
