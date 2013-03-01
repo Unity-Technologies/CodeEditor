@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using CodeEditor.Text.UI.Implementation;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 {
