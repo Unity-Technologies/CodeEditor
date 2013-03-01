@@ -1,4 +1,4 @@
-﻿using CodeEditor.IO;
+using CodeEditor.IO;
 
 namespace CodeEditor.Text.UI.Unity.Engine
 {
@@ -10,8 +10,27 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		ITextView CreateView();
 
 		/// <summary>
-		/// Creates a view for the specific file taken from the current <see cref="IFileSystem"/>.
+		/// Creates a view for the specified file taken from the imported <see cref="IFileSystem"/>
+		/// with margins provided by the imported <see cref="IDefaultTextViewMarginsProvider" />.
 		/// </summary>
 		ITextView ViewForFile(string fileName);
+
+		/// <summary>
+		/// Creates a view with the specified options.
+		/// </summary>
+		ITextView CreateView(TextViewCreationOptions options);
+	}
+
+	public class TextViewCreationOptions
+	{
+		/// <summary>
+		/// File to be viewed. Defaults to a transient txt file.
+		/// </summary>
+		public IFile File { get; set; }
+
+		/// <summary>
+		/// Margins to be included. Defaults to <see cref="IDefaultTextViewMarginsProvider.MarginsFor"/>.
+		/// </summary>
+		public ITextViewMargins Margins { get; set; }
 	}
 }

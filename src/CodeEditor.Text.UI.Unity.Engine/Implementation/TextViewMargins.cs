@@ -5,16 +5,17 @@ using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 {
-	internal class TextViewMargins : ITextViewMargins
+	public class TextViewMargins : ITextViewMargins
 	{
-		private readonly ITextViewMargin[] _textViewMargins;
-
-		private const int Spacing = 5;
-
 		public TextViewMargins(IEnumerable<ITextViewMargin> textViewMargins)
 		{
-			_textViewMargins = textViewMargins.ToArray();
+			Margins = textViewMargins.ToArray();
+			Spacing = 5;
 		}
+
+		public ITextViewMargin[] Margins { get; set; }
+
+		public int Spacing { get; set; }
 
 		public void Repaint(ITextViewLine line, Rect lineRect)
 		{
@@ -28,7 +29,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		private void InvokeWithRects(Rect lineRect, Action<ITextViewMargin, Rect> invokeMe)
 		{
-			foreach (var margin in _textViewMargins)
+			foreach (var margin in Margins)
 			{
 				lineRect.x += Spacing;
 				lineRect.width = margin.Width;
@@ -40,7 +41,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		public float TotalWidth
 		{
-			get { return _textViewMargins.Sum(m => m.Width) + Spacing * (_textViewMargins.Length + 1); }
+			get { return Margins.Sum(m => m.Width) + Spacing * (Margins.Length + 1); }
 		}
 	}
 }
