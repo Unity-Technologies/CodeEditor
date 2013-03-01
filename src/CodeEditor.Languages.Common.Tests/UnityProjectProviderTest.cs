@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using CodeEditor.Composition;
 using CodeEditor.Composition.Client;
 using CodeEditor.IO;
 using CodeEditor.Testing;
@@ -42,7 +43,8 @@ namespace CodeEditor.Languages.Common.Tests
 			var subject = new ObservableServiceClientProvider
 			{
 				ProjectPathProvider = projectPathProvider.Object,
-				FileSystem = fileSystem.Object
+				FileSystem = fileSystem.Object,
+				Logger = new StandardLogger()
 			};
 			Assert.IsNotNull(subject.Client);
 

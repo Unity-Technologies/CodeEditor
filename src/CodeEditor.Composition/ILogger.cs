@@ -9,7 +9,7 @@ namespace CodeEditor.Composition
 	}
 
 	[Export(typeof(ILogger))]
-	internal class StandardLogger : ILogger
+	public class StandardLogger : ILogger
 	{
 		public void Log(object value)
 		{
