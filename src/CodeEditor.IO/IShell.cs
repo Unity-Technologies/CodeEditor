@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.IO;
 using CodeEditor.Composition;
@@ -22,7 +23,8 @@ namespace CodeEditor.IO
 	{
 		public IProcess StartManagedProcess(string executable)
 		{
-			return new StandardProcess(Process.Start(new ProcessStartInfo(executable)
+			var mono = Environment.GetEnvironmentVariable("MONO_EXECUTABLE") ?? "mono";
+			return new StandardProcess(Process.Start(new ProcessStartInfo(mono, executable)
 			{
 				RedirectStandardInput = true,
 				RedirectStandardOutput = true,
