@@ -103,8 +103,7 @@ namespace CodeEditor.Server
 			if (string.IsNullOrEmpty(pattern))
 				return AllSymbols;
 			return AllSymbols
-				.Where(symbol => symbol.DisplayText.Contains(pattern))
-				.Do(_ => Console.Error.WriteLine("seen symbol {0}", _));
+				.Where(symbol => symbol.DisplayText.Contains(pattern));
 		}
 
 		public void Start()
@@ -129,7 +128,6 @@ namespace CodeEditor.Server
 
 		private ISymbol[] ParseSymbolsOf(IFile file)
 		{
-			Console.Error.WriteLine("Parsing {0}", file);
 			return _parser.Parse(file);
 		}
 	}
