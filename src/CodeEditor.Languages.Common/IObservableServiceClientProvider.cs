@@ -60,8 +60,8 @@ namespace CodeEditor.Languages.Common
 			{
 				EnsureCompositionServerIsRunning();
 
-				var serverAddress = PidFile.ReadAllText();
-				return new ObservableServiceClient(serverAddress, Logger);
+				var baseUri = PidFile.ReadAllText();
+				return new ObservableServiceClient(baseUri);
 			}
 			catch (Exception e)
 			{
@@ -126,26 +126,21 @@ namespace CodeEditor.Languages.Common
 		}
 	}
 
-	internal class ObservableServiceClient : IObservableServiceClient
+	public class ObservableServiceClient : IObservableServiceClient
 	{
-		private readonly string _serverAddress;
-		private readonly ILogger _logger;
+		private readonly string _baseUri;
 
-		public ObservableServiceClient(string serverAddress, ILogger logger)
+		public ObservableServiceClient(string baseUri)
 		{
-			_serverAddress = serverAddress;
-			_logger = logger;
+			_baseUri = baseUri;
 		}
 
 		public IObservableX<TResponse> ObserveMany<TResponse>(IReturn<IEnumerable<TResponse>> request)
 		{
 			return ObservableX.Start(() =>
 			{
-				_logger.Log("'{0}'.ObserveMany({1})".Fmt(_serverAddress, request.Dump()));
-
-				var client = new JsonServiceClient(_serverAddress);
+				var client = new JsonServiceClient(_baseUri);
 				return client.Send(request);
-
 			}).SelectMany(_ => _);
 		}
 	}
