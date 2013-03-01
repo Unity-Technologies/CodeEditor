@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using CodeEditor.Composition.Hosting;
 using Funq;
+using ServiceStack.Configuration;
 using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface.Providers;
 using ServiceStack.WebHost.Endpoints;
@@ -56,8 +58,31 @@ namespace CodeEditor.Composition.Server
 			public override void Configure(Container container)
 			{
 				EndpointHostConfig.Instance.DebugMode = true;
-				container.Register<ICompositionContainer>(CompositionContainer);
+				container.Adapter = new CompositionContainerAdapter(CompositionContainer);
 				container.Register<IRequestLogger>(new InMemoryRollingRequestLogger());
+			}
+
+			public class CompositionContainerAdapter : IContainerAdapter
+			{
+				private readonly CompositionContainer _compositionContainer;
+
+				public CompositionContainerAdapter(CompositionContainer compositionContainer)
+				{
+					_compositionContainer = compositionContainer;
+				}
+
+				public T TryResolve<T>()
+				{
+					var singleOrDefault = _compositionContainer.GetExports(typeof(T)).SingleOrDefault();
+					if (singleOrDefault == null)
+						return default(T);
+					return (T) singleOrDefault.Value;
+				}
+
+				public T Resolve<T>()
+				{
+					return _compositionContainer.GetExportedValue<T>();
+				}
 			}
 		}
 	}

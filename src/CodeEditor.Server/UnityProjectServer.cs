@@ -13,17 +13,11 @@ namespace CodeEditor.Server
 {
 	public class SymbolService : Service
 	{
-		private readonly ICompositionContainer _container;
-
-		public SymbolService(ICompositionContainer container)
-		{
-			_container = container;
-		}
+		public IUnityProjectServer ProjectServer { get; set; }
 
 		public IEnumerable<Interface.Symbol> Any(SymbolSearch request)
 		{
-			var server = (IUnityProjectServer)_container.GetExports(typeof(IUnityProjectServer)).Single().Value;
-			return server
+			return ProjectServer
 				.ProjectForFolder("c:/Users/bamboo/code/kaizen/CodeEditor/UnityProject/Assets")
 				.SearchSymbol(request.Filter)
 				.Select(_ => new Interface.Symbol { Line = _.Line, Column = _.Column, DisplayText = _.DisplayText })
