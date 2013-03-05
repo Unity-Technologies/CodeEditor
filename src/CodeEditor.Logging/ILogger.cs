@@ -1,6 +1,7 @@
 using System;
+using CodeEditor.Composition;
 
-namespace CodeEditor.Composition
+namespace CodeEditor.Logging
 {
 	public interface ILogger
 	{

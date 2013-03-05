@@ -1,4 +1,5 @@
 using CodeEditor.Composition;
+using CodeEditor.Logging;
 using CodeEditor.Reactive;
 using CodeEditor.Server.Interface;
 using CodeEditor.Text.UI;

@@ -3,6 +3,7 @@ using System.Linq;
 using CodeEditor.Composition;
 using CodeEditor.Composition.Hosting;
 using CodeEditor.IO;
+using CodeEditor.Logging;
 using CodeEditor.Text.UI.Unity.Engine;
 using CodeEditor.Text.UI.Unity.Engine.Implementation;
 using UnityEditor;

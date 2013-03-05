@@ -38,7 +38,8 @@ vs {
 			':CodeEditor.Testing',
 			':CodeEditor.Composition.Client',
 			':CodeEditor.Composition.Server',
-			':CodeEditor.Reactive'
+			':CodeEditor.Reactive',
+			':CodeEditor.Logging',
 		]
 		def isTestProject = { p -> (p.name =~ /\.Tests(\.Fixtures)?/).any() }
 		def testProjects = subprojects.findAll(isTestProject) .collect { it.path }

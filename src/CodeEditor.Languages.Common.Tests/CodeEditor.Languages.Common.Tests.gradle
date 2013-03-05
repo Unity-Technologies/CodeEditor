@@ -5,6 +5,7 @@ dependencies {
 		'CodeEditor.Composition',
 		'CodeEditor.Composition.Client',
 		'CodeEditor.IO',
+		'CodeEditor.Logging',
 		'CodeEditor.Text.Data',
 		'CodeEditor.Languages.Common',
 		'CodeEditor.Server.Interface',

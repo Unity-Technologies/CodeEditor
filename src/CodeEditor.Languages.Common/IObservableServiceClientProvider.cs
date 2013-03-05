@@ -4,6 +4,7 @@ using System.IO;
 using CodeEditor.Composition;
 using CodeEditor.Composition.Client;
 using CodeEditor.IO;
+using CodeEditor.Logging;
 using CodeEditor.Reactive;
 using ServiceStack.ServiceClient.Web;
 using ServiceStack.ServiceHost;

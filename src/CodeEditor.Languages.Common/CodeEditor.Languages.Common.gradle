@@ -6,6 +6,7 @@ dependencies {
 		'CodeEditor.Composition',
 		'CodeEditor.Composition.Client',
 		'CodeEditor.IO',
+		'CodeEditor.Logging',
 		'CodeEditor.Reactive',
 		'CodeEditor.Text.Data',
 		'CodeEditor.Text.Logic',

@@ -1,8 +1,7 @@
-using System;
 using System.IO;
 using CodeEditor.Composition;
-using CodeEditor.Composition.Client;
 using CodeEditor.IO;
+using CodeEditor.Logging;
 using CodeEditor.Testing;
 using NUnit.Framework;
 
