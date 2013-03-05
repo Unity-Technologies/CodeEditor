@@ -17,7 +17,7 @@ namespace CodeEditor.Composition.Server
 		{
 			using (var pidFileWriter = new StreamWriter(File.Open(PidFile, FileMode.Create, FileAccess.Write, FileShare.Read)))
 			{
-				var baseUri = "http://127.0.0.1:8888/";
+				var baseUri = "http://localhost:8888/";
 				
 				pidFileWriter.Write(baseUri);
 				pidFileWriter.Flush();
