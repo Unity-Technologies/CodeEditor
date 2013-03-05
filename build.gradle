@@ -185,7 +185,7 @@ def rxDependency(rxPackage, rxAssembly, rxConfiguration) {
 }
 
 def serviceStack(assembly, pkg = 'ServiceStack') {
-		['group': pkg, 'name': assembly, 'version':	'3.9.37', 'configuration': 'net35']
+		['group': pkg, 'name': assembly, 'version':	'3.9.38', 'configuration': 'net35']
 }
 
 ext {
