@@ -39,37 +39,17 @@ namespace CodeEditor.Reactive
 
 			public IDisposable Subscribe(IObserverX<T> observer)
 			{
-				Console.Error.WriteLine("Subscribing {0}", observer);
+				var observerX = observer as ObserverX<T>;
+				if (observerX != null)
+					return _observable.Subscribe(observerX.Observer);
 				return _observable.Subscribe(
-					value =>
-					{
-						Console.Error.WriteLine("sending {0}", value);
-						try
-						{
-							observer.OnNext(value);
-						}
-						catch (Exception x)
-						{
-							Console.Error.WriteLine("error: {0}", x);
-						}
-					},
-					exception => observer.OnError(exception),
-					() =>
-					{
-						Console.Error.WriteLine("sending OnCompleted");
-						try
-						{
-							observer.OnCompleted();
-						}
-						catch (Exception x)
-						{
-							Console.Error.WriteLine("error: {0}", x);
-						}
-					});
+					observer.OnNext,
+					observer.OnError,
+					observer.OnCompleted);
 			}
 		}
 
-		public sealed class ObserverX<T> : MarshalByRefObject, IObserverX<T>
+		public sealed class ObserverX<T> : IObserverX<T>
 		{
 			private readonly IObserver<T> _observer;
 
@@ -78,21 +58,23 @@ namespace CodeEditor.Reactive
 				_observer = observer;
 			}
 
+			public IObserver<T> Observer
+			{
+				get { return _observer; }
+			}
+
 			void IObserverX<T>.OnNext(T value)
 			{
-				Console.Error.WriteLine("ObserverX.OnNext({0})", value);
 				_observer.OnNext(value);
 			}
 
 			void IObserverX<T>.OnCompleted()
 			{
-				Console.Error.WriteLine("ObserverX.OnCompleted()");
 				_observer.OnCompleted();
 			}
 
 			void IObserverX<T>.OnError(Exception exception)
 			{
-				Console.Error.WriteLine("ObserverX.OnError() -> {0}", exception);
 				_observer.OnError(exception);
 			}
 		}
