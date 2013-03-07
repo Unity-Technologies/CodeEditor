@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Concurrency;
+using System.IO;
 using System.Linq;
 
 namespace CodeEditor.Reactive
@@ -54,6 +55,11 @@ namespace CodeEditor.Reactive
 			return source.Map(_ => _.Catch(second.ToObservable()));
 		}
 
+		public static IObservableX<T> Catch<T, TException>(this IObservableX<T> source, Func<TException, IObservableX<T>> handler) where TException : Exception
+		{
+			return source.Map(_ => _.Catch((TException exception) => handler(exception).ToObservable()));
+		}
+
 		public static IDisposable Subscribe<T>(this IObservableX<T> source, Action<T> onNext)
 		{
 			return source.ToObservable().Subscribe(onNext);
@@ -78,6 +84,11 @@ namespace CodeEditor.Reactive
 		public static IObservableX<T> Where<T>(this IObservableX<T> source, Func<T, bool> predicate)
 		{
 			return source.Map(_ => _.Where(predicate));
+		}
+
+		public static IObservableX<T> TakeWhile<T>(this IObservableX<T> source, Func<T, bool> predicate)
+		{
+			return source.Map(_ => _.TakeWhile(predicate));
 		}
 
 		public static IObservableX<T> Do<T>(this IObservableX<T> source, Action<T> action)
@@ -113,6 +124,32 @@ namespace CodeEditor.Reactive
 		public static IObservableX<TResult> Map<T, TResult>(this IObservableX<T> source, Func<IObservable<T>, IObservable<TResult>> selector)
 		{
 			return selector(source.ToObservable()).ToObservableX();
+		}
+
+		public static IEnumerable<T> ToEnumerable<T>(this IObservableX<T> source)
+		{
+			return source.ToObservable().ToEnumerable();
+		}
+
+		public static IObservableX<T> Using<T, TResource>(Func<TResource> resourceSelector, Func<TResource, IObservableX<T>> resourceUsage) where TResource : IDisposable
+		{
+			return Observable.Using(resourceSelector, resource => resourceUsage(resource).ToObservable()).ToObservableX();
+		}
+
+		public static IObservableX<TResult> Generate<TState, TResult>(TState initialState, Func<TState, bool> condition, Func<TState, TState> iteration, Func<TState, TResult> selection)
+		{
+			return Observable.Generate(initialState, condition, iteration, selection).ToObservableX();
+		}
+
+		public static IObservableX<T> Create<T>(Func<IObserverX<T>, Action> subscribe)
+		{
+			return Observable.Create<T>(observer => subscribe(observer.ToObserverX())).ToObservableX();
+		}
+
+		public static Func<IObservableX<TResult>> FromAsyncPattern<TResult>(Func<AsyncCallback, object, IAsyncResult> begin, Func<IAsyncResult, TResult> end)
+		{
+			var fromAsyncPattern = Observable.FromAsyncPattern(begin, end);
+			return () => fromAsyncPattern().ToObservableX();
 		}
 	}
 }
