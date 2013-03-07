@@ -5,7 +5,6 @@ using CodeEditor.Composition.Hosting;
 using CodeEditor.IO;
 using CodeEditor.Logging;
 using CodeEditor.Text.UI.Unity.Engine;
-using CodeEditor.Text.UI.Unity.Engine.Implementation;
 using UnityEditor;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
@@ -26,9 +25,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		private static T GetExportedValue<T>()
 		{
-			return CodeTimer.LoggingTime(
-				string.Format("GetExportedValue<{0}>()", typeof(T).Name),
-				() => CompositionContainer.GetExportedValue<T>());
+			return CompositionContainer.GetExportedValue<T>();
 		}
 
 		private static CompositionContainer CompositionContainer
