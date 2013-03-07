@@ -3,7 +3,6 @@ using CodeEditor.Logging;
 using CodeEditor.Reactive;
 using CodeEditor.Server.Interface;
 using CodeEditor.Text.UI;
-using ServiceStack.Text;
 
 namespace CodeEditor.Languages.Common
 {
@@ -18,8 +17,12 @@ namespace CodeEditor.Languages.Common
 
 		public IObservableX<INavigateToItem> Search(string filter)
 		{
-			Logger.Log("SymbolNavigateToItemProvider.Search({0})".Fmt(filter));
-			return ServiceClient.ObserveMany(new SymbolSearch {Filter = filter}).Select(_ => (INavigateToItem)new SymbolItem(_));
+			if (string.IsNullOrEmpty(filter))
+				return ObservableX.Empty<INavigateToItem>();
+
+			return ServiceClient
+				.ObserveMany(new SymbolSearch {Filter = filter})
+				.Select(_ => (INavigateToItem)new SymbolItem(_));
 		}
 
 		private IObservableServiceClient ServiceClient
