@@ -8,22 +8,25 @@ using CodeEditor.IO;
 using CodeEditor.Reactive;
 using CodeEditor.Server.Interface;
 using ServiceStack.ServiceInterface;
+using IFile = CodeEditor.IO.IFile;
 
 namespace CodeEditor.Server
 {
-	public class SymbolService : Service
+	public class SymbolService : AsyncServiceBase<SymbolSearch>
 	{
 		public IUnityProjectServer ProjectServer { get; set; }
 
-		public IEnumerable<Interface.Symbol> Any(SymbolSearch request)
+		protected override object Run(SymbolSearch request)
 		{
-			return ProjectServer
-				.ProjectForFolder("c:/Users/bamboo/code/kaizen/CodeEditor/UnityProject/Assets")
-				.SearchSymbol(request.Filter)
-				.Select(_ => new Interface.Symbol { Line = _.Line, Column = _.Column, DisplayText = _.DisplayText })
-				.ToList()
-				.FirstOrTimeout(TimeSpan.FromSeconds(3));
+			return
+				Symbols
+				.Where(_ => _.Contains(request.Filter))
+				.Select(s => new Interface.Symbol {DisplayText = s, Line = 1, Column = 42})
+				.ToObservableX()
+				.ToJsonStreamWriter();
 		}
+
+		private static string[] Symbols = new[] {"Foo.Update", "Foo.Start", "Bar.Start"};
 	}
 
 	public interface IUnityProjectServer
