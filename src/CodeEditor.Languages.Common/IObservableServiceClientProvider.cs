@@ -1,23 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using CodeEditor.Composition;
 using CodeEditor.Composition.Client;
 using CodeEditor.IO;
 using CodeEditor.Logging;
-using CodeEditor.Reactive;
-using ServiceStack.ServiceClient.Web;
-using ServiceStack.ServiceHost;
+using CodeEditor.Server.Interface;
 using ServiceStack.Text;
 using IFile = CodeEditor.IO.IFile;
 
 namespace CodeEditor.Languages.Common
 {
-	public interface IObservableServiceClient
-	{
-		IObservableX<TResponse> ObserveMany<TResponse>(IReturn<IEnumerable<TResponse>> request);
-	}
-
 	public interface IObservableServiceClientProvider
 	{
 		IObservableServiceClient Client { get; }
@@ -124,25 +116,6 @@ namespace CodeEditor.Languages.Common
 		protected string ProjectFolder
 		{
 			get { return ProjectPathProvider.Location; }
-		}
-	}
-
-	public class ObservableServiceClient : IObservableServiceClient
-	{
-		private readonly string _baseUri;
-
-		public ObservableServiceClient(string baseUri)
-		{
-			_baseUri = baseUri;
-		}
-
-		public IObservableX<TResponse> ObserveMany<TResponse>(IReturn<IEnumerable<TResponse>> request)
-		{
-			return ObservableX.Start(() =>
-			{
-				var client = new JsonServiceClient(_baseUri);
-				return client.Send(request);
-			}).SelectMany(_ => _);
 		}
 	}
 }

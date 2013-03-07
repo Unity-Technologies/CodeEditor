@@ -3,5 +3,5 @@ version = '0.1.0'
 dependencies {
 	'default' project(':CodeEditor.Composition')
 	'default' project(':CodeEditor.Reactive')
-	'default' rootProject.references.serviceStackInterfaces
+	'default' rootProject.references.serviceStackClient
 }
