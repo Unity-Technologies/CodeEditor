@@ -54,7 +54,7 @@ namespace ReactiveServiceStack
 	{
 		public static void Run()
 		{
-			var client = new ObservableServiceClient("http://localhost:1337/");
+			var client = new ObservableServiceClient("http://localhost:1338/");
 			client
 				.ObserveMany(new SearchRequest { Filter = "f" })
 				.Take(3)
@@ -91,7 +91,11 @@ namespace ReactiveServiceStack
 						var responseStream = response.GetResponseStream();
 						disposable.Disposable = responseStream.DeserializeMany<TResponse>().Subscribe(observer);
 					},
-					onError: (response, exception) => observer.OnError(exception));
+					onError: (response, exception) =>
+					{
+						response.Close();
+						observer.OnError(exception);
+					});
 
 				return disposable.Dispose;
 			});
