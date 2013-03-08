@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using CodeEditor.Reactive;
+using CodeEditor.Reactive.Disposables;
+using ServiceStack.ServiceClient.Web;
 using ServiceStack.ServiceHost;
-using ServiceStack.Text;
 
 namespace CodeEditor.Server.Interface
 {
@@ -12,41 +13,6 @@ namespace CodeEditor.Server.Interface
 		IObservableX<TResponse> ObserveMany<TResponse>(IReturn<IEnumerable<TResponse>> request);
 	}
 
-	public class ObservableServiceClient : IObservableServiceClient
-	{
-		private const int DefaultTimeout = 1000;
-
-		private readonly string _baseUri;
-
-		public ObservableServiceClient(string baseUri)
-		{
-			_baseUri = baseUri.WithTrailingSlash();
-		}
-
-		public IObservableX<TResponse> ObserveMany<TResponse>(IReturn<IEnumerable<TResponse>> request)
-		{
-			var absoluteUri = _baseUri + DefaultRouteFor(request).TrimStart('/');
-			var queryString = QueryStringSerializer.SerializeToString(request);
-			var requestUri = string.IsNullOrEmpty(queryString) ? absoluteUri : absoluteUri + "?" + queryString;
-
-			var webRequest = WebRequest.Create(requestUri);
-			webRequest.Timeout = DefaultTimeout;
-
-			var observableResponse = ObservableX.FromAsyncPattern(webRequest.BeginGetResponse, webRequest.EndGetResponse);
-			return observableResponse()
-				.SelectMany(_ => _.GetResponseStream().DeserializeMany<TResponse>());
-		}
-
-		private static string DefaultRouteFor(object request)
-		{
-			return ((RouteAttribute)Attribute.GetCustomAttribute(request.GetType(), typeof(RouteAttribute))).Path;
-		}
-	}
-
-	/* 
-	 * ServiceStack async API doesn't play nice with unity
-	 * because of its Timer + WebRequest.Abort approach to timeouts
-	 * 
 	public class ObservableServiceClient : IObservableServiceClient
 	{
 		readonly string _baseUri;
@@ -82,5 +48,5 @@ namespace CodeEditor.Server.Interface
 				return disposable.Dispose;
 			});
 		}
-	}*/
+	}
 }
