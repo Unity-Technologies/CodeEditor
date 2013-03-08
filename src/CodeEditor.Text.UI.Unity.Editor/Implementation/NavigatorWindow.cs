@@ -68,6 +68,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		private void StartSearch()
 		{
+			// TODO: use SerialDisposable instead
 			if (_searchSubscription != null) _searchSubscription.Dispose();
 			_selectedItem = null;
 			_currentItems = new List<INavigateToItem>();

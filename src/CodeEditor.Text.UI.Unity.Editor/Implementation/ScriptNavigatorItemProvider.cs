@@ -39,8 +39,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		private static ScriptNavigatorItem ScriptNavigatorItemFor(MonoScript script, string path)
 		{
 			var fullPath = System.IO.Path.GetFullPath(path); // get extension
-			string fileName = System.IO.Path.GetFileName(fullPath);
-			int instanceID = script.GetInstanceID();
+			var fileName = System.IO.Path.GetFileName(fullPath);
+			var instanceID = script.GetInstanceID();
 			var scriptNavigatorItem = new ScriptNavigatorItem(fileName, instanceID);
 			return scriptNavigatorItem;
 		}
