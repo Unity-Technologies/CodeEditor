@@ -29,9 +29,9 @@ namespace CodeEditor.Composition.Hosting
 			AddExportedValue<IExportProvider>(this);
 		}
 
-		public void AddExportedValue<T>(T value)
+		public void AddExportedValue<T>(T value, params object[] metadata)
 		{
-			AddExport(new Export(new ExportDefinition(typeof(T), value.GetType()), () => value));
+			AddExport(new Export(new ExportDefinition(typeof(T), value.GetType(), () => metadata ?? new object[0]), () => value));
 		}
 
 		private void AddExport(Export export)

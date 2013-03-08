@@ -1,4 +1,5 @@
-﻿using CodeEditor.Composition.Hosting;
+using System.Linq;
+using CodeEditor.Composition.Hosting;
 using CodeEditor.Composition.Primitives;
 using NUnit.Framework;
 
@@ -58,6 +59,30 @@ namespace CodeEditor.Composition.Tests
 		{
 			Assert.AreSame(GetExportedValue<IContract1>(), GetExportedValue<IContract2>());
 			Assert.IsTrue(GetExportedValue<IContract1>() is PartWithMultipleContracts);
+		}
+
+		[Test]
+		public void CanAddExportedValueWithoutMetadata()
+		{
+			const string value = "42";
+			_container.AddExportedValue(value);
+
+			var export = _container.GetExports(typeof(string)).Single();
+			Assert.AreEqual(value, export.Value);
+			Assert.IsFalse(export.Metadata.Any(), "No metadata for added exported value");
+		}
+
+		[Test]
+		public void CanAddExportedValueWithMetadata()
+		{
+			const string value = "42";
+			const string metadata = "LTUAE";
+
+			_container.AddExportedValue(value, metadata);
+
+			var export = _container.GetExports(typeof(string)).Single();
+			Assert.AreEqual(value, export.Value);
+			Assert.AreEqual(metadata, export.Metadata.Single());
 		}
 
 		private T GetExportedValue<T>()
