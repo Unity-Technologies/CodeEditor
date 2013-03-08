@@ -1,0 +1,26 @@
+version = '0.1.0'
+
+assembly {
+	targetFrameworkVersion 'v4.0'
+}
+
+def nrefactory(assembly) {
+	[group: 'ICSharpCode.NRefactory', name: assembly, version: '5.3.0', configuration: 'Net40']
+}
+
+dependencies {
+	def projects = [
+		':CodeEditor.Composition',
+		':CodeEditor.IO',
+		':CodeEditor.Logging',
+		':CodeEditor.Reactive',
+		':CodeEditor.Text.Data',
+		':CodeEditor.Server',
+		':CodeEditor.Languages.CSharp',
+	]
+	projects.each {
+		'default' project(it)
+	}
+	'default' nrefactory('ICSharpCode.NRefactory')
+	'default' nrefactory('ICSharpCode.NRefactory.CSharp')
+}

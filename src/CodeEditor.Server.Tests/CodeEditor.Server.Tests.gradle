@@ -4,7 +4,14 @@ assembly {
 
 dependencies {
 	'default' rootProject.references.moq
-	[':CodeEditor.Server.Interface', ':CodeEditor.Testing', ':CodeEditor.IO', ':CodeEditor.Composition', ':CodeEditor.Reactive'].each {
+	[
+		':CodeEditor.Server.Interface',
+		':CodeEditor.Testing',
+		':CodeEditor.IO',
+		':CodeEditor.Composition',
+		':CodeEditor.Reactive',
+		':CodeEditor.Text.Data'
+	 ].each {
 		'default' project(it)
 	}
 }
