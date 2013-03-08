@@ -44,7 +44,8 @@ vs {
 		def isTestProject = { p -> (p.name =~ /\.Tests(\.Fixtures)?/).any() }
 		def testProjects = subprojects.findAll(isTestProject) .collect { it.path }
 		def languageProjects = subprojects.findAll { it.name.contains('Languages') && !(it.path in testProjects) }.collect { it.path }
-		def categorizedProjects = (frameworkProjects + testProjects + languageProjects).toSet()
+		def serverProjects = subprojects.findAll { it.name.contains('Server') && !(it.path in frameworkProjects) }.collect { it.path }
+		def categorizedProjects = (frameworkProjects + serverProjects + testProjects + languageProjects).toSet()
 		def remainingProjects = subprojects.collect { it.path }.findAll { !(it in categorizedProjects) }
 
 		CodeEditor {
@@ -60,6 +61,11 @@ vs {
 			}
 			folder('Tests') { f ->
 				testProjects.each {
+					f.project(it)
+				}
+			}
+			folder('Server') { f ->
+				serverProjects.each {
 					f.project(it)
 				}
 			}
