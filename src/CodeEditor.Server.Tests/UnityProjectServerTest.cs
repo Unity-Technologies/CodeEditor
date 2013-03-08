@@ -1,10 +1,8 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using CodeEditor.Composition.Hosting;
 using CodeEditor.IO;
-using CodeEditor.Reactive;
-using CodeEditor.Server.Interface;
 using CodeEditor.Testing;
 using NUnit.Framework;
 
@@ -36,11 +34,11 @@ namespace CodeEditor.Server.Tests
 				.Callback(() => parseWaitEvent.Set())
 				.Returns(new[] {symbol.Object});
 
-			var container = new CompositionContainer(typeof(UnityProjectServer).Assembly);
+			var container = new CompositionContainer(typeof(UnityProjectFactory).Assembly);
 			container.AddExportedValue(fileSystem.Object);
 			container.AddExportedValue(parser.Object);
 
-			var subject = container.GetExportedValue<IUnityProjectServer>();
+			var subject = container.GetExportedValue<IUnityProjectFactory>();
 			var project = subject.ProjectForFolder("UnityProject");
 
 			// TODO: replace by injecting immediate scheduler

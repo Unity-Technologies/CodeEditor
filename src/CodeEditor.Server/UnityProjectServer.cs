@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +14,7 @@ namespace CodeEditor.Server
 {
 	public class SymbolService : AsyncServiceBase<SymbolSearch>
 	{
-		public IUnityProjectServer ProjectServer { get; set; }
+		public IUnityProjectFactory ProjectFactory { get; set; }
 
 		protected override object Run(SymbolSearch request)
 		{
@@ -29,7 +29,7 @@ namespace CodeEditor.Server
 		private static string[] Symbols = new[] {"Foo.Update", "Foo.Start", "Bar.Start"};
 	}
 
-	public interface IUnityProjectServer
+	public interface IUnityProjectFactory
 	{
 		IUnityProject ProjectForFolder(string projectFolder);
 	}
@@ -64,8 +64,8 @@ namespace CodeEditor.Server
 		}
 	}
 
-	[Export(typeof(IUnityProjectServer))]
-	public class UnityProjectServer : IUnityProjectServer
+	[Export(typeof(IUnityProjectFactory))]
+	public class UnityProjectFactory : IUnityProjectFactory
 	{
 		[Import]
 		public IFileSystem FileSystem { get; set; }
