@@ -14,19 +14,18 @@ namespace CodeEditor.Server.Tests
 		[Test]
 		public void ParsesAllFilesAutomaticallyUponStartup()
 		{
-			var fileSystem = MockFor<IFileSystem>();
-			var projectFolder = MockFor<IFolder>();
-			fileSystem
-				.Setup(_ => _.FolderFor(Path.GetFullPath("UnityProject")))
-				.Returns(projectFolder.Object);
-
+			var assetsFolder = MockFor<IFolder>();
 			var sourceFile = MockFor<IFile>();
-			projectFolder
+			assetsFolder
 				.Setup(_ => _.GetFiles("*.cs", SearchOption.AllDirectories))
 				.Returns(new[] {sourceFile.Object});
 
-			var parser = MockFor<ISymbolParser>();
+			var assetsFolderProvider = MockFor<IUnityAssetsFolderProvider>();
+			assetsFolderProvider
+				.SetupGet(_ => _.AssetsFolder)
+				.Returns(assetsFolder.Object);
 
+			var parser = MockFor<ISymbolParser>();
 			var parseWaitEvent = new AutoResetEvent(false);
 			var symbol = MockFor<ISymbol>();
 			parser
@@ -34,12 +33,12 @@ namespace CodeEditor.Server.Tests
 				.Callback(() => parseWaitEvent.Set())
 				.Returns(new[] {symbol.Object});
 
-			var container = new CompositionContainer(typeof(UnityProjectFactory).Assembly);
-			container.AddExportedValue(fileSystem.Object);
+			var container = new CompositionContainer(typeof(IUnityProjectProvider).Assembly);
+			container.AddExportedValue(assetsFolderProvider.Object);
 			container.AddExportedValue(parser.Object);
 
-			var subject = container.GetExportedValue<IUnityProjectFactory>();
-			var project = subject.ProjectForFolder("UnityProject");
+			var subject = container.GetExportedValue<IUnityProjectProvider>();
+			var project = subject.Project;
 
 			// TODO: replace by injecting immediate scheduler
 			parseWaitEvent.WaitOne(TimeSpan.FromSeconds(1));

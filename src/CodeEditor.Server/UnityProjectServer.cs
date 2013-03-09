@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CodeEditor.Composition;
 using CodeEditor.IO;
+using CodeEditor.Logging;
 using CodeEditor.Reactive;
 using CodeEditor.Server.Interface;
 using ServiceStack.ServiceInterface;
@@ -14,24 +13,82 @@ namespace CodeEditor.Server
 {
 	public class SymbolService : AsyncServiceBase<SymbolSearch>
 	{
-		public IUnityProjectFactory ProjectFactory { get; set; }
+		public IUnityProjectProvider ProjectProvider { get; set; }
 
 		protected override object Run(SymbolSearch request)
 		{
 			return
-				Symbols
-				.Where(_ => _.Contains(request.Filter))
-				.Select(s => new Interface.Symbol {DisplayText = s, Line = 1, Column = 42})
-				.ToObservableX()
+				ProjectProvider
+				.Project
+				.SearchSymbol(request.Filter)
+				.Select(s => new Symbol {DisplayText = s.DisplayText, Line = s.Line, Column = s.Column})
 				.ToJsonStreamWriter();
 		}
-
-		private static string[] Symbols = new[] {"Foo.Update", "Foo.Start", "Bar.Start"};
 	}
 
-	public interface IUnityProjectFactory
+	public interface IUnityProjectProvider
 	{
-		IUnityProject ProjectForFolder(string projectFolder);
+		IUnityProject Project { get; }
+	}
+
+	public interface IUnityAssetsFolderProvider
+	{
+		IFolder AssetsFolder { get; }
+	}
+
+	[Export(typeof(IUnityProjectProvider))]
+	class UnityProjectProvider : IUnityProjectProvider
+	{
+		[Import]
+		public IUnityAssetsFolderProvider AssetsFolderProvider { get; set; }
+
+		[Import]
+		public ISymbolParser SymbolParser { get; set; }
+
+		public IUnityProject Project
+		{
+			get { return _project.Value; }
+		}
+
+		readonly Lazy<IUnityProject> _project;
+
+		public UnityProjectProvider()
+		{
+			 _project = new Lazy<IUnityProject>(CreateProject); 
+		}
+
+		IUnityProject CreateProject()
+		{
+			var project = new UnityProject(AssetsFolderProvider.AssetsFolder, SymbolParser);
+			project.Start();
+			return project;
+		}
+	}
+
+	[Export(typeof(IUnityAssetsFolderProvider))]
+	class ServerAssetsFolderProvider : IUnityAssetsFolderProvider
+	{
+		[Import]
+		public IFileSystem FileSystem { get; set; }
+
+		[Import]
+		public ILogger Logger { get; set; } 
+
+		public IFolder AssetsFolder
+		{
+			get
+			{
+				// ServerDirectory is $Project/Library/CodeEditor/Server
+				var assetsFolder = Path.Combine(ServerDirectory, "../../../Assets");
+				Logger.Log("Assets folder is " + assetsFolder);
+				return FileSystem.FolderFor(assetsFolder);
+			}
+		}
+
+		private string ServerDirectory
+		{
+			get { return Path.GetDirectoryName(GetType().Module.FullyQualifiedName); }
+		}
 	}
 
 	public interface IUnityProject
@@ -46,58 +103,16 @@ namespace CodeEditor.Server
 		string DisplayText { get; }
 	}
 
-	public class Symbol : ISymbol
+	class UnityProject : IUnityProject
 	{
-		public int Line
-		{
-			get { return 1; }
-		}
-
-		public int Column
-		{
-			get { return 7; }
-		}
-
-		public string DisplayText
-		{
-			get { return "Foo"; }
-		}
-	}
-
-	[Export(typeof(IUnityProjectFactory))]
-	public class UnityProjectFactory : IUnityProjectFactory
-	{
-		[Import]
-		public IFileSystem FileSystem { get; set; }
-
-		[Import]
-		public ISymbolParser SymbolParser { get; set; }
-
-		public IUnityProject ProjectForFolder(string projectFolder)
-		{
-			return _projects.GetOrAdd(Path.GetFullPath(projectFolder), CreateProjectForFolder);
-		}
-
-		private IUnityProject CreateProjectForFolder(string projectFolder)
-		{
-			var project = new UnityProject(FileSystem.FolderFor(projectFolder), SymbolParser);
-			project.Start();
-			return project;
-		}
-
-		readonly ConcurrentDictionary<string, IUnityProject> _projects = new ConcurrentDictionary<string, IUnityProject>();
-	}
-
-	class UnityProject : MarshalByRefObject, IUnityProject
-	{
-		private readonly IFolder _projectFolder;
+		private readonly IFolder _assetsFolder;
 		private readonly ISymbolParser _parser;
 
 		private IObservableX<ISymbol> AllSymbols;
 
-		public UnityProject(IFolder projectFolder, ISymbolParser parser)
+		public UnityProject(IFolder assetsFolder, ISymbolParser parser)
 		{
-			_projectFolder = projectFolder;
+			_assetsFolder = assetsFolder;
 			_parser = parser;
 		}
 
@@ -121,7 +136,7 @@ namespace CodeEditor.Server
 
 		protected IEnumerable<IFile> SourceFiles
 		{
-			get { return _projectFolder.GetFiles("*.cs", SearchOption.AllDirectories); }
+			get { return _assetsFolder.GetFiles("*.cs", SearchOption.AllDirectories); }
 		}
 
 		private IObservableX<ISymbol[]> ObservableSymbolsOf(IFile file)

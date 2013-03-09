@@ -6,17 +6,21 @@ using NUnit.Framework;
 namespace CodeEditor.Server.CSharp.Tests
 {
 	[TestFixture]
-	public class CSharpSymbolSearchTest : MockBasedTest
+	public class CSharpSymbolParserTest : MockBasedTest
 	{
 		[Test]
-		[Ignore("wip")]
 		public void ReturnsSymbolsForClasses()
 		{
 			var subject = new CSharpSymbolParser();
 			var parsedSymbols = subject.Parse(MockFileWithContent("class Foo {}\nclass Bar {}"));
+			var expectedSymbols = new[]
+			{
+				new {DisplayText = "Foo", Line = 1, Column = 7},
+				new {DisplayText = "Bar", Line = 2, Column = 7}
+			};
 			CollectionAssert.AreEquivalent(
-				new [] { "Foo", "Bar" },
-				parsedSymbols.Select(_ => _.DisplayText));
+				expectedSymbols,
+				parsedSymbols.Select(_ => new { _.DisplayText, _.Line, _.Column }));
 		}
 
 		private IFile MockFileWithContent(string content)
