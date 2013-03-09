@@ -50,7 +50,7 @@ namespace CodeEditor.Composition.Server
 
 		public class AppHost : AppHostHttpListenerBase
 		{
-			public AppHost(Assembly[] assemblies) : base("CodeEditor.Composition.Server", assemblies)
+			public AppHost(Assembly[] assemblies) : base("CodeEditor.Composition.Server", assemblies.Where(_ => _.References(typeof(IService).Assembly)).ToArray())
 			{
 				CompositionContainer = new CompositionContainer(AssemblyCatalog.For(assemblies));
 			}

@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace CodeEditor.Composition.Hosting
 {
-	static class AssemblyExtensions
+	public static class AssemblyExtensions
 	{
 		public static bool IsSafeForComposition(this Assembly assembly)
 		{
@@ -14,9 +14,14 @@ namespace CodeEditor.Composition.Hosting
 
 		private static bool CaresForComposition(Assembly assembly)
 		{
+			return assembly.References(typeof(ExportAttribute).Assembly);
+		}
+
+		public static bool References(this Assembly assembly, Assembly referencedAssembly)
+		{
 			return assembly
 				.GetReferencedAssemblies()
-				.Any(name => name.FullName.Equals(typeof(ExportAttribute).Assembly.FullName));
+				.Any(name => name.FullName.Equals(referencedAssembly.FullName));
 		}
 
 		private static bool TypesAreAccessible(Assembly assembly)
