@@ -15,6 +15,8 @@ namespace CodeEditor.Server.Interface
 
 	public class ObservableServiceClient : IObservableServiceClient
 	{
+		private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(3);
+
 		readonly string _baseUri;
 
 		public ObservableServiceClient(string baseUri)
@@ -26,7 +28,7 @@ namespace CodeEditor.Server.Interface
 		{
 			return ObservableX.Create<TResponse>(observer =>
 			{
-				var client = new JsonServiceClient(_baseUri) {Timeout = TimeSpan.FromSeconds(1)};
+				var client = new JsonServiceClient(_baseUri) {Timeout = Timeout};
 				var disposable = new MultipleAssignmentDisposable
 				{
 					Disposable = Disposable.Create(client.CancelAsync)
