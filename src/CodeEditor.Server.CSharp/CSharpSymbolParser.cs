@@ -1,7 +1,7 @@
 using CodeEditor.Composition;
+using CodeEditor.ContentTypes;
 using CodeEditor.IO;
 using CodeEditor.Languages.CSharp;
-using CodeEditor.Text.Data;
 
 namespace CodeEditor.Server.CSharp
 {

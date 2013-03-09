@@ -1,6 +1,6 @@
 using CodeEditor.Composition;
+using CodeEditor.ContentTypes;
 using CodeEditor.IO;
-using CodeEditor.Text.Data;
 
 namespace CodeEditor.Server
 {
@@ -29,10 +29,7 @@ namespace CodeEditor.Server
 
 		private ISymbolParser SymbolParserFor(IFile file)
 		{
-			var contentType = ContentTypeRegistry.ForFileExtension(file.Extension);
-			return contentType != null
-				? contentType.GetService<ISymbolParser>()
-				: null;
+			return ContentTypeRegistry.ServiceForFileExtension<ISymbolParser>(file.Extension);
 		}
 	}
 }

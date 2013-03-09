@@ -1,4 +1,5 @@
-﻿using CodeEditor.IO;
+using CodeEditor.ContentTypes;
+using CodeEditor.IO;
 using CodeEditor.Testing;
 using CodeEditor.Text.Data.Implementation;
 using Moq;

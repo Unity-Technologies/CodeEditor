@@ -3,7 +3,7 @@ using CodeEditor.Composition;
 using CodeEditor.Composition.Hosting;
 using NUnit.Framework;
 
-namespace CodeEditor.Text.Data.Tests
+namespace CodeEditor.ContentTypes.Tests
 {
 	[TestFixture]
 	public class ContentTypeRegistryTest

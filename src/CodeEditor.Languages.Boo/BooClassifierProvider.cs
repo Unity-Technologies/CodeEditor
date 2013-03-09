@@ -1,4 +1,5 @@
 using CodeEditor.Composition;
+using CodeEditor.ContentTypes;
 using CodeEditor.Text.Data;
 using CodeEditor.Text.Logic;
 

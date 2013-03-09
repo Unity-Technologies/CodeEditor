@@ -1,5 +1,6 @@
 using System;
 using CodeEditor.Collections;
+using CodeEditor.ContentTypes;
 
 namespace CodeEditor.Text.Data.Implementation
 {
@@ -7,15 +8,15 @@ namespace CodeEditor.Text.Data.Implementation
 	{
 		private TextSnapshot _currentSnapshot;
 
-		public TextBuffer(IPiece<char> text, IContentType contentType)
-		{
-			ContentType = contentType;
-			_currentSnapshot = new TextSnapshot(this, PieceTable.ForPiece(text));
-		}
-
 		public TextBuffer(string text, IContentType contentType)
 			: this(Piece.ForString(NormalizeLineTerminators(text)), contentType)
 		{
+		}
+
+		private TextBuffer(IPiece<char> text, IContentType contentType)
+		{
+			ContentType = contentType;
+			_currentSnapshot = new TextSnapshot(this, PieceTable.ForPiece(text));
 		}
 
 		public event TextChange Changed;

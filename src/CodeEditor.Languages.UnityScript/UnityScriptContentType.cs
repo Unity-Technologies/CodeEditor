@@ -1,3 +1,4 @@
+using CodeEditor.ContentTypes;
 using CodeEditor.Text.Data;
 
 namespace CodeEditor.Languages.UnityScript

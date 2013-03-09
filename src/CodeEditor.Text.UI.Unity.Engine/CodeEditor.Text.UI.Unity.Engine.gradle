@@ -4,6 +4,7 @@ version = '0.2.0'
 dependencies {
 	def projectReferences = [
 		'CodeEditor.Composition',
+		'CodeEditor.ContentTypes',
 		'CodeEditor.IO',
 		'CodeEditor.Text.Data',
 		'CodeEditor.Text.Logic',

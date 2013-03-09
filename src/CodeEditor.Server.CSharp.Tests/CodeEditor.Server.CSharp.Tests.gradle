@@ -4,7 +4,5 @@ assembly {
 
 dependencies {
 	'default' rootProject.references.frameworks
-	'default' project(':CodeEditor.Testing')
 	'default' project(':CodeEditor.Server')
-	'default' rootProject.references.moq
 }

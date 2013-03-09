@@ -1,6 +1,6 @@
+using CodeEditor.ContentTypes;
 using CodeEditor.IO;
 using CodeEditor.Testing;
-using CodeEditor.Text.Data;
 using NUnit.Framework;
 
 namespace CodeEditor.Server.Tests

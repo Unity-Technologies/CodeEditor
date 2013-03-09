@@ -99,6 +99,65 @@ apply plugin: 'assembly-bundle'
 apply plugin: 'nunit'
 apply plugin: 'idea'
 
+def rxDependency(rxPackage, rxAssembly, rxConfiguration) {
+	['group': rxPackage, 'name': rxAssembly, 'version': '1.0.2856.0', 'configuration': rxConfiguration]
+}
+
+def serviceStack(assembly, pkg = 'ServiceStack') {
+		['group': pkg, 'name': assembly, 'version':	'3.9.38', 'configuration': 'net35']
+}
+
+ext {
+	rxCore = { assemblyName, configuration = 'Net35' -> rxDependency('Rx-Core-old', assemblyName, configuration) }
+	rxMain = { assemblyName, configuration = 'Net35' -> rxDependency('Rx-Main', assemblyName, configuration) }
+	references = [
+		'nunitFramework': "nunit:nunit.framework:${nunit.version}",
+		'moq': 'Moq:Moq:4.0+',
+		'adt': 'boo-extensions:Boo.Adt:0.1.1+',
+		'ometa': 'boo-extensions:Boo.OMeta:0.1.1+',
+		'frameworks': [
+			project(':CodeEditor.IO'),
+			project(':CodeEditor.Logging'),
+			project(':CodeEditor.Composition'),
+		],
+		'languagesCommon': [
+ 			project(':CodeEditor.IO'),
+			project(':CodeEditor.Logging'),
+			project(':CodeEditor.Composition'),
+			project(':CodeEditor.ContentTypes'),
+			project(':CodeEditor.Text.Data'),
+			project(':CodeEditor.Text.Logic'),
+			project(':CodeEditor.Text.UI'),
+			project(':CodeEditor.Languages.Common')
+		],
+		'rx35': [
+			rxMain('System.Reactive'),
+			rxCore('System.Observable'),
+			rxCore('System.CoreEx'),
+			rxCore('System.Threading'),
+		],
+		'rx40': [
+			rxMain('System.Reactive', 'Net4'),
+			rxCore('System.CoreEx', 'Net4'),
+		],
+		'serviceStack': [
+			serviceStack('ServiceStack'),
+			serviceStack('ServiceStack.ServiceInterface'),
+			serviceStack('ServiceStack.Common', 'ServiceStack.Common'),
+			serviceStack('ServiceStack.Interfaces', 'ServiceStack.Common'),
+			serviceStack('ServiceStack.Text', 'ServiceStack.Text')
+		],
+		'serviceStackInterfaces': [
+			serviceStack('ServiceStack.Interfaces', 'ServiceStack.Common'),
+		],
+		'serviceStackClient': [
+			serviceStack('ServiceStack.Interfaces', 'ServiceStack.Common'),
+			serviceStack('ServiceStack.Text', 'ServiceStack.Text'),
+			serviceStack('ServiceStack.Common', 'ServiceStack.Common')
+		],
+	]
+}
+
 def bundleDependency(configuration, subProject) {
 	dependencies.add(configuration, dependencies.project(path: subProject.path))
 }
@@ -110,6 +169,8 @@ subprojects { subProject ->
 		dependencies {
 			// Foo.Bar.Tests depends on Foo.Bar
 			'default' project(subProject.path[0..-('.Tests'.length() + 1)])
+			'default' project(':CodeEditor.Testing')
+			'default' rootProject.references.moq
 		}
 		bundleDependency('tests', subProject)
 		break
@@ -186,6 +247,7 @@ task open {
 	}
 }
 
+<<<<<<< HEAD
 def rxDependency(rxPackage, rxAssembly, rxConfiguration) {
 	['group': rxPackage, 'name': rxAssembly, 'version': '1.0.2856.0', 'configuration': rxConfiguration]
 }
@@ -232,7 +294,6 @@ ext {
 			serviceStack('ServiceStack.Text', 'ServiceStack.Text'),
 			serviceStack('ServiceStack.Common', 'ServiceStack.Common')
 		],
-
 	]
 }
 

@@ -1,5 +1,6 @@
 using System.Linq;
 using CodeEditor.Composition;
+using CodeEditor.ContentTypes;
 using CodeEditor.Text.Data;
 using CodeEditor.Text.UI.Completion;
 using CodeEditor.Text.UI.Completion.Implementation;

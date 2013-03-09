@@ -1,4 +1,5 @@
-﻿using Boo.Ide.Grammars;
+using Boo.Ide.Grammars;
+using CodeEditor.ContentTypes;
 using CodeEditor.Testing;
 using CodeEditor.Text.Data;
 using CodeEditor.Text.Data.Implementation;

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CodeEditor.Composition;
+using CodeEditor.ContentTypes;
 using CodeEditor.IO;
 using CodeEditor.Text.Data;
 using CodeEditor.Text.Logic;

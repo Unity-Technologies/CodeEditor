@@ -3,13 +3,12 @@ dependencies {
 	def projectReferences = [
 		'CodeEditor.IO',
 		'CodeEditor.Collections',
+		'CodeEditor.ContentTypes',
 		'CodeEditor.Text.Data',
 		'CodeEditor.Text.Logic',
 		'CodeEditor.Text.UI',
-		'CodeEditor.Testing',
 	]
 	projectReferences.each {
 		'default' project(":$it")
 	}
-	'default' rootProject.references.moq
 }

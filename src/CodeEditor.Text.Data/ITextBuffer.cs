@@ -1,3 +1,5 @@
+using CodeEditor.ContentTypes;
+
 namespace CodeEditor.Text.Data
 {
 	public interface ITextBuffer

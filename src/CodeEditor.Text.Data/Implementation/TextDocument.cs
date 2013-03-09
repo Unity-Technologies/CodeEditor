@@ -1,3 +1,4 @@
+using CodeEditor.ContentTypes;
 using CodeEditor.IO;
 
 namespace CodeEditor.Text.Data.Implementation
