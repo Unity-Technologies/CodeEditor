@@ -42,6 +42,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			var container = new CompositionContainer(AppDomain.CurrentDomain.GetAssemblies().ToArray());
 			container.AddExportedValue<IFileSystem>(new UnityEditorFileSystem());
 			container.AddExportedValue<IServerExecutableProvider>(new ServerExecutableProvider(ServerExecutable));
+			container.AddExportedValue<IMonoExecutableProvider>(new MonoExecutableProvider(MonoExecutable));
 			if (UnityEngine.Debug.isDebugBuild)
 				container.AddExportedValue<ILogger>(new UnityLogger());
 			return container;
@@ -52,9 +53,29 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			get { return Path.Combine(ProjectPath, "Library/CodeEditor/Server/CodeEditor.Composition.Server.exe"); }
 		}
 
+		static string MonoExecutable
+		{
+			get { return Path.Combine(EditorApplication.applicationContentsPath, "MonoBleedingEdge/bin/mono.exe"); }
+		}
+
 		static string ProjectPath
 		{
 			get { return Path.GetDirectoryName(UnityEngine.Application.dataPath); }
+		}
+
+		class MonoExecutableProvider : IMonoExecutableProvider
+		{
+			readonly string _monoExecutable;
+
+			public MonoExecutableProvider(string monoExecutable)
+			{
+				_monoExecutable = monoExecutable;
+			}
+
+			string IMonoExecutableProvider.MonoExecutable
+			{
+				get { return _monoExecutable; }
+			}
 		}
 
 		class UnityLogger : ILogger

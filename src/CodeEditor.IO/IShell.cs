@@ -19,6 +19,9 @@ namespace CodeEditor.IO
 	[Export(typeof(IShell))]
 	public class StandardShell : IShell
 	{
+		[Import]
+		public IMonoExecutableProvider MonoExecutableProvider { get; set; }
+
 		public IProcess StartManagedProcess(string executable)
 		{
 			return new StandardProcess(Process.Start(new ProcessStartInfo(MonoExecutable, executable)
@@ -27,9 +30,9 @@ namespace CodeEditor.IO
 			}));
 		}
 
-		static string MonoExecutable
+		string MonoExecutable
 		{
-			get { return Environment.GetEnvironmentVariable("MONO_EXECUTABLE") ?? "mono"; }
+			get { return MonoExecutableProvider.MonoExecutable; }
 		}
 
 		public class StandardProcess : IProcess
@@ -60,6 +63,20 @@ namespace CodeEditor.IO
 			{
 				_process.Dispose();
 			}
+		}
+	}
+
+	public interface IMonoExecutableProvider
+	{
+		string MonoExecutable { get; }
+	}
+
+	[Export(typeof(IMonoExecutableProvider))]
+	class StandardMonoExecutableProvider : IMonoExecutableProvider
+	{
+		public string MonoExecutable
+		{
+			get { return Environment.GetEnvironmentVariable("MONO_EXECUTABLE") ?? "mono"; }
 		}
 	}
 }

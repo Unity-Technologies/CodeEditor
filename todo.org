@@ -1,5 +1,3 @@
-* implement IShell.StartManagedProcess on top of Unity's MonoBleedingEdge
-* get mono from MONO_EXECUTABLE environment variable in the default case
 * kaizen Clr.exec should set MONO_EXECUTABLE
 * move File search also to the server (using the client search only as a fallback)
 * rename all Implementation folders to Internal
