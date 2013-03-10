@@ -7,25 +7,25 @@ using CodeEditor.Text.UI;
 namespace CodeEditor.Languages.Common
 {
 	[Export(typeof(INavigateToItemProvider))]
-	internal class SymbolNavigateToItemProvider : INavigateToItemProvider
+	public class SymbolNavigateToItemProvider : INavigateToItemProvider
 	{
 		[Import]
-		public IObservableServiceClientProvider ServiceClientProvider;
+		public IObservableServiceClientProvider ServiceClientProvider { get; set; }
 
 		[Import]
-		public ILogger Logger;
+		public ILogger Logger { get; set; }
 
 		public IObservableX<INavigateToItem> Search(string filter)
 		{
-			if (string.IsNullOrEmpty(filter))
-				return ObservableX.Empty<INavigateToItem>();
-
-			return ServiceClient
-				.ObserveMany(new SymbolSearch {Filter = filter})
-				.Select(_ => (INavigateToItem)new SymbolItem(_));
+			return string.IsNullOrEmpty(filter)
+				? ObservableX.Empty<INavigateToItem>()
+				: ServiceClient
+					.SelectMany(
+						(client) => client.ObserveMany(new SymbolSearch {Filter = filter}),
+						(client, symbol) => (INavigateToItem) new SymbolItem(symbol));
 		}
 
-		private IObservableServiceClient ServiceClient
+		private IObservableX<IObservableServiceClient> ServiceClient
 		{
 			get { return ServiceClientProvider.Client; }
 		}

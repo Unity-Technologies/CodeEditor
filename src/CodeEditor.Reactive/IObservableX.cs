@@ -17,6 +17,15 @@ namespace CodeEditor.Reactive
 		void OnCompleted();
 	}
 
+	public static class ObserverX
+	{
+		public static void CompleteWith<T>(this IObserverX<T> observer, T value)
+		{
+			observer.OnNext(value);
+			observer.OnCompleted();
+		}
+	}
+
 	public static class ObservableX
 	{
 		public static IObservableX<T> ObserveOnThreadPool<T>(this IObservableX<T> source)
@@ -37,6 +46,16 @@ namespace CodeEditor.Reactive
 		public static IObservableX<T> Start<T>(Func<T> func)
 		{
 			return Observable.Start(func).ToObservableX();
+		}
+
+		public static IObservableX<T> Delay<T>(this IObservableX<T> source, TimeSpan dueTimeout)
+		{
+			return source.Map(_ => _.Delay(dueTimeout));
+		}
+
+		public static IObservableX<T> Retry<T>(this IObservableX<T> source)
+		{
+			return source.Map(_ => _.Retry());
 		}
 
 		public static IObservableX<T> Return<T>(T value)
@@ -79,6 +98,12 @@ namespace CodeEditor.Reactive
 			Func<T, IObservable<TResult>> observableSelector = t => selector(t).ToObservable();
 			return source.Map(_ => _.SelectMany(observableSelector));
 		}
+		
+		public static IObservableX<TResult> SelectMany<TSource, TCollection, TResult>(this IObservableX<TSource> source, Func<TSource, IObservableX<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
+		{
+			Func<TSource, IObservable<TCollection>> observableCollectionSelector = t => collectionSelector(t).ToObservable();
+			return source.Map(_ => _.SelectMany(observableCollectionSelector, resultSelector));
+		}
 
 		public static IObservableX<T> Where<T>(this IObservableX<T> source, Func<T, bool> predicate)
 		{
@@ -88,6 +113,11 @@ namespace CodeEditor.Reactive
 		public static IObservableX<T> TakeWhile<T>(this IObservableX<T> source, Func<T, bool> predicate)
 		{
 			return source.Map(_ => _.TakeWhile(predicate));
+		}
+
+		public static IObservableX<T> Take<T>(this IObservableX<T> source, int count)
+		{
+			return source.Map(_ => _.Take(count));
 		}
 
 		public static IObservableX<T> Do<T>(this IObservableX<T> source, Action<T> action)
@@ -145,10 +175,20 @@ namespace CodeEditor.Reactive
 			return Observable.Create<T>(observer => subscribe(observer.ToObserverX())).ToObservableX();
 		}
 
+		public static IObservableX<T> CreateWithDisposable<T>(Func<IObserverX<T>, IDisposable> subscribe)
+		{
+			return Observable.CreateWithDisposable<T>(observer => subscribe(observer.ToObserverX())).ToObservableX();
+		}
+
 		public static Func<IObservableX<TResult>> FromAsyncPattern<TResult>(Func<AsyncCallback, object, IAsyncResult> begin, Func<IAsyncResult, TResult> end)
 		{
 			var fromAsyncPattern = Observable.FromAsyncPattern(begin, end);
 			return () => fromAsyncPattern().ToObservableX();
+		}
+
+		public static IObservableX<TResult> Defer<TResult>(Func<IObservableX<TResult>> observableFactory)
+		{
+			return Observable.Defer(() => observableFactory().ToObservable()).ToObservableX();
 		}
 	}
 }

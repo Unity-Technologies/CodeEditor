@@ -26,7 +26,7 @@ namespace CodeEditor.Server.Interface
 
 		public IObservableX<TResponse> ObserveMany<TResponse>(IReturn<IEnumerable<TResponse>> request)
 		{
-			return ObservableX.Create<TResponse>(observer =>
+			return ObservableX.CreateWithDisposable<TResponse>(observer =>
 			{
 				var client = new JsonServiceClient(_baseUri) {Timeout = Timeout};
 				var disposable = new MultipleAssignmentDisposable
@@ -47,7 +47,7 @@ namespace CodeEditor.Server.Interface
 						observer.OnError(exception);
 					});
 
-				return disposable.Dispose;
+				return disposable;
 			});
 		}
 	}

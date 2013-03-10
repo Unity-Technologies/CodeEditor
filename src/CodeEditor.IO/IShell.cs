@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.IO;
 using CodeEditor.Composition;
 
 namespace CodeEditor.IO
@@ -10,12 +9,11 @@ namespace CodeEditor.IO
 		IProcess StartManagedProcess(string executable);
 	}
 
-	public interface IProcess
+	public interface IProcess : IDisposable
 	{
 		int Id { get; }
-		StreamReader StandardOutput { get; }
-		StreamWriter StandardInput { get; }
 		bool WaitForExit(int timeout);
+		void Kill();
 	}
 
 	[Export(typeof(IShell))]
@@ -23,13 +21,15 @@ namespace CodeEditor.IO
 	{
 		public IProcess StartManagedProcess(string executable)
 		{
-			var mono = Environment.GetEnvironmentVariable("MONO_EXECUTABLE") ?? "mono";
-			return new StandardProcess(Process.Start(new ProcessStartInfo(mono, executable)
+			return new StandardProcess(Process.Start(new ProcessStartInfo(MonoExecutable, executable)
 			{
-				RedirectStandardInput = true,
-				RedirectStandardOutput = true,
-				UseShellExecute = false
+				WindowStyle = ProcessWindowStyle.Minimized
 			}));
+		}
+
+		static string MonoExecutable
+		{
+			get { return Environment.GetEnvironmentVariable("MONO_EXECUTABLE") ?? "mono"; }
 		}
 
 		public class StandardProcess : IProcess
@@ -46,19 +46,19 @@ namespace CodeEditor.IO
 				get { return _process.Id; }
 			}
 
-			public StreamReader StandardOutput
-			{
-				get { return _process.StandardOutput; }
-			}
-
-			public StreamWriter StandardInput
-			{
-				get { return _process.StandardInput; }
-			}
-
 			public bool WaitForExit(int timeout)
 			{
 				return _process.WaitForExit(timeout);
+			}
+
+			public void Kill()
+			{
+				_process.Kill();
+			}
+
+			public void Dispose()
+			{
+				_process.Dispose();
 			}
 		}
 	}

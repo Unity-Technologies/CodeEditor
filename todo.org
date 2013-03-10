@@ -1,11 +1,7 @@
 * implement IShell.StartManagedProcess on top of Unity's MonoBleedingEdge
 * get mono from MONO_EXECUTABLE environment variable in the default case
 * kaizen Clr.exec should set MONO_EXECUTABLE
-* pass project folder as environment variable to CodeEditor.Composition.Server
-* integrate nrefactory for symbol search
-* implement streaming behaviour for ObservableServiceClient
 * move File search also to the server (using the client search only as a fallback)
-* move logging to CodeEditor.Logging
 * rename all Implementation folders to Internal
 * rename all gradle files to build.gradle
 * integrate undo

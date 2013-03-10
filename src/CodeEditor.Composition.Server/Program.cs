@@ -15,12 +15,12 @@ namespace CodeEditor.Composition.Server
 	{
 		static void Main()
 		{
-			using (var pidFileWriter = new StreamWriter(File.Open(PidFile, FileMode.Create, FileAccess.Write, FileShare.Read)))
+			using (var uriFileWriter = new StreamWriter(File.Open(UriFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
 			{
-				var baseUri = "http://localhost:8888/";
+				const string baseUri = "http://localhost:8888/";
 				
-				pidFileWriter.Write(baseUri);
-				pidFileWriter.Flush();
+				uriFileWriter.WriteLine(baseUri);
+				uriFileWriter.Flush();
 
 				using (var appHost = new AppHost(DirectoryCatalog.AllAssembliesIn(ServerDirectory)))
 				{
@@ -38,9 +38,9 @@ namespace CodeEditor.Composition.Server
 			get { return Path.GetDirectoryName(FullyQualifiedName); }
 		}
 
-		protected static string PidFile
+		protected static string UriFilePath
 		{
-			get { return Path.ChangeExtension(FullyQualifiedName, "pid"); }
+			get { return Path.ChangeExtension(FullyQualifiedName, "uri"); }
 		}
 
 		private static string FullyQualifiedName

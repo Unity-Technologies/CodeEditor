@@ -31,11 +31,6 @@ namespace CodeEditor.Server
 		IUnityProject Project { get; }
 	}
 
-	public interface IUnityAssetsFolderProvider
-	{
-		IFolder AssetsFolder { get; }
-	}
-
 	[Export(typeof(IUnityProjectProvider))]
 	class UnityProjectProvider : IUnityProjectProvider
 	{
@@ -63,6 +58,11 @@ namespace CodeEditor.Server
 			project.Start();
 			return project;
 		}
+	}
+
+	public interface IUnityAssetsFolderProvider
+	{
+		IFolder AssetsFolder { get; }
 	}
 
 	[Export(typeof(IUnityAssetsFolderProvider))]

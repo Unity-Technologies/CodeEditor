@@ -8,5 +8,10 @@ namespace CodeEditor.Reactive.Disposables
 		{
 			return System.Disposables.Disposable.Create(dispose);
 		}
+
+		public static IDisposable Empty
+		{
+			get { return System.Disposables.Disposable.Empty; }
+		}
 	}
 }

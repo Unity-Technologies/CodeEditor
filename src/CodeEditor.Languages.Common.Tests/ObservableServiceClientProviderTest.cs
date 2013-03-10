@@ -1,51 +1,51 @@
+using System;
 using System.IO;
-using CodeEditor.Composition;
 using CodeEditor.IO;
 using CodeEditor.Logging;
+using CodeEditor.Reactive;
 using CodeEditor.Testing;
 using NUnit.Framework;
 
 namespace CodeEditor.Languages.Common.Tests
 {
 	[TestFixture]
-	public class UnityProjectProviderTest : MockBasedTest
+	public class ObservableServiceClientProviderTest : MockBasedTest
 	{
 		[Test]
-		public void GetsProjectLocationFromLocationProviderAndAddressFromPidFile()
+		public void GetsServerAddressFromUriFile()
 		{
-			const string projectFolder = "/Project";
+			const string serverExecutable = "server.exe";
+			const string serverUrilFile = "server.uri";
 			const string serverAddress = "tcp://localhost:4242/IServiceProvider";
 
-			var projectPathProvider = MockFor<IUnityProjectPathProvider>();
+			var projectPathProvider = MockFor<IServerExecutableProvider>();
 			projectPathProvider
-				.SetupGet(_ => _.Location)
-				.Returns(projectFolder);
-
-			var pidFilePath = Path.Combine(projectFolder, "Library/CodeEditor/Server/CodeEditor.Composition.Server.pid");
+				.SetupGet(_ => _.ServerExecutable)
+				.Returns(serverExecutable);
 
 			// provider tries to delete pid file to decide if it needs
 			// to start the server
 			var fileSystem = MockFor<IFileSystem>();
-			var pidFile = MockFor<IFile>();
+			var uriFile = MockFor<IFile>();
 			fileSystem
-				.Setup(_ => _.FileFor(pidFilePath))
-				.Returns(pidFile.Object);
+				.Setup(_ => _.FileFor(serverUrilFile))
+				.Returns(uriFile.Object);
 
-			pidFile
+			uriFile
 				.Setup(_ => _.Delete())
 				.Throws(new IOException());
 
-			pidFile
+			uriFile
 				.Setup(_ => _.ReadAllText())
-				.Returns(serverAddress);
+				.Returns(serverAddress + "\n");
 			
 			var subject = new ObservableServiceClientProvider
 			{
-				ProjectPathProvider = projectPathProvider.Object,
+				ServerExecutableProvider = projectPathProvider.Object,
 				FileSystem = fileSystem.Object,
 				Logger = new StandardLogger()
 			};
-			Assert.IsNotNull(subject.Client);
+			Assert.IsNotNull(subject.Client.FirstOrTimeout(TimeSpan.FromSeconds(1)));
 
 			VerifyAllMocks();
 		}

@@ -1,9 +1,10 @@
 using System;
 using System.IO;
 using CodeEditor.Composition;
-using CodeEditor.Composition.Client;
 using CodeEditor.IO;
 using CodeEditor.Logging;
+using CodeEditor.Reactive;
+using CodeEditor.Reactive.Disposables;
 using CodeEditor.Server.Interface;
 using ServiceStack.Text;
 using IFile = CodeEditor.IO.IFile;
@@ -12,63 +13,74 @@ namespace CodeEditor.Languages.Common
 {
 	public interface IObservableServiceClientProvider
 	{
-		IObservableServiceClient Client { get; }
-	}
-
-	public interface IUnityProjectPathProvider
-	{
-		string Location { get; }
+		IObservableX<IObservableServiceClient> Client { get; }
 	}
 
 	[Export(typeof(IObservableServiceClientProvider))]
 	public class ObservableServiceClientProvider : IObservableServiceClientProvider
 	{
-		private readonly Lazy<IObservableServiceClient> _client;
-
-		[Import]
-		public IFileSystem FileSystem;
-
-		[Import]
-		public IUnityProjectPathProvider ProjectPathProvider;
-
-		[Import]
-		public ICompositionServerControllerFactory ControllerFactory;
-
-		[Import]
-		public ILogger Logger;
+		readonly Lazy<IFile> _serverUriFile;
 
 		public ObservableServiceClientProvider()
 		{
-			_client = new Lazy<IObservableServiceClient>(CreateClient);
+			_serverUriFile = new Lazy<IFile>(() => FileSystem.FileFor(ServerUriFilePath));
 		}
 
-		public IObservableServiceClient Client
-		{
-			get { return _client.Value; }
-		}
+		[Import]
+		public IServerExecutableProvider ServerExecutableProvider { get; set; }
 
-		private IObservableServiceClient CreateClient()
+		[Import]
+		public IFileSystem FileSystem { get; set; }
+
+		[Import]
+		public IShell Shell { get; set; }
+
+		[Import]
+		public ILogger Logger { get; set; }
+
+		public IObservableX<IObservableServiceClient> Client
 		{
-			try
+			get
 			{
-				EnsureCompositionServerIsRunning();
-
-				var baseUri = PidFile.ReadAllText();
-				return new ObservableServiceClient(baseUri);
-			}
-			catch (Exception e)
-			{
-				Logger.LogError(e);
-				throw;
+				return
+					CreateClient()
+					.Catch(
+						(Exception e) =>
+							ObservableX
+							.Throw<IObservableServiceClient>(e)
+							.Delay(TimeSpan.FromMilliseconds(500)))
+					.Retry();
 			}
 		}
 
-		private IFile PidFile
+		IObservableX<IObservableServiceClient> CreateClient()
 		{
-			get { return FileSystem.FileFor(PidFilePath); }
+			return ObservableX.CreateWithDisposable<IObservableServiceClient>(observer =>
+			{
+				try
+				{
+					EnsureCompositionServerIsRunning();
+					var baseUri = FirstLineFromUriFile();
+					observer.CompleteWith(new ObservableServiceClient(baseUri));
+				}
+				catch (Exception e)
+				{
+					Logger.LogError(e);
+					observer.OnError(e);
+				}
+				return Disposable.Empty;
+			});
 		}
 
-		private void EnsureCompositionServerIsRunning()
+		string FirstLineFromUriFile()
+		{
+			var content = UriFile.ReadAllText();
+			if (content[content.Length - 1] != '\n')
+				throw new InvalidOperationException("'{0}' is missing a line ending".Fmt(content));
+			return content.Trim();
+		}
+
+		void EnsureCompositionServerIsRunning()
 		{
 			if (IsRunning())
 			{
@@ -78,44 +90,69 @@ namespace CodeEditor.Languages.Common
 			StartCompositionContainer();
 		}
 
-		private void StartCompositionContainer()
+		IFile UriFile
 		{
-			var folder = Path.GetDirectoryName(CompositionServerExe);
-			Logger.Log("Starting server at {0}".Fmt(folder));
-			ControllerFactory.StartCompositionServerAtFolder(folder);
+			get { return _serverUriFile.Value; }
 		}
 
-		private bool IsRunning()
+		void StartCompositionContainer()
 		{
-			return !TryToDeleteFilePidFile();
+			var serverExe = ServerExecutable;
+			Logger.Log("Starting {0}".Fmt(serverExe));
+			using (Shell.StartManagedProcess(serverExe))
+			{
+				// this doesn't kill the actual process but
+				// just releases any resources attached to
+				// the object
+			}
 		}
 
-		private bool TryToDeleteFilePidFile()
+		bool IsRunning()
+		{
+			return !TryToDeleteUriFile();
+		}
+
+		bool TryToDeleteUriFile()
 		{
 			try
 			{
-				PidFile.Delete();
+				UriFile.Delete();
 				return true;
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				return false;
 			}
 		}
 
-		private string PidFilePath
+		string ServerUriFilePath
 		{
-			get { return Path.ChangeExtension(CompositionServerExe, "pid"); }
+			get { return Path.ChangeExtension(ServerExecutable, "uri"); }
 		}
 
-		private string CompositionServerExe
+		string ServerExecutable
 		{
-			get { return Path.Combine(ProjectFolder, "Library/CodeEditor/Server/CodeEditor.Composition.Server.exe"); }
+			get { return ServerExecutableProvider.ServerExecutable; }
+		}
+	}
+
+	public interface IServerExecutableProvider
+	{
+		string ServerExecutable { get; }
+	}
+
+	public class ServerExecutableProvider : IServerExecutableProvider
+	{
+		readonly string _serverExecutable;
+
+		public ServerExecutableProvider(string serverExecutable)
+		{
+			_serverExecutable = serverExecutable;
 		}
 
-		protected string ProjectFolder
+		public string ServerExecutable
 		{
-			get { return ProjectPathProvider.Location; }
+			get { return _serverExecutable; }
 		}
 	}
 }
