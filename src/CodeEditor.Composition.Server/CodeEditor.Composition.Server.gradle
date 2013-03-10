@@ -8,7 +8,6 @@ assembly {
 dependencies {
 	def projectReferences = [
 		'CodeEditor.Composition',
-		'CodeEditor.Composition.Client'
 	]
 	projectReferences.each {
 		'default' project(":$it")

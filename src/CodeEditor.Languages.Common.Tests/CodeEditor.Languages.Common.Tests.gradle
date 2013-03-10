@@ -2,8 +2,6 @@
 dependencies {
   'default' rootProject.references.languagesCommon
 	def projectReferences = [
-		'CodeEditor.Composition.Client',
-		'CodeEditor.Languages.Common',
 		'CodeEditor.Server.Interface',
 		'CodeEditor.Grammars',
 	]
