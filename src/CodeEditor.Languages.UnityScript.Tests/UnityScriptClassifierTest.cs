@@ -1,12 +1,11 @@
-﻿using System.Linq;
-using CodeEditor.Languages.UnityScript;
+using System.Linq;
 using CodeEditor.Text.Data;
 using CodeEditor.Text.Data.Tests;
 using CodeEditor.Text.Logic;
 using CodeEditor.Text.Logic.Implementation;
 using NUnit.Framework;
 
-namespace CodeEditor.Languages.Tests
+namespace CodeEditor.Languages.UnityScript.Tests
 {
 	[TestFixture]
 	public class UnityScriptClassifierTest : TextBufferBasedTest

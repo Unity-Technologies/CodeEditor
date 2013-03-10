@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using NUnit.Framework;
 
 namespace CodeEditor.Text.Data.Tests
@@ -43,7 +44,11 @@ namespace CodeEditor.Text.Data.Tests
 		[TestCase(2)]
 		public void LineAccessorThrowsOnInvalidNumber(int invalidLineNumber)
 		{
-			Assert.Throws<ArgumentOutOfRangeException>(delegate { var invalid = CurrentSnapshot.Lines[invalidLineNumber]; });
+			Assert.Throws<ArgumentOutOfRangeException>(() =>
+			{
+				var invalid = CurrentSnapshot.Lines[invalidLineNumber];
+				Debug.WriteLine(invalid); // force variable to be used
+			});
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using CodeEditor.Composition;
 using CodeEditor.Composition.Hosting;
 using NUnit.Framework;
@@ -18,11 +18,17 @@ namespace CodeEditor.Text.Data.Tests
 		}
 
 		[Test]
-		public void ContentTypeSpecificService()
+		public void ForName()
 		{
 			var contentType = _registry.ForName(FooContentType.Name);
 			Assert.AreEqual(FooContentType.Name, contentType.Name);
 			Assert.IsInstanceOf<FooContentType>(contentType.Definition);
+		}
+
+		[Test]
+		public void ContentTypeSpecificService()
+		{
+			var contentType = _registry.ForName(FooContentType.Name);
 			Assert.IsInstanceOf<FooSpecificService>(contentType.GetService<IContentTypeSpecificService>());
 		}
 

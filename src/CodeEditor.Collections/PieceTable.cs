@@ -245,12 +245,7 @@ namespace CodeEditor.Collections
 			return _insertionBuffer.Insert(value);
 		}
 
-		private int PieceIndexForPosition(int position)
-		{
-			return PieceIndexForPosition(position, 0);
-		}
-
-		private int PieceIndexForPosition(int position, int min)
+		private int PieceIndexForPosition(int position, int min = 0)
 		{
 			var max = LastIndex;
 			while (max >= min)

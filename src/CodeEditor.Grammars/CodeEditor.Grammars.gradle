@@ -4,6 +4,6 @@ version = '0.1.1'
 dependencies {
 	'default' rootProject.references.adt 
 	'default' rootProject.references.ometa
-	'default' 'boo:Boo.Lang.PatternMatching:0.9.5+'
+	'default' 'boo:Boo.Lang.PatternMatching:0.9.6+'
 }
 

@@ -28,7 +28,7 @@ namespace CodeEditor.Languages.Common.Tests
 			[Test]
 			public void WillNotCallTheTokenizerTwiceForTheSameLine()
 			{
-				var firstLineText = " ";
+				const string firstLineText = " ";
 
 				var tokenizer = MockFor<IPartitionTokenizer>();
 				tokenizer

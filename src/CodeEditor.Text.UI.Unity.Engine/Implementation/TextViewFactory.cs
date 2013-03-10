@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CodeEditor.Composition;
 using CodeEditor.IO;
 
@@ -20,30 +20,45 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		ITextViewAdornments Adornments { get; set; }
 
 		[Import]
-		ITextViewMarginsFactory TextViewMarginsFactory { get; set; }
-
+		IDefaultTextViewMarginsProvider DefaultTextViewMarginsProvider { get; set; }
 
 		public ITextView ViewForFile(string fileName)
 		{
-			return ForFile(FileSystem.FileFor(fileName));
+			return CreateView(new TextViewCreationOptions {File = FileSystem.FileFor(fileName)});
 		}
 
 		public ITextView CreateView()
 		{
-			return ForFile(new TransientFile(".txt"));
+			return CreateView(new TextViewCreationOptions());
 		}
 
-		private ITextView ForFile(IFile file)
+		public ITextView CreateView(TextViewCreationOptions options)
 		{
-			var document = DocumentFactory.DocumentForFile(file);
-			var textView = new TextView(document, AppearanceProvider.AppearanceFor(document), Adornments);
-			textView.Margins = MarginsFor(textView);
+			var file = options.File ?? TransientTextFile();
+			var document = DocumentFor(file);
+			var textView = new TextView(document, AppearanceFor(document), Adornments);
+			textView.Margins = options.Margins ?? DefaultMarginsFor(textView);
 			return textView;
 		}
 
-		private ITextViewMargins MarginsFor(TextView textView)
+		private static TransientFile TransientTextFile()
 		{
-			return TextViewMarginsFactory.MarginsFor(textView);
+			return new TransientFile(".txt");
+		}
+
+		private ITextViewDocument DocumentFor(IFile file)
+		{
+			return DocumentFactory.DocumentForFile(file);
+		}
+
+		private ITextViewAppearance AppearanceFor(ITextViewDocument document)
+		{
+			return AppearanceProvider.AppearanceFor(document);
+		}
+
+		private ITextViewMargins DefaultMarginsFor(ITextView textView)
+		{
+			return DefaultTextViewMarginsProvider.MarginsFor(textView);
 		}
 
 		class TransientFile : IFile

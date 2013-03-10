@@ -1,0 +1,11 @@
+version = '0.1.0'
+
+dependencies {
+	'default' project(':CodeEditor.Composition')
+}
+
+assembly {
+	references {
+		frameworkAssembly 'System.Runtime.Remoting'
+	}
+}

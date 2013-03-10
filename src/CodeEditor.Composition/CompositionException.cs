@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace CodeEditor.Composition
 {
+	[Serializable]
 	public class CompositionException : Exception
 	{
 		private readonly IList<CompositionError> _errors = new List<CompositionError>();
@@ -15,6 +17,10 @@ namespace CodeEditor.Composition
 		public CompositionException(Exception cause, CompositionError error) : base(error.Message, cause)
 		{
 			Add(error);
+		}
+
+		protected CompositionException(SerializationInfo info, StreamingContext context) : base(info, context)
+		{
 		}
 
 		public IList<CompositionError> Errors

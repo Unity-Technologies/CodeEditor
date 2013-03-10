@@ -8,6 +8,8 @@ lib
 *.ipr
 *.iws
 *~
+*.csproj
+*.sln
 *.user
 *.suo
 _ReSharper.*

@@ -1,0 +1,9 @@
+assembly {
+  targetFrameworkVersion = 'v4.0'
+}
+
+dependencies {
+  'default' rootProject.references.nunitFramework
+  'default' project(':CodeEditor.Composition')
+  'default' rootProject.references.rx40
+}

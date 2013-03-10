@@ -1,0 +1,22 @@
+version = '0.1.0'
+
+assembly {
+	target = 'exe'
+	targetFrameworkVersion = 'v4.0'
+}
+
+dependencies {
+	def projectReferences = [
+		'CodeEditor.Composition',
+		'CodeEditor.Composition.Client'
+	]
+	projectReferences.each {
+		'default' project(":$it")
+	}
+}
+
+assembly {
+	references {
+		frameworkAssembly 'System.Runtime.Remoting'
+	}
+}
