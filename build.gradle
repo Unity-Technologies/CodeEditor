@@ -253,7 +253,7 @@ task open {
 def applyProjectRenaming(String oldName, String newName) {
 	def oldDir = project(":$oldName").projectDir
 	def srcDir = oldDir.parentFile
-	def newDir = new File(srcDir, to)
+	def newDir = new File(srcDir, newName)
 
 	// rename project directory
 	println "$oldDir -> $newDir"
