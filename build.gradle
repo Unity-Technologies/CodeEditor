@@ -250,6 +250,16 @@ task open {
 	}
 }
 
+def fileReplace(File file, pattern, replacementPattern) {
+	def oldText = file.text
+	def newText = oldText.replaceAll(pattern, replacementPattern)
+	if (oldText == newText)
+		return
+	print "Updating ${file.name}... "
+	file.text = newText
+	println "done."
+}
+
 def applyProjectRenaming(String oldName, String newName) {
 	def oldDir = project(":$oldName").projectDir
 	def srcDir = oldDir.parentFile
@@ -264,18 +274,13 @@ def applyProjectRenaming(String oldName, String newName) {
 
 	// update project references in every .gradle file
 	def projectRefPattern = /('|"|:)${java.util.regex.Pattern.quote(oldName)}('|")/
-	srcDir.eachFileRecurse { file ->
+	def replacementPattern = "\$1$newName\$2"
+	srcDir.eachFileRecurse(groovy.io.FileType.FILES) { file ->
 		if (!file.name.endsWith('.gradle'))
 			return
-		def oldText = file.text
-		def newText = oldText.replaceAll(projectRefPattern, "\$1$newName\$2")
-		if (oldText == newText)
-			return
-
-		print "Updating ${file.name}... "
-		file.text = newText
-		println "done."
+		fileReplace file, projectRefPattern, replacementPattern
 	}
+	fileReplace rootProject.buildFile, projectRefPattern, replacementPattern
 }
 
 task renameProject {
