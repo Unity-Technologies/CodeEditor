@@ -21,8 +21,13 @@ namespace CodeEditor.Server
 				ProjectProvider
 				.Project
 				.SearchSymbol(request.Filter)
-				.Select(s => new Symbol {DisplayText = s.DisplayText, Line = s.Line, Column = s.Column})
+				.Select(s => new Symbol {DisplayText = s.DisplayText, SourceFile = RelativePathFor(s.SourceFile), Line = s.Line, Column = s.Column})
 				.ToJsonStreamWriter();
+		}
+
+		string RelativePathFor(IFile sourceFile)
+		{
+			return sourceFile.FullName;
 		}
 	}
 
@@ -98,6 +103,7 @@ namespace CodeEditor.Server
 
 	public interface ISymbol
 	{
+		IFile SourceFile { get; }
 		int Line { get; }
 		int Column { get; }
 		string DisplayText { get; }

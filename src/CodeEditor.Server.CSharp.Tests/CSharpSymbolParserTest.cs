@@ -12,15 +12,16 @@ namespace CodeEditor.Server.CSharp.Tests
 		public void ReturnsSymbolsForClasses()
 		{
 			var subject = new CSharpSymbolParser();
-			var parsedSymbols = subject.Parse(MockFileWithContent("class Foo {}\nclass Bar {}"));
+			var file = MockFileWithContent("class Foo {}\nclass Bar {}");
+			var parsedSymbols = subject.Parse(file);
 			var expectedSymbols = new[]
 			{
-				new {DisplayText = "Foo", Line = 1, Column = 7},
-				new {DisplayText = "Bar", Line = 2, Column = 7}
+				new {DisplayText = "Foo", File = file, Line = 0, Column = 6},
+				new {DisplayText = "Bar", File = file, Line = 1, Column = 6}
 			};
 			CollectionAssert.AreEquivalent(
 				expectedSymbols,
-				parsedSymbols.Select(_ => new { _.DisplayText, _.Line, _.Column }));
+				parsedSymbols.Select(_ => new { _.DisplayText, File = _.SourceFile, _.Line, _.Column }));
 		}
 
 		private IFile MockFileWithContent(string content)

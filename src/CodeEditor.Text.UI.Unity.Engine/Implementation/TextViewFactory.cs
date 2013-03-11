@@ -70,6 +70,11 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				_extension = extension;
 			}
 
+			public string FullName
+			{
+				get { return ""; }
+			}
+
 			public string Extension
 			{
 				get { return _extension; }

@@ -5,11 +5,18 @@ using UnityEditor;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
-	public class UnityEditorScheduler : IDisposable
+	public class UnityEditorScheduler
 	{
+		public static UnityEditorScheduler Instance
+		{
+			get { return Singleton; }
+		}
+
+		static readonly UnityEditorScheduler Singleton = new UnityEditorScheduler();
+
 		readonly ConcurrentQueue<Action> _actions = new ConcurrentQueue<Action>();
 
-		public UnityEditorScheduler()
+		UnityEditorScheduler()
 		{
 			EditorApplication.update += Update;
 		}
@@ -17,11 +24,6 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		public void Schedule(Action action)
 		{
 			_actions.Enqueue(action);
-		}
-
-		public void Dispose()
-		{
-			EditorApplication.update -= Update;
 		}
 
 		private void Update()

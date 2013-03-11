@@ -49,10 +49,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				s_Styles = new Styles();
 
 			if (_navigateToItemProvider == null)
-			{
 				_navigateToItemProvider = ProviderAggregatorFactory();
-				_unityScheduler = new UnityEditorScheduler();
-			}
 		}
 
 		private void DelayExpensiveInit()
@@ -77,7 +74,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		private void OnNextItem(INavigateToItem item)
 		{
-			_unityScheduler.Schedule(() =>
+			UnityEditorScheduler.Instance.Schedule(() =>
 			{
 				if (_selectedItem == null)
 					_selectedItem = item;

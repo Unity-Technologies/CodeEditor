@@ -13,6 +13,9 @@ namespace CodeEditor.Languages.Common
 		public IObservableServiceClientProvider ServiceClientProvider { get; set; }
 
 		[Import]
+		public IFileNavigationService FileNavigationService { get; set; }
+
+		[Import]
 		public ILogger Logger { get; set; }
 
 		public IObservableX<INavigateToItem> Search(string filter)
@@ -22,21 +25,23 @@ namespace CodeEditor.Languages.Common
 				: ServiceClient
 					.SelectMany(
 						(client) => client.ObserveMany(new SymbolSearch {Filter = filter}),
-						(client, symbol) => (INavigateToItem) new SymbolItem(symbol));
+						(client, symbol) => (INavigateToItem) new SymbolItem(symbol, FileNavigationService));
 		}
 
-		private IObservableX<IObservableServiceClient> ServiceClient
+		IObservableX<IObservableServiceClient> ServiceClient
 		{
 			get { return ServiceClientProvider.Client; }
 		}
 
 		internal class SymbolItem : INavigateToItem
 		{
-			private readonly Symbol _symbol;
+			readonly Symbol _symbol;
+			readonly IFileNavigationService _fileNavigationService;
 
-			public SymbolItem(Symbol symbol)
+			public SymbolItem(Symbol symbol, IFileNavigationService fileNavigationService)
 			{
 				_symbol = symbol;
+				_fileNavigationService = fileNavigationService;
 			}
 
 			public string DisplayText
@@ -46,7 +51,10 @@ namespace CodeEditor.Languages.Common
 
 			public void NavigateTo()
 			{
-				throw new System.NotImplementedException();
+				var file = _symbol.SourceFile;
+				var line = _symbol.Line;
+				var column = _symbol.Column;
+				_fileNavigationService.NavigateTo(file, new PositionAnchor(line, column));
 			}
 		}
 	}
