@@ -166,9 +166,12 @@ subprojects { subProject ->
 	switch (subProject.name) {
 	case ~/.+\.Tests$/:
 		apply plugin: 'nunit-assembly'
+		def subjectPath = subProject.path[0..-('.Tests'.length() + 1)]
 		dependencies {
 			// Foo.Bar.Tests depends on Foo.Bar
-			'default' project(subProject.path[0..-('.Tests'.length() + 1)])
+			if (rootProject.findProject(subjectPath)) {
+				'default' project(subjectPath)
+			}
 			'default' project(':CodeEditor.Testing')
 			'default' rootProject.references.moq
 		}
@@ -247,31 +250,45 @@ task open {
 	}
 }
 
+def applyProjectRenaming(String oldName, String newName) {
+	def oldDir = project(":$oldName").projectDir
+	def srcDir = oldDir.parentFile
+	def newDir = new File(srcDir, to)
+
+	// rename project directory
+	println "$oldDir -> $newDir"
+	oldDir.renameTo newDir
+
+	// rename .gradle file
+	new File(newDir, "${oldName}.gradle").renameTo(new File(newDir, "${newName}.gradle"))
+
+	// update project references in every .gradle file
+	def projectRefPattern = /('|"|:)${java.util.regex.Pattern.quote(oldName)}('|")/
+	srcDir.eachFileRecurse { file ->
+		if (!file.name.endsWith('.gradle'))
+			return
+		def oldText = file.text
+		def newText = oldText.replaceAll(projectRefPattern, "\$1$newName\$2")
+		if (oldText == newText)
+			return
+
+		print "Updating ${file.name}... "
+		file.text = newText
+		println "done."
+	}
+}
+
 task renameProject {
 	description "Renames a project. Required arguments: -Pfrom=oldName -Pto=newName"
 	group "Refactoring"
 	doFirst {
 		def oldName = project.properties.from
 		def newName = project.properties.to
-		def oldDir = project(":$oldName").projectDir
-		def srcDir = oldDir.parentFile
-		def newDir = new File(srcDir, to)
-		println "$oldDir -> $newDir"
-		oldDir.renameTo newDir
-		new File(newDir, "${oldName}.gradle").renameTo(new File(newDir, "${newName}.gradle"))
-
-		def pattern = /('|"|:)${java.util.regex.Pattern.quote(oldName)}('|")/
-		srcDir.eachFileRecurse { file ->
-			if (!file.name.endsWith('.gradle'))
-				return
-			def oldText = file.text
-			def newText = oldText.replaceAll(pattern, "\$1$newName\$2")
-			if (oldText == newText)
-				return
-
-			print "Updating ${file.name}... "
-			file.text = newText
-			println "done."
+		applyProjectRenaming oldName, newName
+		def oldTestsName = oldName + '.Tests'
+		if (rootProject.findProject(":$oldTestsName")) {
+			def newTestsName = newName + '.Tests'
+			applyProjectRenaming oldTestsName, newTestsName
 		}
 	}
 }
