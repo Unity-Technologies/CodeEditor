@@ -298,3 +298,16 @@ task renameProject {
 		}
 	}
 }
+
+task createProject {
+	description "Creates a new project. Required argument: -PprojectName=projectName"
+	group "Refactoring"
+	doFirst {
+		def projectName = project.properties.projectName
+		def projectDir = file("src/$projectName")
+		assert !projectDir.exists()
+		projectDir.mkdirs()
+		def buildFile = new File(projectDir, "${projectName}.gradle")
+		buildFile.text = "version = '0.1.0'\n"
+	}
+}
