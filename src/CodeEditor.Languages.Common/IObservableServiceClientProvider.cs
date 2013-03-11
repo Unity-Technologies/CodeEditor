@@ -75,8 +75,8 @@ namespace CodeEditor.Languages.Common
 		string FirstLineFromUriFile()
 		{
 			var content = UriFile.ReadAllText();
-			if (content[content.Length - 1] != '\n')
-				throw new InvalidOperationException("'{0}' is missing a line ending".Fmt(content));
+			if (string.IsNullOrEmpty(content))
+				throw new InvalidOperationException("Server address couldn't be read.");
 			return content.Trim();
 		}
 
