@@ -43,9 +43,26 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			container.AddExportedValue<IFileSystem>(new UnityEditorFileSystem());
 			container.AddExportedValue<IServerExecutableProvider>(new ServerExecutableProvider(ServerExecutable));
 			container.AddExportedValue<IMonoExecutableProvider>(new MonoExecutableProvider(MonoExecutable));
+			container.AddExportedValue<IFileNavigationService>(new UnityEditorFileNavigationService());
 			if (UnityEngine.Debug.isDebugBuild)
 				container.AddExportedValue<ILogger>(new UnityLogger());
 			return container;
+		}
+
+		class UnityEditorFileNavigationService : IFileNavigationService
+		{
+			public void NavigateTo(string fileName, IAnchor anchor = null)
+			{
+				CodeEditorWindow.OpenWindowFor(fileName, PositionFrom(anchor));
+			}
+
+			static Position? PositionFrom(IAnchor anchor)
+			{
+				var positionAnchor = anchor as PositionAnchor;
+				if (positionAnchor == null)
+					return null;
+				return positionAnchor.Position;
+			}
 		}
 
 		static string ServerExecutable

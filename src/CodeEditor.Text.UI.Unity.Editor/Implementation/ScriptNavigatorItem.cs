@@ -4,23 +4,24 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	public class ScriptNavigatorItem : INavigateToItem
 	{
-		public ScriptNavigatorItem(string displayText, int instanceID)
+		readonly IFileNavigationService _fileNavigationService;
+
+		public ScriptNavigatorItem(string displayText, int instanceID, IFileNavigationService fileNavigationService)
 		{
+			_fileNavigationService = fileNavigationService;
 			DisplayText = displayText;
 			InstanceID = instanceID;
 		}
+
 		public string DisplayText { get; set; }
+
 		public int InstanceID { get; set; }
 
 		public void NavigateTo()
 		{
-			string path = AssetDatabase.GetAssetPath(InstanceID);
+			var path = AssetDatabase.GetAssetPath(InstanceID);
 			if (!string.IsNullOrEmpty(path))
-			{
-				string filePath = System.IO.Path.GetFullPath(path);
-				CodeEditorWindow.OpenWindowFor(filePath);
-			}
-
+				_fileNavigationService.NavigateTo(System.IO.Path.GetFullPath(path));
 		}
 	}
 }

@@ -58,10 +58,11 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			return window;
 		}
 
-		static public void OpenWindowFor(string file)
+		static public void OpenWindowFor(string file, Position? position = null)
 		{
-			var window = OpenOrFocusExistingWindow ();
-			window.OpenFile (file);
+			var window = OpenOrFocusExistingWindow();
+			var actualPosition = position ?? new Position(0, 0);
+			window.OpenFile(file, actualPosition.Row, actualPosition.Column);
 		}
 
 		private CodeEditorWindow() 
@@ -84,7 +85,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		}
 		*/
 
-		void OpenFile (string file)
+		/// <returns>true if the file was open, false otherwise</returns>
+		bool OpenFile (string file)
 		{
 			_textView = null;
 			_codeView = null;
@@ -92,11 +94,12 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			_fileNameWithExtension = "";
 
 			if (string.IsNullOrEmpty(_filePath))
-				return;
+				return false;
 
 			_textView = TextViewFactory(_filePath);
 			_codeView = new CodeView(this, _textView);
 			_fileNameWithExtension = Path.GetFileName(_filePath);
+			return true;
 		}
 
 		public void OnInspectorUpdate()
@@ -107,6 +110,14 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			_codeView.Update();
 		}
 
+		bool OpenFile(string file, int row, int column)
+		{
+			if (!OpenFile(file))
+				return false;
+			SetPosition(row, column);
+			return true;
+		}
+		
 		void InitIfNeeded()
 		{
 			if (s_Styles == null)
@@ -118,12 +129,16 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			// Reconstruct state after domain reloading
 			if (_textView == null && !string.IsNullOrEmpty(_filePath))
 			{
-				OpenFile (_filePath);
-				_textView.Document.Caret.SetPosition(_backupData.caretRow, _backupData.caretColumn);
+				OpenFile(_filePath, _backupData.caretRow, _backupData.caretColumn);
 				_textView.ScrollOffset = _backupData.scrollOffset;
 				_textView.SelectionAnchor = new Position((int)_backupData.selectionAnchor.y, (int)_backupData.selectionAnchor.x);
 				_textView.Appearance.SetFontSize(_selectedFontSize);
 			}
+		}
+
+		void SetPosition(int row, int column)
+		{
+			_textView.Document.Caret.SetPosition(row, column);
 		}
 
 		void OnGUI()

@@ -10,6 +10,9 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 	[Export(typeof(INavigateToItemProvider))]
 	internal class ScriptNavigatorItemProvider : INavigateToItemProvider
 	{
+		[Import]
+		public IFileNavigationService FileNavigationService { get; set; }
+
 		public IObservableX<INavigateToItem> Search(string filter)
 		{
 			return
@@ -36,13 +39,12 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			return MonoImporter.GetAllRuntimeMonoScripts();
 		}
 
-		private static ScriptNavigatorItem ScriptNavigatorItemFor(MonoScript script, string path)
+		private ScriptNavigatorItem ScriptNavigatorItemFor(MonoScript script, string path)
 		{
 			var fullPath = System.IO.Path.GetFullPath(path); // get extension
 			var fileName = System.IO.Path.GetFileName(fullPath);
 			var instanceID = script.GetInstanceID();
-			var scriptNavigatorItem = new ScriptNavigatorItem(fileName, instanceID);
-			return scriptNavigatorItem;
+			return new ScriptNavigatorItem(fileName, instanceID, FileNavigationService);
 		}
 	}
 }
