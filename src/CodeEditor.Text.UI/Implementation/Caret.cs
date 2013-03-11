@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CodeEditor.Text.UI.Implementation
 {
@@ -17,9 +17,9 @@ namespace CodeEditor.Text.UI.Implementation
 		public void SetPosition(int row, int column)
 		{
 			if (row < 0 || row > LastRowIndex)
-				throw new ArgumentOutOfRangeException("row", row.ToString());
+				throw new ArgumentOutOfRangeException("row", string.Format("row must be a value between 0 and {0}, was {1}", LastRowIndex, row));
 			if (column < 0 || column > ColumnsForRow(row))
-				throw new ArgumentOutOfRangeException("column", column.ToString());
+				throw new ArgumentOutOfRangeException("column", string.Format("column must be a value between 0 and {0}, was {1}", ColumnsForRow(row), column));
 
 			Row = row;
 			Column = column;

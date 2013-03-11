@@ -2,6 +2,9 @@ using System;
 
 namespace CodeEditor.Text.UI
 {
+	/// <summary>
+	/// Maintains the zero based coordinates of the input caret.
+	/// </summary>
 	public interface ICaret
 	{
 		int Row { get; }

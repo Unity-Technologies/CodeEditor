@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using CodeEditor.Composition;
 using CodeEditor.Text.Data;
 
