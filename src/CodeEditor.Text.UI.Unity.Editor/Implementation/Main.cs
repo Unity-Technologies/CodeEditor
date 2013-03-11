@@ -67,7 +67,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		static string ServerExecutable
 		{
-			get { return Path.Combine(ProjectPath, "Library/CodeEditor/Server/CodeEditor.Composition.Server.exe"); }
+			get { return Path.Combine(ProjectPath, "Library/CodeEditor/Server/CodeEditor.ServiceHost.exe"); }
 		}
 
 		static string MonoExecutable

@@ -9,7 +9,7 @@ using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface.Providers;
 using ServiceStack.WebHost.Endpoints;
 
-namespace CodeEditor.Composition.Server
+namespace CodeEditor.ServiceHost
 {
 	public class Program
 	{
@@ -50,7 +50,7 @@ namespace CodeEditor.Composition.Server
 
 		public class AppHost : AppHostHttpListenerBase
 		{
-			public AppHost(Assembly[] assemblies) : base("CodeEditor.Composition.Server", assemblies.Where(_ => _.References(typeof(IService).Assembly)).ToArray())
+			public AppHost(Assembly[] assemblies) : base(typeof(AppHost).Namespace, assemblies.Where(_ => _.References(typeof(IService).Assembly)).ToArray())
 			{
 				CompositionContainer = new CompositionContainer(AssemblyCatalog.For(assemblies));
 			}
@@ -73,7 +73,7 @@ namespace CodeEditor.Composition.Server
 					_compositionContainer = compositionContainer;
 				}
 
-				public T TryResolve<T>()
+				T IContainerAdapter.TryResolve<T>()
 				{
 					var singleOrDefaultExport = _compositionContainer.GetExports(typeof(T)).SingleOrDefault();
 					if (singleOrDefaultExport == null)
@@ -81,7 +81,7 @@ namespace CodeEditor.Composition.Server
 					return (T) singleOrDefaultExport.Value;
 				}
 
-				public T Resolve<T>()
+				T IContainerAdapter.Resolve<T>()
 				{
 					return _compositionContainer.GetExportedValue<T>();
 				}

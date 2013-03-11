@@ -36,7 +36,7 @@ vs {
 			':CodeEditor.Composition',
 			':CodeEditor.IO',
 			':CodeEditor.Testing',
-			':CodeEditor.Composition.Server',
+			':CodeEditor.ServiceHost',
 			':CodeEditor.Reactive',
 			':CodeEditor.Logging',
 		]
@@ -177,6 +177,7 @@ subprojects { subProject ->
 		}
 		bundleDependency('tests', subProject)
 		break
+	case ~/.+\.ServiceHost$/:
 	case ~/.+\.Server($|\..+)/:
 		bundleDependency('server', subProject)
 		break
