@@ -1,10 +1,9 @@
 using CodeEditor.ContentTypes;
-using CodeEditor.Text.Data;
 
-namespace CodeEditor.Languages.UnityScript
+namespace CodeEditor.Languages.UnityScript.ContentType
 {
 	[ContentTypeDefinition(Name)]
-	class UnityScriptContentType : IContentTypeDefinition
+	public class UnityScriptContentType : IContentTypeDefinition
 	{
 		public const string Name = "UnityScript";
 	}

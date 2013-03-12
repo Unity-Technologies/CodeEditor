@@ -2,5 +2,6 @@
 version = '0.1.1'
 
 dependencies {
-  'default' rootProject.references.languagesCommon
+	'default' rootProject.references.languagesCommon
+	'default' project(':CodeEditor.Languages.UnityScript.ContentType')
 }

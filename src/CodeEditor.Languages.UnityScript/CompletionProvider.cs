@@ -1,6 +1,7 @@
 using System.Linq;
 using CodeEditor.Composition;
 using CodeEditor.ContentTypes;
+using CodeEditor.Languages.UnityScript.ContentType;
 using CodeEditor.Text.Data;
 using CodeEditor.Text.UI.Completion;
 using CodeEditor.Text.UI.Completion.Implementation;

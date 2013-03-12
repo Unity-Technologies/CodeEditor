@@ -1,5 +1,6 @@
 using CodeEditor.Composition;
 using CodeEditor.ContentTypes;
+using CodeEditor.Languages.UnityScript.ContentType;
 using CodeEditor.Text.Data;
 using CodeEditor.Text.Logic;
 
