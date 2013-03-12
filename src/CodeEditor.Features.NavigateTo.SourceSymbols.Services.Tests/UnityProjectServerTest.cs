@@ -38,7 +38,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.Tests
 			container.AddExportedValue(parser.Object);
 
 			var subject = container.GetExportedValue<IUnityProjectProvider>();
-			var project = subject.Project;
+			Assert.IsNotNull(subject.Project);
 
 			// TODO: replace by injecting immediate scheduler
 			parseWaitEvent.WaitOne(TimeSpan.FromSeconds(1));
