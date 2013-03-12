@@ -81,8 +81,17 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 	public interface ISymbol
 	{
 		IFile SourceFile { get; }
+
+		/// <summary>
+		/// 1 based.
+		/// </summary>
 		int Line { get; }
+
+		/// <summary>
+		/// 1 based.
+		/// </summary>
 		int Column { get; }
+
 		string DisplayText { get; }
 	}
 

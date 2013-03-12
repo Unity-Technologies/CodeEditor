@@ -70,12 +70,12 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.CSharp
 
 			public int Line
 			{
-				get { return StartLocation.Line - 1; }
+				get { return StartLocation.Line; }
 			}
 
 			public int Column
 			{
-				get { return StartLocation.Column - 1; }
+				get { return StartLocation.Column; }
 			}
 
 			TextLocation StartLocation

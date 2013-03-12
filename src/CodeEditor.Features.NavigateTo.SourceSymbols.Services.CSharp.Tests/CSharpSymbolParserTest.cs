@@ -16,8 +16,8 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.CSharp.Tests
 			var parsedSymbols = subject.Parse(file);
 			var expectedSymbols = new[]
 			{
-				new {DisplayText = "Foo", File = file, Line = 0, Column = 6},
-				new {DisplayText = "Bar", File = file, Line = 1, Column = 6}
+				new {DisplayText = "Foo", File = file, Line = 1, Column = 7},
+				new {DisplayText = "Bar", File = file, Line = 2, Column = 7}
 			};
 			CollectionAssert.AreEquivalent(
 				expectedSymbols,
