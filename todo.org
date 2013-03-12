@@ -6,7 +6,5 @@
 * multi level undo
 * fix dead keys on osx
 * adjust spacing according to font size
-* squiggly red lines for errors
-* squiggly yellow lines for warnings
 * register MonoScript inspector
 
