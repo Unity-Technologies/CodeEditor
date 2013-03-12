@@ -30,4 +30,12 @@ namespace CodeEditor.IO
 	{
 		IEnumerable<IFile> GetFiles(string pattern, SearchOption searchOption);
 	}
+
+	public static class FileExtensions
+	{
+		public static TextReader OpenText(this IFile file)
+		{
+			return new StringReader(file.ReadAllText());
+		}
+	}
 }

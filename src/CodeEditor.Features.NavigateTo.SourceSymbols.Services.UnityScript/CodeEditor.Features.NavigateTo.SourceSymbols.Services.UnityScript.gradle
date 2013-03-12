@@ -1,0 +1,23 @@
+version = '0.1.0'
+
+dependencies {
+	def projects = [
+		':CodeEditor.Composition',
+		':CodeEditor.IO',
+		':CodeEditor.Logging',
+		':CodeEditor.Reactive',
+		':CodeEditor.ContentTypes',
+		':CodeEditor.Features.NavigateTo.SourceSymbols.Services',
+		':CodeEditor.Languages.UnityScript.ContentType',
+	]
+	projects.each {
+		'default' project(it)
+	}
+
+	def booRefs = ['Boo.Lang', 'Boo.Lang.Compiler', 'Boo.Lang.Parser']
+	booRefs.each {
+		'default' rootProject.references.boo(it)
+	}
+
+	'default' 'unityscript:UnityScript:0.1.3'
+}

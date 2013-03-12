@@ -1,0 +1,6 @@
+version = '0.1.0'
+
+dependencies {
+	'default' project(':CodeEditor.Features.NavigateTo.SourceSymbols.Services')
+	'default' project(':CodeEditor.IO')
+}

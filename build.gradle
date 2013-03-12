@@ -121,6 +121,7 @@ ext {
 		'moq': 'Moq:Moq:4.0+',
 		'adt': 'boo-extensions:Boo.Adt:0.1.1+',
 		'ometa': 'boo-extensions:Boo.OMeta:0.1.1+',
+		'boo': { assembly -> "boo:$assembly:0.9.6+" },
 		'unityEngine': unityAssembly('UnityEngine'),
 		'unityEditor': [
 			unityAssembly('UnityEngine'),
