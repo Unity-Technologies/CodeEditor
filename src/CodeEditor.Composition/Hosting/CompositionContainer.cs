@@ -8,10 +8,10 @@ namespace CodeEditor.Composition.Hosting
 {
 	public class CompositionContainer : ICompositionContainer
 	{
-		private readonly Dictionary<Type, Export[]> _exports = new Dictionary<Type, Export[]>();
-		private readonly Dictionary<Type, Lazy<object>> _parts = new Dictionary<Type, Lazy<object>>();
-		private readonly IExportDefinitionProvider _exportDefinitionProvider;
-		private readonly ImportDefinitionProvider _importDefinitionProvider = new ImportDefinitionProvider();
+		readonly Dictionary<Type, Export[]> _exports = new Dictionary<Type, Export[]>();
+		readonly Dictionary<Type, Lazy<object>> _parts = new Dictionary<Type, Lazy<object>>();
+		readonly IExportDefinitionProvider _exportDefinitionProvider;
+		readonly ImportDefinitionProvider _importDefinitionProvider = new ImportDefinitionProvider();
 
 		public CompositionContainer(Assembly assembly)
 			: this(new AssemblyCatalog(assembly))
@@ -34,7 +34,7 @@ namespace CodeEditor.Composition.Hosting
 			AddExport(new Export(new ExportDefinition(typeof(T), value.GetType(), () => metadata ?? new object[0]), () => value));
 		}
 
-		private void AddExport(Export export)
+		void AddExport(Export export)
 		{
 			_exports.Add(export.Definition.ContractType, new[] {export});
 		}
@@ -52,7 +52,7 @@ namespace CodeEditor.Composition.Hosting
 			return export.Value;
 		}
 
-		private Export GetExport(Type contractType)
+		Export GetExport(Type contractType)
 		{
 			return GetExports(contractType).SingleOrDefault();
 		}
@@ -63,7 +63,7 @@ namespace CodeEditor.Composition.Hosting
 				return DoGetExports(contractType);
 		}
 
-		private IEnumerable<Export> DoGetExports(Type contractType)
+		IEnumerable<Export> DoGetExports(Type contractType)
 		{
 			Export[] existing;
 			if (_exports.TryGetValue(contractType, out existing))
@@ -73,7 +73,7 @@ namespace CodeEditor.Composition.Hosting
 			return exports;
 		}
 
-		private Export[] CreateExportsFor(Type contractType)
+		Export[] CreateExportsFor(Type contractType)
 		{
 			return _exportDefinitionProvider
 				.GetExports(contractType)
@@ -81,18 +81,18 @@ namespace CodeEditor.Composition.Hosting
 				.ToArray();
 		}
 
-		private Func<object> FactoryFor(ExportDefinition exportDefinition)
+		Func<object> FactoryFor(ExportDefinition exportDefinition)
 		{
 			return AccessorFor(exportDefinition, GetPartFor(exportDefinition.Implementation));
 		}
 
-		private Lazy<object> GetPartFor(Type implementation)
+		Lazy<object> GetPartFor(Type implementation)
 		{
 			lock (_parts)
 				return DoGetPartFor(implementation);
 		}
 
-		private Lazy<object> DoGetPartFor(Type implementation)
+		Lazy<object> DoGetPartFor(Type implementation)
 		{
 			Lazy<object> existing;
 			if (_parts.TryGetValue(implementation, out existing))
@@ -102,12 +102,12 @@ namespace CodeEditor.Composition.Hosting
 			return part;
 		}
 
-		private Lazy<object> NewPartFor(Type implementation)
+		Lazy<object> NewPartFor(Type implementation)
 		{
 			return new Lazy<object>(() => InstantiatePart(implementation));
 		}
 
-		private object InstantiatePart(Type implementation)
+		object InstantiatePart(Type implementation)
 		{
 			var importingConstructor = ImportingConstructorOf(implementation);
 			var part = importingConstructor != null
@@ -117,7 +117,7 @@ namespace CodeEditor.Composition.Hosting
 			return part;
 		}
 
-		private Func<object> AccessorFor(ExportDefinition exportDefinition, Lazy<object> part)
+		Func<object> AccessorFor(ExportDefinition exportDefinition, Lazy<object> part)
 		{
 			return () =>
 			{
@@ -128,45 +128,48 @@ namespace CodeEditor.Composition.Hosting
 				catch (Exception e)
 				{
 					throw new CompositionException(e,
-						new CompositionError(exportDefinition.ContractType, string.Format("Failed to create `{0}' to satisfy `{1}'!", exportDefinition.Implementation, exportDefinition.ContractType)));
+						new CompositionError(exportDefinition.ContractType,
+							string.Format("Failed to create `{0}' to satisfy `{1}'!",
+								exportDefinition.Implementation,
+								exportDefinition.ContractType)));
 				}
 			};
 		}
 
-		private object CreateInstanceThrough(ConstructorInfo importingConstructor)
+		object CreateInstanceThrough(ConstructorInfo importingConstructor)
 		{
 			return importingConstructor.Invoke(ExportedValuesFor(importingConstructor).ToArray());
 		}
 
-		private IEnumerable<object> ExportedValuesFor(ConstructorInfo importingConstructor)
+		IEnumerable<object> ExportedValuesFor(ConstructorInfo importingConstructor)
 		{
 			return importingConstructor.GetParameters().Select(p => GetExportedValue(p.ParameterType));
 		}
 
-		private static ConstructorInfo ImportingConstructorOf(Type implementation)
+		static ConstructorInfo ImportingConstructorOf(Type implementation)
 		{
 			return implementation.InstanceConstructors().SingleOrDefault(IsImportingConstructor);
 		}
 
-		private static bool IsImportingConstructor(ConstructorInfo c)
+		static bool IsImportingConstructor(ConstructorInfo c)
 		{
 			return Attribute.IsDefined(c, typeof(ImportingConstructor));
 		}
 
-		private void ComposeParts(object part)
+		void ComposeParts(object part)
 		{
 			foreach (var import in ImportsOf(part))
 				Satisfy(import, part);
 		}
 
-		private void Satisfy(ImportDefinition importDefinition, object part)
+		void Satisfy(ImportDefinition importDefinition, object part)
 		{
 			var exports = GetExportsSatisfying(importDefinition);
 			Validate(importDefinition, exports);
 			importDefinition.SatisfyWith(exports, part);
 		}
 
-		private static void Validate(ImportDefinition importDefinition, Export[] exports)
+		static void Validate(ImportDefinition importDefinition, Export[] exports)
 		{
 			switch (importDefinition.Cardinality)
 			{
@@ -179,25 +182,27 @@ namespace CodeEditor.Composition.Hosting
 			}
 		}
 
-		private static CompositionException TooManyExportsError(ImportDefinition importDefinition, Export[] exports)
+		static CompositionException TooManyExportsError(ImportDefinition importDefinition, Export[] exports)
 		{
 			return new CompositionException(
-				new CompositionError(importDefinition.ContractType, string.Format("Too many exports for `{0}': `{1}'.", importDefinition.ContractType, exports.Select(e => e.Definition.Implementation.FullName).ToList())));
+				new CompositionError(importDefinition.ContractType,
+					string.Format("Too many exports for `{0}': `{1}'.", importDefinition.ContractType,
+						exports.Select(e => e.Definition.Implementation.FullName).ToList())));
 		}
 
-		private Export[] GetExportsSatisfying(ImportDefinition importDefinition)
+		Export[] GetExportsSatisfying(ImportDefinition importDefinition)
 		{
 			return GetExports(importDefinition.ContractType)
 				.Where(importDefinition.IsSatisfiableBy)
 				.ToArray();
 		}
 
-		private IEnumerable<ImportDefinition> ImportsOf(object value)
+		IEnumerable<ImportDefinition> ImportsOf(object value)
 		{
 			return _importDefinitionProvider.ImportsFor(value.GetType());
 		}
 
-		private static CompositionException NoExportFoundError(Type contractType)
+		static CompositionException NoExportFoundError(Type contractType)
 		{
 			return new CompositionException(
 				new CompositionError(contractType, string.Format("Export `{0}' not found!", contractType)));
