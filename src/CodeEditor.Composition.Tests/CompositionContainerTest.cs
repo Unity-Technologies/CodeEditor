@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using CodeEditor.Composition.Hosting;
 using CodeEditor.Composition.Primitives;
@@ -85,6 +86,26 @@ namespace CodeEditor.Composition.Tests
 			Assert.AreEqual(metadata, export.Metadata.Single());
 		}
 
+		[Test]
+		[TestCase(typeof(INonInheritedContract), typeof(BaseTypeWithNonInheritedContract))]
+		[TestCase(typeof(BaseTypeWithNonInheritedContract), typeof(BaseTypeWithNonInheritedContract))]
+		public void ExportedContractIsNotInherited(Type contractType, Type expectedImplementation)
+		{
+			var exports = _container.GetExports(contractType).ToList();
+			Assert.AreEqual(1, exports.Count);
+			Assert.AreSame(expectedImplementation, exports[0].Definition.Implementation);
+		}
+
+		[Test]
+		[TestCase(typeof(IInheritedContract))]
+		[TestCase(typeof(BaseTypeWithInheritedContract))]
+		public void ExportedContractIsNotInherited(Type contractType)
+		{
+			var expectedImplementations = new[] {typeof(BaseTypeWithInheritedContract), typeof(DerivedTypeWithInheritedContract)};
+			var actualImplementations = _container.GetExports(contractType).Select(_ => _.Definition.Implementation);
+			CollectionAssert.AreEquivalent(expectedImplementations, actualImplementations);
+		}
+
 		private T GetExportedValue<T>()
 		{
 			return _container.GetExportedValue<T>();
@@ -161,6 +182,34 @@ namespace CodeEditor.Composition.Tests
 		[Export(typeof(IContract1))]
 		[Export(typeof(IContract2))]
 		public class PartWithMultipleContracts : IContract1, IContract2
+		{
+		}
+
+		[Export(typeof(INonInheritedContract))]
+		[Export]
+		public class BaseTypeWithNonInheritedContract : INonInheritedContract
+		{
+		}
+
+		public class DerivedTypeWithNonInheritedContract : BaseTypeWithNonInheritedContract
+		{
+		}
+
+		public interface INonInheritedContract
+		{
+		}
+
+		[InheritedExport(typeof(IInheritedContract))]
+		[InheritedExport]
+		public class BaseTypeWithInheritedContract : IInheritedContract
+		{
+		}
+
+		public class DerivedTypeWithInheritedContract : BaseTypeWithInheritedContract
+		{
+		}
+
+		public interface IInheritedContract
 		{
 		}
 	}

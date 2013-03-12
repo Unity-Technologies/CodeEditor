@@ -13,15 +13,15 @@ namespace CodeEditor.Composition.Hosting
 			return new AggregateCatalog(AssemblyCatalogsFor(assemblies));
 		}
 
-		private static IEnumerable<IExportDefinitionProvider> AssemblyCatalogsFor(IEnumerable<Assembly> assemblies)
+		static IEnumerable<IExportDefinitionProvider> AssemblyCatalogsFor(IEnumerable<Assembly> assemblies)
 		{
 			return assemblies
 				.Where(assembly => assembly.IsSafeForComposition())
 				.Select(assembly => (IExportDefinitionProvider) new AssemblyCatalog(assembly));
 		}
 
-		private Dictionary<Type, ExportDefinition[]> _exports;
-		private readonly Assembly _assembly;
+		Dictionary<Type, ExportDefinition[]> _exports;
+		readonly Assembly _assembly;
 
 		public AssemblyCatalog(Assembly assembly)
 		{
@@ -36,13 +36,13 @@ namespace CodeEditor.Composition.Hosting
 				: NoExportsDefinition;
 		}
 
-		private Dictionary<Type, ExportDefinition[]> Exports()
+		Dictionary<Type, ExportDefinition[]> Exports()
 		{
 			lock (this)
 				return _exports ?? (_exports = ComputeExports());
 		}
 
-		private Dictionary<Type, ExportDefinition[]> ComputeExports()
+		Dictionary<Type, ExportDefinition[]> ComputeExports()
 		{
 			return _assembly
 				.GetTypes()
@@ -52,13 +52,26 @@ namespace CodeEditor.Composition.Hosting
 				.ToDictionary(e => e.Key, e => e.ToArray());
 		}
 
-		private IEnumerable<ExportDefinition> ExportsFromType(Type implementation)
+		IEnumerable<ExportDefinition> ExportsFromType(Type implementation)
 		{
-			return CustomAttribute<ExportAttribute>
-				.AllFrom(implementation)
-				.Select(attribute => new ExportDefinition(attribute.ContractType ?? implementation, implementation));
+			foreach (var attribute in ExportAttributesFrom(implementation))
+				yield return new ExportDefinition(attribute.ContractType ?? implementation, implementation);
+
+			foreach (var baseType in implementation.BaseTypes())
+				foreach (var inheritedAttribute in InheritedExportAttributesFrom(baseType))
+					yield return new ExportDefinition(inheritedAttribute.ContractType ?? baseType, implementation);
 		}
 
-		private static readonly ExportDefinition[] NoExportsDefinition = new ExportDefinition[0];
+		static IEnumerable<ExportAttribute> ExportAttributesFrom(Type implementation)
+		{
+			return CustomAttribute<ExportAttribute>.AllFrom(implementation);
+		}
+
+		static IEnumerable<InheritedExportAttribute> InheritedExportAttributesFrom(Type baseType)
+		{
+			return CustomAttribute<InheritedExportAttribute>.AllFrom(baseType);
+		}
+
+		static readonly ExportDefinition[] NoExportsDefinition = new ExportDefinition[0];
 	}
 }

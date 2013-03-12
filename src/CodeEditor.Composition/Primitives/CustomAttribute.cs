@@ -9,12 +9,12 @@ namespace CodeEditor.Composition.Primitives
 	{
 		public static T From(MemberInfo member)
 		{
-			return (T)Attribute.GetCustomAttribute(member, typeof(T));
+			return (T)Attribute.GetCustomAttribute(member, typeof(T), false);
 		}
 
 		public static IEnumerable<T> AllFrom(MemberInfo member)
 		{
-			return Attribute.GetCustomAttributes(member, typeof(T)).Cast<T>();
+			return Attribute.GetCustomAttributes(member, typeof(T), false).Cast<T>();
 		}
 	}
 }
