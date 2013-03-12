@@ -1,9 +1,5 @@
 version = '0.1.0'
 
-assembly {
-	targetFrameworkVersion 'v4.0'
-}
-
 dependencies {
 	'default' project(':CodeEditor.Features.NavigateTo.SourceSymbols.ServiceInterface')
 	'default' project(':CodeEditor.Composition')
