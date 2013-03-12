@@ -1,0 +1,16 @@
+assembly {
+	targetFrameworkVersion 'v4.0'
+}
+
+dependencies {
+	'default' rootProject.references.moq
+	[
+		':CodeEditor.Features.NavigateTo.SourceSymbols.ServiceInterface',
+		':CodeEditor.IO',
+		':CodeEditor.Composition',
+		':CodeEditor.ContentTypes',
+		':CodeEditor.Reactive',
+	 ].each {
+		'default' project(it)
+	}
+}

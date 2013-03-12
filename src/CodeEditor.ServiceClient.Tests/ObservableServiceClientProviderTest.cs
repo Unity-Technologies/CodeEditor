@@ -18,9 +18,9 @@ namespace CodeEditor.ServiceClient.Tests
 			const string serverUrilFile = "server.uri";
 			const string serverAddress = "http://localhost:1337/";
 
-			var projectPathProvider = MockFor<IServerExecutableProvider>();
+			var projectPathProvider = MockFor<IServiceHostExecutableProvider>();
 			projectPathProvider
-				.SetupGet(_ => _.ServerExecutable)
+				.SetupGet(_ => _.ServiceHostExecutable)
 				.Returns(serverExecutable);
 
 			// provider tries to delete pid file to decide if it needs
@@ -41,7 +41,7 @@ namespace CodeEditor.ServiceClient.Tests
 			
 			var subject = new ObservableServiceClientProvider
 			{
-				ServerExecutableProvider = projectPathProvider.Object,
+				ServiceHostExecutableProvider = projectPathProvider.Object,
 				FileSystem = fileSystem.Object,
 				Logger = new StandardLogger()
 			};

@@ -18,15 +18,15 @@ namespace CodeEditor.ServiceClient
 	[Export(typeof(IObservableServiceClientProvider))]
 	public class ObservableServiceClientProvider : IObservableServiceClientProvider
 	{
-		readonly Lazy<IFile> _serverUriFile;
+		readonly Lazy<IFile> _serviceHostUriFile;
 
 		public ObservableServiceClientProvider()
 		{
-			_serverUriFile = new Lazy<IFile>(() => FileSystem.FileFor(ServerUriFilePath));
+			_serviceHostUriFile = new Lazy<IFile>(() => FileSystem.FileFor(ServiceHostUriFilePath));
 		}
 
 		[Import]
-		public IServerExecutableProvider ServerExecutableProvider { get; set; }
+		public IServiceHostExecutableProvider ServiceHostExecutableProvider { get; set; }
 
 		[Import]
 		public IFileSystem FileSystem { get; set; }
@@ -91,14 +91,14 @@ namespace CodeEditor.ServiceClient
 
 		IFile UriFile
 		{
-			get { return _serverUriFile.Value; }
+			get { return _serviceHostUriFile.Value; }
 		}
 
 		void StartCompositionContainer()
 		{
-			var serverExe = ServerExecutable;
-			Logger.Log("Starting {0}".Fmt(serverExe));
-			using (Shell.StartManagedProcess(serverExe))
+			var executable = ServiceHostExecutable;
+			Logger.Log("Starting {0}".Fmt(executable));
+			using (Shell.StartManagedProcess(executable))
 			{
 				// this doesn't kill the actual process but
 				// just releases any resources attached to
@@ -124,34 +124,34 @@ namespace CodeEditor.ServiceClient
 			}
 		}
 
-		string ServerUriFilePath
+		string ServiceHostUriFilePath
 		{
-			get { return Path.ChangeExtension(ServerExecutable, "uri"); }
+			get { return Path.ChangeExtension(ServiceHostExecutable, "uri"); }
 		}
 
-		string ServerExecutable
+		string ServiceHostExecutable
 		{
-			get { return ServerExecutableProvider.ServerExecutable; }
+			get { return ServiceHostExecutableProvider.ServiceHostExecutable; }
 		}
 	}
 
-	public interface IServerExecutableProvider
+	public interface IServiceHostExecutableProvider
 	{
-		string ServerExecutable { get; }
+		string ServiceHostExecutable { get; }
 	}
 
-	public class ServerExecutableProvider : IServerExecutableProvider
+	public class ServiceHostExecutableProvider : IServiceHostExecutableProvider
 	{
-		readonly string _serverExecutable;
+		readonly string _serviceHostExecutable;
 
-		public ServerExecutableProvider(string serverExecutable)
+		public ServiceHostExecutableProvider(string serviceHostExecutable)
 		{
-			_serverExecutable = serverExecutable;
+			_serviceHostExecutable = serviceHostExecutable;
 		}
 
-		public string ServerExecutable
+		public string ServiceHostExecutable
 		{
-			get { return _serverExecutable; }
+			get { return _serviceHostExecutable; }
 		}
 	}
 }

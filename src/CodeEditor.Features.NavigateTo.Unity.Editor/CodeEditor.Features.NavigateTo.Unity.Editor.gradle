@@ -3,4 +3,7 @@ version = '0.1.0'
 dependencies {
 	'default' project(':CodeEditor.Features.NavigateTo')
 	'default' project(':CodeEditor.Text.UI.Unity.Editor')
+	'default' project(':CodeEditor.Text.UI')
+	'default' rootProject.references.frameworks
+	'default' rootProject.references.unityEditor
 }

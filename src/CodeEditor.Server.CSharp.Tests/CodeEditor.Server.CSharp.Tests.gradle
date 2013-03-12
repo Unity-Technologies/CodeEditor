@@ -1,8 +1,0 @@
-assembly {
-	targetFrameworkVersion 'v4.0'
-}
-
-dependencies {
-	'default' rootProject.references.frameworks
-	'default' project(':CodeEditor.Server')
-}

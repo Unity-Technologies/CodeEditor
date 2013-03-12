@@ -1,0 +1,11 @@
+version = '0.1.0'
+
+dependencies {
+	'default' project(':CodeEditor.Features.NavigateTo')
+	'default' project(':CodeEditor.Features.NavigateTo.SourceSymbols.ServiceInterface')
+	'default' project(':CodeEditor.ReactiveServiceStack')
+	'default' project(':CodeEditor.ServiceClient')
+	'default' project(':CodeEditor.Text.UI')
+	'default' rootProject.references.frameworks
+	'default' rootProject.references.serviceStackClient
+}

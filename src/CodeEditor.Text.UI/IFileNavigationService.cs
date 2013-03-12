@@ -2,6 +2,8 @@
 {
 	/// <summary>
 	/// Provides a way to open files at specific locations denoted by anchors.
+	/// 
+	/// Host interface.
 	/// </summary>
 	public interface IFileNavigationService
 	{

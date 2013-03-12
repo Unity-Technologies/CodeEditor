@@ -15,7 +15,7 @@ namespace CodeEditor.ReactiveServiceStack
 
 	public class ObservableServiceClient : IObservableServiceClient
 	{
-		private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(3);
+		static readonly TimeSpan Timeout = TimeSpan.FromSeconds(3);
 
 		readonly string _baseUri;
 

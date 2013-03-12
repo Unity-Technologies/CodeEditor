@@ -16,9 +16,6 @@ dependencies {
 	projectReferences.each {
 		'default' project(":$it")
 	}
-	def unityReferences = ['UnityEngine', 'UnityEditor']
-	unityReferences.each {
-		'default' group: 'Unity', name: it, version: '4.0+', configuration: 'editor'
-	}
+	'default' rootProject.references.unityEditor
 	'default' rootProject.references.serviceStackClient
 }

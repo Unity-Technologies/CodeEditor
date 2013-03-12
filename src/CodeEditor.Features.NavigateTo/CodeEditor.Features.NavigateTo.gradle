@@ -1,6 +1,7 @@
 version = '0.1.0'
 
 dependencies {
-	'default' project(':CodeEditor.Text.UI')
 	'default' project(':CodeEditor.Reactive')
+	'default' project(':CodeEditor.Logging')
+	'default' project(':CodeEditor.Composition')
 }

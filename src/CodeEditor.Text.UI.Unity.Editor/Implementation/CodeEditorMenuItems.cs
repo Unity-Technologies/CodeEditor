@@ -9,23 +9,5 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		{
 			CodeEditorWindow.OpenOrFocusExistingWindow ();
 		}
-
-		[MenuItem("Window/NavigateTo %e")]
-		public static void OpenNavigateToFileWindow()
-		{
-			NavigatorWindow.Open ();
-		}
-
-		private static string SelectedAssetPath
-		{
-			get
-			{
-				if (UnityEditor.Selection.activeInstanceID == 0)
-					return "";
-
-				var assetPath = AssetDatabase.GetAssetPath(UnityEditor.Selection.activeInstanceID);
-				return System.IO.Path.GetFullPath(assetPath);
-			}
-		}
 	}
 }

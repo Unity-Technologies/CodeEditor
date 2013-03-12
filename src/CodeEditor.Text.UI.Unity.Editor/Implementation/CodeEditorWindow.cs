@@ -11,9 +11,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	internal class CodeEditorWindow : EditorWindow, ICompletionSessionProvider
 	{
-		public static Func<string, ITextView> TextViewFactory;
-		
-		[Serializable]
+		[System.Serializable]
 		class BackupData 
 		{
 			public int caretRow, caretColumn;
@@ -96,7 +94,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			if (string.IsNullOrEmpty(_filePath))
 				return false;
 
-			_textView = TextViewFactory(_filePath);
+			_textView = TextViewFactory.ViewForFile(_filePath);
 			_codeView = new CodeView(this, _textView);
 			_fileNameWithExtension = Path.GetFileName(_filePath);
 			return true;
@@ -108,6 +106,11 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				return;
 
 			_codeView.Update();
+		}
+
+		static ITextViewFactory TextViewFactory
+		{
+			get { return UnityEditorCompositionContainer.GetExportedValue<ITextViewFactory>(); }
 		}
 
 		bool OpenFile(string file, int row, int column)

@@ -52,7 +52,6 @@ vs {
 		def framework = categorize { p -> frameworkProjects.any({ p.path.startsWith(it) }) }
 		def navigateTo = categorize { it.name.contains('NavigateTo') }
 		def language = categorize { it.name.contains('Languages') }
-		def server = categorize { it.name.contains('Server') }
 
 		CodeEditor {
 			folder('Frameworks') { f ->
@@ -69,11 +68,6 @@ vs {
 			}
 			folder('Languages') { f ->
 				language.each {
-					f.project(it.path)
-				}
-			}
-			folder('Server') { f ->
-				server.each {
 					f.project(it.path)
 				}
 			}
@@ -98,8 +92,8 @@ configurations {
 	tests {
 		description "Configuration for testing artifacts."
 	}
-	server {
-		description "Configuration for server artifacts."
+	services {
+		description "Configuration for service artifacts."
 	}
 }
 
@@ -112,7 +106,11 @@ def rxDependency(rxPackage, rxAssembly, rxConfiguration) {
 }
 
 def serviceStack(assembly, pkg = 'ServiceStack') {
-		['group': pkg, 'name': assembly, 'version':	'3.9.38', 'configuration': 'net35']
+	['group': pkg, 'name': assembly, 'version':	'3.9.38', 'configuration': 'net35']
+}
+
+def unityAssembly(assembly) {
+	['group': 'Unity', 'name': assembly, version: '4.0+', configuration: 'editor']
 }
 
 ext {
@@ -123,6 +121,11 @@ ext {
 		'moq': 'Moq:Moq:4.0+',
 		'adt': 'boo-extensions:Boo.Adt:0.1.1+',
 		'ometa': 'boo-extensions:Boo.OMeta:0.1.1+',
+		'unityEngine': unityAssembly('UnityEngine'),
+		'unityEditor': [
+			unityAssembly('UnityEngine'),
+			unityAssembly('UnityEditor')
+		],
 		'frameworks': [
 			project(':CodeEditor.IO'),
 			project(':CodeEditor.Logging'),
@@ -130,11 +133,8 @@ ext {
 			project(':CodeEditor.Reactive')
 		],
 		'languagesCommon': [
- 			project(':CodeEditor.IO'),
-			project(':CodeEditor.Logging'),
 			project(':CodeEditor.Composition'),
 			project(':CodeEditor.ContentTypes'),
-			project(':CodeEditor.Reactive'),
 			project(':CodeEditor.Text.Data'),
 			project(':CodeEditor.Text.Logic'),
 			project(':CodeEditor.Text.UI'),
@@ -188,8 +188,8 @@ subprojects { subProject ->
 		bundleDependency('tests', subProject)
 		break
 	case ~/.+\.ServiceHost$/:
-	case ~/.+\.Server($|\..+)/:
-		bundleDependency('server', subProject)
+	case ~/.+\.Services($|\..+)/:
+		bundleDependency('services', subProject)
 		break
 	case ~/.+\.(Testing|Fixtures)$/:
 		break
@@ -238,15 +238,15 @@ task updateUnityProjectEditorConfig(type: UpdateDir) {
 	destinationDir = "$unityProjectDir/Assets/kaizen/lib/Editor"
 }
 
-task updateUnityProjectServerConfig(type: UpdateDir) {
+task updateUnityProjectServicesConfig(type: UpdateDir) {
 	description 'Builds and copies required assemblies to the configured Unity project (unityProjectDir)'
-	inputs.source project.configurations.server
-	destinationDir = "$unityProjectDir/Library/CodeEditor/Server"
+	inputs.source project.configurations.services
+	destinationDir = "$unityProjectDir/Library/CodeEditor/Services"
 }
 
 task updateUnityProject {
 	dependsOn updateUnityProjectEditorConfig
-	dependsOn updateUnityProjectServerConfig
+	dependsOn updateUnityProjectServicesConfig
 }
 
 task open {
