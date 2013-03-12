@@ -1,8 +1,0 @@
-assembly {
-  target = 'exe'
-}
-
-dependencies {
-  'default' rootProject.references.rx35
-  'default' rootProject.references.serviceStack
-}

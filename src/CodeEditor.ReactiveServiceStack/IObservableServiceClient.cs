@@ -6,7 +6,7 @@ using CodeEditor.Reactive.Disposables;
 using ServiceStack.ServiceClient.Web;
 using ServiceStack.ServiceHost;
 
-namespace CodeEditor.Server.Interface
+namespace CodeEditor.ReactiveServiceStack
 {
 	public interface IObservableServiceClient
 	{

@@ -1,7 +1,9 @@
 using CodeEditor.Composition;
 using CodeEditor.Logging;
 using CodeEditor.Reactive;
+using CodeEditor.ReactiveServiceStack;
 using CodeEditor.Server.Interface;
+using CodeEditor.ServiceClient;
 using CodeEditor.Text.UI;
 
 namespace CodeEditor.Languages.Common

@@ -6,7 +6,7 @@ using CodeEditor.Reactive;
 using CodeEditor.Testing;
 using NUnit.Framework;
 
-namespace CodeEditor.Languages.Common.Tests
+namespace CodeEditor.ServiceClient.Tests
 {
 	[TestFixture]
 	public class ObservableServiceClientProviderTest : MockBasedTest
@@ -16,7 +16,7 @@ namespace CodeEditor.Languages.Common.Tests
 		{
 			const string serverExecutable = "server.exe";
 			const string serverUrilFile = "server.uri";
-			const string serverAddress = "tcp://localhost:4242/IServiceProvider";
+			const string serverAddress = "http://localhost:1337/";
 
 			var projectPathProvider = MockFor<IServerExecutableProvider>();
 			projectPathProvider
@@ -37,7 +37,7 @@ namespace CodeEditor.Languages.Common.Tests
 
 			uriFile
 				.Setup(_ => _.ReadAllText())
-				.Returns(serverAddress + "\n");
+				.Returns(serverAddress);
 			
 			var subject = new ObservableServiceClientProvider
 			{

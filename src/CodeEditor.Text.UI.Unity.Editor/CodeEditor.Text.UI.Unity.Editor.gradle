@@ -11,7 +11,7 @@ dependencies {
 		'CodeEditor.Text.Logic',
 		'CodeEditor.Text.UI',
 		'CodeEditor.Text.UI.Unity.Engine',
-		'CodeEditor.Languages.Common',
+		'CodeEditor.ServiceClient',
 	]
 	projectReferences.each {
 		'default' project(":$it")

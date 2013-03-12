@@ -18,7 +18,7 @@ namespace CodeEditor.ServiceHost
 			using (var uriFileWriter = new StreamWriter(File.Open(UriFilePath, FileMode.Create, FileAccess.Write, FileShare.Read)))
 			{
 				const string baseUri = "http://localhost:8888/";
-				
+
 				uriFileWriter.WriteLine(baseUri);
 				uriFileWriter.Flush();
 
@@ -33,7 +33,7 @@ namespace CodeEditor.ServiceHost
 			}
 		}
 
-		private static string ServerDirectory
+		static string ServerDirectory
 		{
 			get { return Path.GetDirectoryName(FullyQualifiedName); }
 		}
@@ -43,14 +43,15 @@ namespace CodeEditor.ServiceHost
 			get { return Path.ChangeExtension(FullyQualifiedName, "uri"); }
 		}
 
-		private static string FullyQualifiedName
+		static string FullyQualifiedName
 		{
 			get { return typeof(Program).Module.FullyQualifiedName; }
 		}
 
 		public class AppHost : AppHostHttpListenerBase
 		{
-			public AppHost(Assembly[] assemblies) : base(typeof(AppHost).Namespace, assemblies.Where(_ => _.References(typeof(IService).Assembly)).ToArray())
+			public AppHost(Assembly[] assemblies)
+				: base(typeof(AppHost).Namespace, assemblies.Where(_ => _.References(typeof(IService).Assembly)).ToArray())
 			{
 				CompositionContainer = new CompositionContainer(AssemblyCatalog.For(assemblies));
 			}
@@ -66,7 +67,7 @@ namespace CodeEditor.ServiceHost
 
 			public class CompositionContainerAdapter : IContainerAdapter
 			{
-				private readonly CompositionContainer _compositionContainer;
+				readonly CompositionContainer _compositionContainer;
 
 				public CompositionContainerAdapter(CompositionContainer compositionContainer)
 				{

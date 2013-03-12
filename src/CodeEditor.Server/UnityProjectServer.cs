@@ -5,6 +5,7 @@ using CodeEditor.Composition;
 using CodeEditor.IO;
 using CodeEditor.Logging;
 using CodeEditor.Reactive;
+using CodeEditor.ReactiveServiceStack;
 using CodeEditor.Server.Interface;
 using ServiceStack.ServiceInterface;
 using IFile = CodeEditor.IO.IFile;

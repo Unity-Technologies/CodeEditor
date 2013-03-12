@@ -1,0 +1,6 @@
+version = '0.1.0'
+
+dependencies {
+	'default' project(':CodeEditor.Features.NavigateTo')
+	'default' project(':CodeEditor.Text.UI.Unity.Editor')
+}

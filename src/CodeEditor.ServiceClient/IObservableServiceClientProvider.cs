@@ -5,11 +5,10 @@ using CodeEditor.IO;
 using CodeEditor.Logging;
 using CodeEditor.Reactive;
 using CodeEditor.Reactive.Disposables;
-using CodeEditor.Server.Interface;
+using CodeEditor.ReactiveServiceStack;
 using ServiceStack.Text;
-using IFile = CodeEditor.IO.IFile;
 
-namespace CodeEditor.Languages.Common
+namespace CodeEditor.ServiceClient
 {
 	public interface IObservableServiceClientProvider
 	{

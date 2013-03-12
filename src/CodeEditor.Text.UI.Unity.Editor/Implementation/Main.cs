@@ -4,8 +4,8 @@ using System.Linq;
 using CodeEditor.Composition;
 using CodeEditor.Composition.Hosting;
 using CodeEditor.IO;
-using CodeEditor.Languages.Common;
 using CodeEditor.Logging;
+using CodeEditor.ServiceClient;
 using CodeEditor.Text.UI.Unity.Engine;
 using UnityEditor;
 

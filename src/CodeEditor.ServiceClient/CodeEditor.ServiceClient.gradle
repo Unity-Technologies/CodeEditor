@@ -1,0 +1,7 @@
+version = '0.1.0'
+
+dependencies {
+	'default' rootProject.references.frameworks
+	'default' rootProject.references.serviceStackClient
+	'default' project(':CodeEditor.ReactiveServiceStack')
+}

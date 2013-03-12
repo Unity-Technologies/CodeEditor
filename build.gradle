@@ -30,46 +30,55 @@ project(':CodeEditor.Text.UI.Unity.Editor') {
 
 vs {
 	solutions {
-
 		def frameworkProjects = [
 			':CodeEditor.Collections',
 			':CodeEditor.Composition',
+			':CodeEditor.ContentTypes',
 			':CodeEditor.IO',
 			':CodeEditor.Testing',
+			':CodeEditor.ServiceClient',
 			':CodeEditor.ServiceHost',
 			':CodeEditor.Reactive',
 			':CodeEditor.Logging',
 		]
-		def isTestProject = { p -> (p.name =~ /\.Tests(\.Fixtures)?/).any() }
-		def testProjects = subprojects.findAll(isTestProject) .collect { it.path }
-		def languageProjects = subprojects.findAll { it.name.contains('Languages') && !(it.path in testProjects) }.collect { it.path }
-		def serverProjects = subprojects.findAll { it.name.contains('Server') && !(it.path in frameworkProjects) }.collect { it.path }
-		def categorizedProjects = (frameworkProjects + serverProjects + testProjects + languageProjects).toSet()
-		def remainingProjects = subprojects.collect { it.path }.findAll { !(it in categorizedProjects) }
+
+		def remaining = subprojects
+		def categorize = { condition ->
+			def result = remaining.findAll(condition)
+			remaining = remaining.minus(result)
+			result
+		}
+
+		def framework = categorize { p -> frameworkProjects.any({ p.path.startsWith(it) }) }
+		def navigateTo = categorize { it.name.contains('NavigateTo') }
+		def language = categorize { it.name.contains('Languages') }
+		def server = categorize { it.name.contains('Server') }
 
 		CodeEditor {
 			folder('Frameworks') { f ->
-				frameworkProjects.each {
-					f.project(it)
+				framework.each {
+					f.project(it.path)
+				}
+			}
+			folder('Features') { features ->
+				features.folder('NavigateTo') { f ->
+					navigateTo.each {
+						f.project(it.path)
+					}
 				}
 			}
 			folder('Languages') { f ->
-				languageProjects.each {
-					f.project(it)
-				}
-			}
-			folder('Tests') { f ->
-				testProjects.each {
-					f.project(it)
+				language.each {
+					f.project(it.path)
 				}
 			}
 			folder('Server') { f ->
-				serverProjects.each {
-					f.project(it)
+				server.each {
+					f.project(it.path)
 				}
 			}
-			remainingProjects.each {
-				project(it)
+			remaining.each {
+				project(it.path)
 			}
 		}
 	}
@@ -118,6 +127,7 @@ ext {
 			project(':CodeEditor.IO'),
 			project(':CodeEditor.Logging'),
 			project(':CodeEditor.Composition'),
+			project(':CodeEditor.Reactive')
 		],
 		'languagesCommon': [
  			project(':CodeEditor.IO'),
@@ -238,7 +248,6 @@ task updateUnityProject {
 	dependsOn updateUnityProjectEditorConfig
 	dependsOn updateUnityProjectServerConfig
 }
-
 
 task open {
 	dependsOn updateUnityProject

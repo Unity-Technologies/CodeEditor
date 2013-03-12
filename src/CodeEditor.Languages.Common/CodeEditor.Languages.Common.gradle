@@ -12,6 +12,8 @@ dependencies {
 		'CodeEditor.Text.UI',
 		'CodeEditor.Grammars',
 		'CodeEditor.Collections',
+		'CodeEditor.ServiceClient',
+		'CodeEditor.ReactiveServiceStack',
 		'CodeEditor.Server.Interface',
 	]
 	projectReferences.each {

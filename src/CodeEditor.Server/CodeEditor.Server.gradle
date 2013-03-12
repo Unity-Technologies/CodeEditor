@@ -8,6 +8,7 @@ dependencies {
 	'default' project(':CodeEditor.Server.Interface')
 	'default' project(':CodeEditor.Composition')
 	'default' project(':CodeEditor.Reactive')
+	'default' project(':CodeEditor.ReactiveServiceStack')
 	'default' project(':CodeEditor.IO')
 	'default' project(':CodeEditor.ContentTypes')
 	'default' project(':CodeEditor.Logging')

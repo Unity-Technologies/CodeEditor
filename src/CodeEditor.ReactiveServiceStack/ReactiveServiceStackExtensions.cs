@@ -7,9 +7,9 @@ using ServiceStack.Service;
 using ServiceStack.ServiceHost;
 using ServiceStack.Text;
 
-namespace CodeEditor.Server.Interface
+namespace CodeEditor.ReactiveServiceStack
 {
-	public static class ObservableServiceStackExtensions
+	public static class ReactiveServiceStackExtensions
 	{
 		public static IStreamWriter ToJsonStreamWriter<T>(this IObservableX<T> source)
 		{
