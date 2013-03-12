@@ -8,7 +8,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'kaizen:kaizen:0.3.0'
+		classpath 'kaizen:kaizen:0.3.1'
 	}
 }
 
