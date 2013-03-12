@@ -1,5 +1,4 @@
 using System;
-using UnityEditor;
 using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
@@ -121,7 +120,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				const float kScrollbarWidth = 17f;
 				textAreaRect.width -= kScrollbarWidth;
 			}
-			EditorGUIUtility.AddCursorRect(textAreaRect, MouseCursor.Text, 454545);
+			//EditorGUIUtility.AddCursorRect(textAreaRect, MouseCursor.Text, 454545);
 		}
 
 		private void EraseBackground()
