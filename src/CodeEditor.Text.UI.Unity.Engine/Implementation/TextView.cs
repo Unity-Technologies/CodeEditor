@@ -1,4 +1,5 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
@@ -8,9 +9,10 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		const int TopMargin = 6;
 		readonly ITextViewDocument _document;
 		readonly ITextViewAppearance _appearance;
-		private readonly ITextViewAdornments _adornments;
+		readonly ITextViewAdornments _adornments;
 		readonly Selection _selection;
 		public Action<int, int> DoubleClicked {get; set;}
+		public bool ShowCursor { get; set; }
 
 		public TextView(ITextViewDocument document, ITextViewAppearance appearance, ITextViewAdornments adornments)
 		{
@@ -85,7 +87,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		public float LineHeight
 		{
-			get { return 18f; }
+			get { return _appearance.Text.lineHeight; }
 		}
 
 		public void OnGUI()
@@ -100,8 +102,26 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 				DoGUIOnElements();
 				HandleMouseDragSelection ();
-			
+
 			} GUI.EndScrollView();
+
+			HandleMouseCursorImage();
+		}
+
+		private bool IsShowingScrollbar ()
+		{
+			return ContentRect.height > ViewPort.height;
+		}
+
+		private void HandleMouseCursorImage()
+		{
+			Rect textAreaRect = ViewPort;
+			if (IsShowingScrollbar())
+			{
+				const float kScrollbarWidth = 17f;
+				textAreaRect.width -= kScrollbarWidth;
+			}
+			EditorGUIUtility.AddCursorRect(textAreaRect, MouseCursor.Text, 454545);
 		}
 
 		private void EraseBackground()
@@ -279,11 +299,9 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			DrawAdornments(line, lineRect);
 
 			LineStyle.Draw(lineRect, MissingEngineAPI.GUIContent_Temp(line.RichText), controlID);
-
-			if (row == CursorRow)
+			if (ShowCursor && row == CursorRow)
 			{
 				LineStyle.DrawCursor(lineRect, MissingEngineAPI.GUIContent_Temp(line.Text), controlID, CursorPos);
-
 			}
 		}
 
@@ -367,7 +385,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		Rect GetLineRect(int row)
 		{
-			return new Rect(0, row * LineHeight  + TopMargin, 1000, LineHeight);
+			return new Rect(0, row * LineHeight + TopMargin, 1000000, LineHeight);
 		}
 
 		private void DebugDrawRowRect(int row)

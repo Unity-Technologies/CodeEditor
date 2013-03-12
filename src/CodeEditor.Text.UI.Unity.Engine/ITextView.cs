@@ -18,6 +18,7 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		bool GetSelectionInDocument (out int pos, out int length);
 		System.Action<int, int> DoubleClicked {get; set;}			// row, column
 		void EnsureCursorIsVisible();
+		bool ShowCursor { get; set; }
 		void OnGUI();
 	}
 }

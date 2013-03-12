@@ -12,6 +12,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		public LineNumberMargin(ITextView textView)
 		{
 			_appearance = textView.Appearance;
+			_appearance.Changed += (sender, args) => CalculateWidth();
 			_buffer = textView.Document.Buffer;
 			_buffer.Changed += (sender, args) => CalculateWidth();
 

@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Collections.Generic;
 using CodeEditor.Text.Data;
 using CodeEditor.Text.UI.Completion;
 using CodeEditor.Text.UI.Unity.Engine;
@@ -8,33 +11,36 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	internal class CodeEditorWindow : EditorWindow, ICompletionSessionProvider
 	{
-		public static System.Func<string, ITextView> TextViewFactory;
+		public static Func<string, ITextView> TextViewFactory;
 		
-		[System.Serializable]
+		[Serializable]
 		class BackupData 
 		{
-			// TextView state that should survive domain reloads
 			public int caretRow, caretColumn;
 			public Vector2 scrollOffset;
 			public Vector2 selectionAnchor; // argh: Unity cannot serialize Position since its a struct... so we store it as a Vector2
 		}
 	
-		// Serialized fields
+		// Serialized fields (between assembly reloads but NOT between sessions)
 		// ---------------------
 		string _filePath;
 		string _fileNameWithExtension;
 		BackupData _backupData;
 
+		// Serialized fields (between assembly reloads AND between sessions)
+		[SerializeField]
+		int _selectedFontSize = 14;
 
 		// Non serialized fields (reconstructed from serialized state above or recreated when needed)
 		// ---------------------
-		[System.NonSerialized]
+		[NonSerialized]
 		CodeView _codeView;
-
-		[System.NonSerialized]
+		[NonSerialized]
 		ITextView _textView;
-		
-
+		[NonSerialized]
+		int[] _fontSizes = null;
+		[NonSerialized]
+		string[] _fontSizesNames;
 
 		// Layout
 		// ---------------------
@@ -58,9 +64,25 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			window.OpenFile (file);
 		}
 
-		private CodeEditorWindow()
+		private CodeEditorWindow() 
 		{
 		}
+
+		// Use of this section requires 4.2 UnityEditor.dll
+		/*
+		[UnityEditor.Callbacks.OnOpenAsset]
+		public static bool OnOpenAsset(int instanceID, int line)
+		{
+			string assetpath = AssetDatabase.GetAssetPath(instanceID);
+			UnityEngine.Object asset = AssetDatabase.LoadAssetAtPath(assetpath, typeof(UnityEngine.Object));
+			if(asset is TextAsset || asset is ComputeShader)
+			{
+				OpenWindowFor(assetpath);
+				return true;
+			}
+			return false;
+		}
+		*/
 
 		void OpenFile (string file)
 		{
@@ -74,7 +96,15 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 			_textView = TextViewFactory(_filePath);
 			_codeView = new CodeView(this, _textView);
-			_fileNameWithExtension = System.IO.Path.GetFileName(_filePath);
+			_fileNameWithExtension = Path.GetFileName(_filePath);
+		}
+
+		public void OnInspectorUpdate()
+		{
+			if (_codeView == null)
+				return;
+
+			_codeView.Update();
 		}
 
 		void InitIfNeeded()
@@ -92,6 +122,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				_textView.Document.Caret.SetPosition(_backupData.caretRow, _backupData.caretColumn);
 				_textView.ScrollOffset = _backupData.scrollOffset;
 				_textView.SelectionAnchor = new Position((int)_backupData.selectionAnchor.y, (int)_backupData.selectionAnchor.x);
+				_textView.Appearance.SetFontSize(_selectedFontSize);
 			}
 		}
 
@@ -105,18 +136,32 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			
 			TopArea(topAreaRect);
 			CodeViewArea(codeViewRect);
-			
+
 			BackupState ();
 		}
 
 		void CodeViewArea (Rect rect)
 		{
+			HandleZoomScrolling(rect);
 			if (_codeView != null)
 				_codeView.OnGUI(rect);
 		}
 
 		void TopArea(Rect rect)
 		{
+			if (_textView == null)
+				return;
+
+			if(_fontSizes == null)
+			{
+				_fontSizes = _textView.Appearance.GetSupportedFontSizes();
+				var names = new List<string>();
+				foreach(int size in _fontSizes)
+					names.Add(size.ToString());
+				_fontSizesNames = names.ToArray();
+
+			}
+
 			GUILayout.BeginArea(rect);
 			{
 				GUILayout.BeginVertical ();
@@ -129,7 +174,12 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				
 					GUILayout.FlexibleSpace();
 
-					if (GUILayout.Button(s_Styles.saveText))
+					EditorGUI.BeginChangeCheck();
+					_selectedFontSize = EditorGUILayout.IntPopup(_selectedFontSize, _fontSizesNames, _fontSizes, GUILayout.Width(40));
+					if(EditorGUI.EndChangeCheck())
+						AppearanceChanged();
+
+					if (GUILayout.Button(s_Styles.saveText, EditorStyles.miniButton))
 						_textView.Document.Save();
 
 					GUILayout.Space(10f);
@@ -138,6 +188,11 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				GUILayout.FlexibleSpace();
 				GUILayout.EndVertical ();
 			} GUILayout.EndArea();
+		}
+
+		private void AppearanceChanged()
+		{
+			_textView.Appearance.SetFontSize(_selectedFontSize);
 		}
 
 		void BackupState ()
@@ -155,5 +210,28 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		{
 			_codeView.StartCompletionSession(new CompletionSession(completionSpan, completions));
 		}
+
+		void HandleZoomScrolling(Rect rect)
+		{
+			if (EditorGUI.actionKey && Event.current.type == EventType.scrollWheel && rect.Contains(Event.current.mousePosition))
+			{
+				Event.current.Use();
+	
+				int sign = Event.current.delta.y > 0 ? -1 : 1;
+				int orgSize = _selectedFontSize;
+				int index = Array.IndexOf(_fontSizes, _selectedFontSize);
+
+				index = Mathf.Clamp(index + sign, 0, _fontSizes.Length-1);
+				_selectedFontSize = _fontSizes[index];
+
+				if (_selectedFontSize != orgSize)
+				{
+					AppearanceChanged();
+					GUI.changed = true;
+				}
+
+			}
+		}
+
 	}
 }

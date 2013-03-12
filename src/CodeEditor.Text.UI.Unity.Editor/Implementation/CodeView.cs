@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Globalization;
 using System.Linq;
@@ -14,14 +15,16 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		private CompletionSession m_Session;
 		private int m_KeyboardControlID;
 		private bool m_GrabKeyboardControl = true;
+		private double _showCursorDuration = 0.5;
+		private double _nextToggleCursor = 0;
 
-		private readonly CodeEditorWindow m_Owner;
+		private readonly EditorWindow m_Owner;
 		private readonly ITextViewDocument _document;
 		private readonly ITextView _textView;
 		private readonly Font _font;
 		private readonly ITextStructureNavigator _navigator;
 
-		public CodeView(CodeEditorWindow owner, ITextView textView)
+		public CodeView(EditorWindow owner, ITextView textView)
 		{
 			m_Owner = owner;
 			_textView = textView;
@@ -29,8 +32,14 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			var textFont = _textView.Appearance.Text.font;
 			_font = textFont ? textFont : GUI.skin.font;
 			_navigator = new DefaultTextStructureNavigator();
-			Caret.Moved += EnsureCursorIsVisible;
+			Caret.Moved += OnCaretMoved;
 			_textView.DoubleClicked = DoubleClickedDocument;
+		}
+
+		private void OnCaretMoved()
+		{
+			EnsureCursorIsVisible();
+			ToggleCursor(true); // Ensure the cursor is visible while moving it
 		}
 
 		public void Repaint()
@@ -134,6 +143,24 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		private ICaret Caret
 		{
 			get { return _document.Caret; }
+		}
+
+		public void Update()
+		{
+			// Toggle cursor and repaint only when we have focus (to prevent not spending time on repaint when other views have focus)
+			if (EditorApplication.timeSinceStartup > _nextToggleCursor && EditorWindow.focusedWindow == m_Owner)
+			{
+				ToggleCursor(!_textView.ShowCursor);
+				Repaint();
+			}
+
+		}
+
+		private void ToggleCursor(bool show)
+		{
+			_nextToggleCursor = EditorApplication.timeSinceStartup + _showCursorDuration;
+			_textView.ShowCursor = show;
+
 		}
 	}
 
