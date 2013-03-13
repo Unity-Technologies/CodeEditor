@@ -8,17 +8,17 @@ using CodeEditor.Reactive;
 
 namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 {
-	public interface ISourceSymbolIndex
-	{
-		IObservableX<ISymbol> SearchSymbol(string pattern);
-	}
-
 	public interface ISourceSymbolIndexProvider
 	{
 		ISourceSymbolIndex Index { get; }
 	}
 
-	public interface ISymbol
+	public interface ISourceSymbolIndex
+	{
+		IObservableX<ISourceSymbol> SearchSymbol(string filter);
+	}
+
+	public interface ISourceSymbol
 	{
 		IFile SourceFile { get; }
 
@@ -38,22 +38,22 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 	class SourceSymbolIndex : ISourceSymbolIndex
 	{
 		readonly IFolder _assetsFolder;
-		readonly ISymbolParser _parser;
+		readonly ISourceSymbolProviderSelector _symbolProviderSelector;
 
-		IObservableX<ISymbol> _allSymbols;
+		IObservableX<ISourceSymbol> _allSymbols;
 
-		public SourceSymbolIndex(IFolder assetsFolder, ISymbolParserSelector parser)
+		public SourceSymbolIndex(IFolder assetsFolder, ISourceSymbolProviderSelector symbolProviderSelector)
 		{
 			_assetsFolder = assetsFolder;
-			_parser = parser;
+			_symbolProviderSelector = symbolProviderSelector;
 		}
 
-		public IObservableX<ISymbol> SearchSymbol(string pattern)
+		public IObservableX<ISourceSymbol> SearchSymbol(string filter)
 		{
-			if (string.IsNullOrEmpty(pattern))
+			if (string.IsNullOrEmpty(filter))
 				return _allSymbols;
 			return _allSymbols
-				.Where(symbol => symbol.DisplayText.Contains(pattern));
+				.Where(symbol => symbol.DisplayText.Contains(filter));
 		}
 
 		public void Start()
@@ -61,7 +61,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 			_allSymbols = SymbolsFromSourceFiles().Merge().SelectMany(_ => _);
 		}
 
-		List<IObservableX<ISymbol[]>> SymbolsFromSourceFiles()
+		List<IObservableX<ISourceSymbol[]>> SymbolsFromSourceFiles()
 		{
 			return SourceFiles.Select(file => ObservableSymbolsOf(file)).ToList();
 		}
@@ -71,14 +71,14 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 			get { return _assetsFolder.GetFiles("*.cs", SearchOption.AllDirectories); }
 		}
 
-		IObservableX<ISymbol[]> ObservableSymbolsOf(IFile file)
+		IObservableX<ISourceSymbol[]> ObservableSymbolsOf(IFile file)
 		{
-			return ObservableX.Start(() => ParseSymbolsOf(file));
+			return ObservableX.Start(() => SourceSymbolsFor(file));
 		}
 
-		ISymbol[] ParseSymbolsOf(IFile file)
+		ISourceSymbol[] SourceSymbolsFor(IFile file)
 		{
-			return _parser.Parse(file);
+			return _symbolProviderSelector.SourceSymbolsFor(file);
 		}
 	}
 
@@ -89,7 +89,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 		public IUnityAssetsFolderProvider AssetsFolderProvider { get; set; }
 
 		[Import]
-		public ISymbolParserSelector SymbolParser { get; set; }
+		public ISourceSymbolProviderSelector SymbolProviderSelector { get; set; }
 
 		public ISourceSymbolIndex Index
 		{
@@ -105,7 +105,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 
 		ISourceSymbolIndex CreateIndex()
 		{
-			var project = new SourceSymbolIndex(AssetsFolderProvider.AssetsFolder, SymbolParser);
+			var project = new SourceSymbolIndex(AssetsFolderProvider.AssetsFolder, SymbolProviderSelector);
 			project.Start();
 			return project;
 		}

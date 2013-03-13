@@ -9,7 +9,7 @@ using CodeEditor.Text.UI;
 namespace CodeEditor.Features.NavigateTo.SourceSymbols
 {
 	[Export(typeof(INavigateToItemProvider))]
-	public class SymbolNavigateToItemProvider : INavigateToItemProvider
+	public class SourceSymbolNavigateToItemProvider : INavigateToItemProvider
 	{
 		[Import]
 		public IObservableServiceClientProvider ServiceClientProvider { get; set; }
@@ -27,7 +27,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols
 				: ServiceClient
 					.SelectMany(
 						(client) => client.ObserveMany(new SourceSymbolSearchRequest {Filter = filter}),
-						(client, symbol) => (INavigateToItem) new SymbolItem(symbol, FileNavigationService));
+						(client, symbol) => (INavigateToItem) new SourceSymbolNavigateToItem(symbol, FileNavigationService));
 		}
 
 		IObservableX<IObservableServiceClient> ServiceClient
@@ -35,12 +35,12 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols
 			get { return ServiceClientProvider.Client; }
 		}
 
-		internal class SymbolItem : INavigateToItem
+		class SourceSymbolNavigateToItem : INavigateToItem
 		{
 			readonly SourceSymbol _symbol;
 			readonly IFileNavigationService _fileNavigationService;
 
-			public SymbolItem(SourceSymbol symbol, IFileNavigationService fileNavigationService)
+			public SourceSymbolNavigateToItem(SourceSymbol symbol, IFileNavigationService fileNavigationService)
 			{
 				_symbol = symbol;
 				_fileNavigationService = fileNavigationService;

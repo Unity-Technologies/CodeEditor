@@ -12,11 +12,15 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 		protected override object Run(SourceSymbolSearchRequest request)
 		{
 			return
-				IndexProvider
-					.Index
+				SourceSymbolIndex
 					.SearchSymbol(request.Filter)
 					.Select(s => new SourceSymbol {DisplayText = s.DisplayText, SourceFile = s.SourceFile.FullName, Line = s.Line-1, Column = s.Column-1})
 					.ToJsonStreamWriter();
+		}
+
+		ISourceSymbolIndex SourceSymbolIndex
+		{
+			get { return IndexProvider.Index; }
 		}
 	}
 }

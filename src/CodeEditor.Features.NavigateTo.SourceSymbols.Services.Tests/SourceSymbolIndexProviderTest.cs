@@ -12,7 +12,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.Tests
 	public class SourceSymbolIndexProviderTest : MockBasedTest
 	{
 		[Test]
-		public void ParsesAllFilesAutomaticallyUponStartup()
+		public void IndexAllFilesAutomaticallyUponStartup()
 		{
 			var assetsFolder = MockFor<IFolder>();
 			var sourceFile = MockFor<IFile>();
@@ -25,17 +25,17 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.Tests
 				.SetupGet(_ => _.AssetsFolder)
 				.Returns(assetsFolder.Object);
 
-			var parserSelector = MockFor<ISymbolParserSelector>();
+			var providerSelector = MockFor<ISourceSymbolProviderSelector>();
 			var parseWaitEvent = new AutoResetEvent(false);
-			var symbol = MockFor<ISymbol>();
-			parserSelector
-				.Setup(_ => _.Parse(sourceFile.Object))
+			var symbol = MockFor<ISourceSymbol>();
+			providerSelector
+				.Setup(_ => _.SourceSymbolsFor(sourceFile.Object))
 				.Callback(() => parseWaitEvent.Set())
 				.Returns(new[] {symbol.Object});
 
 			var container = new CompositionContainer(typeof(ISourceSymbolIndexProvider).Assembly);
 			container.AddExportedValue(assetsFolderProvider.Object);
-			container.AddExportedValue(parserSelector.Object);
+			container.AddExportedValue(providerSelector.Object);
 
 			var subject = container.GetExportedValue<ISourceSymbolIndexProvider>();
 			Assert.IsNotNull(subject.Index);
