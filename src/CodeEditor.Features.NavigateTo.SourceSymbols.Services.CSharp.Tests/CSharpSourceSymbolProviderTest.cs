@@ -3,17 +3,17 @@ using CodeEditor.IO;
 using CodeEditor.Testing;
 using NUnit.Framework;
 
-namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.UnityScript.Tests
+namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.CSharp.Tests
 {
 	[TestFixture]
-	public class UnityScriptSymbolParserTest : MockBasedTest
+	public class CSharpSourceSymbolProviderTest : MockBasedTest
 	{
 		[Test]
 		public void ReturnsSymbolsForClasses()
 		{
-			var subject = new UnityScriptSymbolParser();
+			var subject = new CSharpSourceSymbolProvider();
 			var file = MockFileWithContent("class Foo {}\nclass Bar {}");
-			var parsedSymbols = subject.Parse(file);
+			var parsedSymbols = subject.SourceSymbolsFor(file);
 			var expectedSymbols = new[]
 			{
 				new {DisplayText = "Foo", File = file, Line = 1, Column = 7},

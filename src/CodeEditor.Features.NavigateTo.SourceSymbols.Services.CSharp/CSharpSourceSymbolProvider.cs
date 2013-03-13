@@ -2,23 +2,22 @@ using System.Collections.Generic;
 using CodeEditor.Composition;
 using CodeEditor.ContentTypes;
 using CodeEditor.IO;
-using CodeEditor.Languages.CSharp;
 using CodeEditor.Languages.CSharp.ContentType;
 using ICSharpCode.NRefactory;
 using ICSharpCode.NRefactory.CSharp;
 
 namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.CSharp
 {
-	[Export(typeof(ISymbolParser))]
+	[Export(typeof(ISourceSymbolProvider))]
 	[ContentType(CSharpContentType.Name)]
-	public class CSharpSymbolParser : ISymbolParser
+	public class CSharpSourceSymbolProvider : ISourceSymbolProvider
 	{
-		public ISymbol[] Parse(IFile file)
+		public ISourceSymbol[] SourceSymbolsFor(IFile file)
 		{
 			var syntaxTree = SyntaxTreeFor(file);
 			var symbolCollector = new CSharpSymbolCollector(file);
 			syntaxTree.AcceptVisitor(symbolCollector);
-			return symbolCollector.Symbols;
+			return symbolCollector.SourceSymbols;
 		}
 
 		static SyntaxTree SyntaxTreeFor(IFile file)
@@ -29,7 +28,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.CSharp
 		class CSharpSymbolCollector : DepthFirstAstVisitor
 		{
 			readonly IFile _sourceFile;
-			readonly List<ISymbol> _symbols = new List<ISymbol>();
+			readonly List<ISourceSymbol> _symbols = new List<ISourceSymbol>();
 
 			public CSharpSymbolCollector(IFile sourceFile)
 			{
@@ -43,21 +42,21 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.CSharp
 
 			void AddSymbolFor(EntityDeclaration entityDeclaration)
 			{
-				_symbols.Add(new CSharpSymbol(entityDeclaration, _sourceFile));
+				_symbols.Add(new CSharpSourceSymbol(entityDeclaration, _sourceFile));
 			}
 
-			public ISymbol[] Symbols
+			public ISourceSymbol[] SourceSymbols
 			{
 				get { return _symbols.ToArray(); }
 			}
 		}
 
-		class CSharpSymbol : ISymbol
+		class CSharpSourceSymbol : ISourceSymbol
 		{
 			readonly EntityDeclaration _declaration;
 			readonly IFile _sourceFile;
 
-			public CSharpSymbol(EntityDeclaration declaration, IFile sourceFile)
+			public CSharpSourceSymbol(EntityDeclaration declaration, IFile sourceFile)
 			{
 				_declaration = declaration;
 				_sourceFile = sourceFile;

@@ -6,16 +6,16 @@ using UnityScript.Parser;
 
 namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.UnityScript
 {
-	public class UnityScriptSymbolParser : ISymbolParser
+	public class UnityScriptSourceSymbolProvider : ISourceSymbolProvider
 	{
-		public ISymbol[] Parse(IFile file)
+		public ISourceSymbol[] SourceSymbolsFor(IFile file)
 		{
 			var symbolCollector = new UnityScriptSymbolCollector(file);
-			ParseModule(file).Accept(symbolCollector);
-			return symbolCollector.Symbols;
+			SyntaxTreeFor(file).Accept(symbolCollector);
+			return symbolCollector.SourceSymbols;
 		}
 
-		static CompileUnit ParseModule(IFile file)
+		static CompileUnit SyntaxTreeFor(IFile file)
 		{
 			var compileUnit = new CompileUnit();
 			UnityScriptParser.ParseReader(file.OpenText(), "", new CompilerContext(), compileUnit);
@@ -25,14 +25,14 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.UnityScript
 		public class UnityScriptSymbolCollector : FastDepthFirstVisitor
 		{
 			readonly IFile _sourceFile;
-			readonly List<ISymbol> _symbols = new List<ISymbol>();
+			readonly List<ISourceSymbol> _symbols = new List<ISourceSymbol>();
 
 			public UnityScriptSymbolCollector(IFile sourceFile)
 			{
 				_sourceFile = sourceFile;
 			}
 
-			public ISymbol[] Symbols
+			public ISourceSymbol[] SourceSymbols
 			{
 				get { return _symbols.ToArray(); }
 			}
@@ -45,7 +45,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.UnityScript
 
 			void AddSymbolFor(TypeMember node)
 			{
-				_symbols.Add(new AstSymbol(node, _sourceFile));
+				_symbols.Add(new UnityScriptSourceSymbol(node, _sourceFile));
 			}
 
 			public override void OnMethod(Method node)
@@ -53,12 +53,12 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.UnityScript
 				base.OnMethod(node);
 			}
 
-			class AstSymbol : ISymbol
+			class UnityScriptSourceSymbol : ISourceSymbol
 			{
 				readonly TypeMember _node;
 				readonly IFile _sourceFile;
 
-				public AstSymbol(TypeMember node, IFile sourceFile)
+				public UnityScriptSourceSymbol(TypeMember node, IFile sourceFile)
 				{
 					_node = node;
 					_sourceFile = sourceFile;
