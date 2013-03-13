@@ -19,6 +19,7 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		System.Action<int, int> DoubleClicked {get; set;}			// row, column
 		void EnsureCursorIsVisible();
 		bool ShowCursor { get; set; }
+		Rect GetTextEdittingRect();
 		void OnGUI();
 	}
 }

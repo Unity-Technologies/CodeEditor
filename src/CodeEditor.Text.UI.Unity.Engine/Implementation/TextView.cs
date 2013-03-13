@@ -103,24 +103,30 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				HandleMouseDragSelection ();
 
 			} GUI.EndScrollView();
-
-			HandleMouseCursorImage();
 		}
 
-		private bool IsShowingScrollbar ()
+		public Rect GetTextEdittingRect()
+		{
+			Rect textRect = ViewPort;
+			textRect.x += Margins.TotalWidth;
+			textRect.width -= Margins.TotalWidth;
+			const float kScrollbarWidth = 17f;
+			if (IsShowingVerticalScrollbar())
+				textRect.width -= kScrollbarWidth;
+			if (IsShowingHorizontalScrllbar())
+				textRect.height -= kScrollbarWidth;
+
+			return textRect;
+		}
+
+		bool IsShowingHorizontalScrllbar()
+		{
+			return ContentRect.width > ViewPort.width;
+		}
+
+		bool IsShowingVerticalScrollbar()
 		{
 			return ContentRect.height > ViewPort.height;
-		}
-
-		private void HandleMouseCursorImage()
-		{
-			Rect textAreaRect = ViewPort;
-			if (IsShowingScrollbar())
-			{
-				const float kScrollbarWidth = 17f;
-				textAreaRect.width -= kScrollbarWidth;
-			}
-			//EditorGUIUtility.AddCursorRect(textAreaRect, MouseCursor.Text, 454545);
 		}
 
 		private void EraseBackground()
