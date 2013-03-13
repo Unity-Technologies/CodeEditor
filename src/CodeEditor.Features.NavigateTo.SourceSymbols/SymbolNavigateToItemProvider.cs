@@ -26,7 +26,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols
 				? ObservableX.Empty<INavigateToItem>()
 				: ServiceClient
 					.SelectMany(
-						(client) => client.ObserveMany(new SymbolSearch {Filter = filter}),
+						(client) => client.ObserveMany(new SourceSymbolSearchRequest {Filter = filter}),
 						(client, symbol) => (INavigateToItem) new SymbolItem(symbol, FileNavigationService));
 		}
 
@@ -37,10 +37,10 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols
 
 		internal class SymbolItem : INavigateToItem
 		{
-			readonly Symbol _symbol;
+			readonly SourceSymbol _symbol;
 			readonly IFileNavigationService _fileNavigationService;
 
-			public SymbolItem(Symbol symbol, IFileNavigationService fileNavigationService)
+			public SymbolItem(SourceSymbol symbol, IFileNavigationService fileNavigationService)
 			{
 				_symbol = symbol;
 				_fileNavigationService = fileNavigationService;

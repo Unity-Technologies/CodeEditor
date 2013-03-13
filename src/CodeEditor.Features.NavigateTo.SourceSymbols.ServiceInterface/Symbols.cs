@@ -3,12 +3,12 @@ using ServiceStack.ServiceHost;
 
 namespace CodeEditor.Features.NavigateTo.SourceSymbols.ServiceInterface
 {
-	public class SymbolSearch : IReturn<IEnumerable<Symbol>>
+	public class SourceSymbolSearchRequest : IReturn<IEnumerable<SourceSymbol>>
 	{
 		public string Filter { get; set; }
 	}
 
-	public class Symbol
+	public class SourceSymbol
 	{
 		public string SourceFile { get; set; }
 		public int Line { get; set; }

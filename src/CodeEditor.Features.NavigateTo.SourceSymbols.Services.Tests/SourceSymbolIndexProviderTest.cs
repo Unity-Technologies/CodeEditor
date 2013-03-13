@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.Tests
 {
 	[TestFixture]
-	public class UnityProjectServerTest : MockBasedTest
+	public class SourceSymbolIndexProviderTest : MockBasedTest
 	{
 		[Test]
 		public void ParsesAllFilesAutomaticallyUponStartup()
@@ -25,20 +25,20 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.Tests
 				.SetupGet(_ => _.AssetsFolder)
 				.Returns(assetsFolder.Object);
 
-			var parser = MockFor<ISymbolParser>();
+			var parserSelector = MockFor<ISymbolParserSelector>();
 			var parseWaitEvent = new AutoResetEvent(false);
 			var symbol = MockFor<ISymbol>();
-			parser
+			parserSelector
 				.Setup(_ => _.Parse(sourceFile.Object))
 				.Callback(() => parseWaitEvent.Set())
 				.Returns(new[] {symbol.Object});
 
-			var container = new CompositionContainer(typeof(IUnityProjectProvider).Assembly);
+			var container = new CompositionContainer(typeof(ISourceSymbolIndexProvider).Assembly);
 			container.AddExportedValue(assetsFolderProvider.Object);
-			container.AddExportedValue(parser.Object);
+			container.AddExportedValue(parserSelector.Object);
 
-			var subject = container.GetExportedValue<IUnityProjectProvider>();
-			Assert.IsNotNull(subject.Project);
+			var subject = container.GetExportedValue<ISourceSymbolIndexProvider>();
+			Assert.IsNotNull(subject.Index);
 
 			// TODO: replace by injecting immediate scheduler
 			parseWaitEvent.WaitOne(TimeSpan.FromSeconds(1));
