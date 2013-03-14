@@ -55,12 +55,6 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			_textView.OnGUI();
 			HandleCompletionSession();
 			HandleKeyboard(true);
-			HandleMouseCursorImage();
-		}
-
-		private void HandleMouseCursorImage()
-		{
-			EditorGUIUtility.AddCursorRect(_textView.GetTextEdittingRect(), MouseCursor.Text, 454545);
 		}
 
 		private void SetKeyboardControl(Rect rect)
