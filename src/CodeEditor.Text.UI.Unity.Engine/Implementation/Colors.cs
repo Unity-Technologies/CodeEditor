@@ -12,5 +12,6 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		public static readonly Color Purple = new Color(174f / 255f, 129f / 255f, 255f / 255f);
 		public static readonly Color LightBrown = new Color(230f / 255f, 219f / 255f, 116f / 255f);
 		public static readonly Color Grey = new Color(128f / 255f, 128f / 255f, 128f / 255f);
+		public static readonly Color DarkYellow = new Color(120f / 255f, 120f / 255f, 85f / 255f);
 	}
 }

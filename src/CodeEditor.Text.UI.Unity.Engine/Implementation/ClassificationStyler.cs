@@ -21,7 +21,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			{
 				{_standardClassificationRegistry.Keyword, Colors.LightBlue},
 				{_standardClassificationRegistry.Identifier, Colors.White},
-				{_standardClassificationRegistry.WhiteSpace, Colors.White},
+				{_standardClassificationRegistry.WhiteSpace, Colors.DarkYellow},
 				{_standardClassificationRegistry.Text, Colors.White},
 				{_standardClassificationRegistry.Operator, Colors.Pink},
 				{_standardClassificationRegistry.Punctuation, Colors.Offwhite},

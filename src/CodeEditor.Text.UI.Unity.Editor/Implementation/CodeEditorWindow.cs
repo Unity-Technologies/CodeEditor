@@ -28,6 +28,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		// Serialized fields (between assembly reloads AND between sessions)
 		[SerializeField]
 		int _selectedFontSize = 14;
+		[SerializeField]
+		int _numberOfWhitespacesPerTab = 4;
 
 		// Non serialized fields (reconstructed from serialized state above or recreated when needed)
 		// ---------------------
@@ -45,6 +47,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		class Styles
 		{
 			public GUIContent saveText = new GUIContent ("Save");
+			public GUIContent showWhitespace = new GUIContent("Show Whitespace");
 		}
 		static Styles s_Styles;
 
@@ -177,7 +180,6 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				foreach(int size in _fontSizes)
 					names.Add(size.ToString());
 				_fontSizesNames = names.ToArray();
-
 			}
 
 			GUILayout.BeginArea(rect);
@@ -192,10 +194,20 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				
 					GUILayout.FlexibleSpace();
 
+					_numberOfWhitespacesPerTab = EditorGUILayout.IntField(_numberOfWhitespacesPerTab, GUILayout.Width(40));
+					_numberOfWhitespacesPerTab = Mathf.Max(_numberOfWhitespacesPerTab, 1);
+					_textView.Tabs.NumberOfWhitespacesPerTab = _numberOfWhitespacesPerTab;
+					GUILayout.Space(6);
+
+					_textView.ShowWhitespace = GUILayout.Toggle(_textView.ShowWhitespace, GUIContent.none);
+					GUILayout.Space(6);
+
 					EditorGUI.BeginChangeCheck();
 					_selectedFontSize = EditorGUILayout.IntPopup(_selectedFontSize, _fontSizesNames, _fontSizes, GUILayout.Width(40));
 					if(EditorGUI.EndChangeCheck())
 						AppearanceChanged();
+
+					GUILayout.Space(6);
 
 					if (GUILayout.Button(s_Styles.saveText, EditorStyles.miniButton))
 						_textView.Document.Save();
