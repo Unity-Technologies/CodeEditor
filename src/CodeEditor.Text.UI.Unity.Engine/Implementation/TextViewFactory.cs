@@ -22,6 +22,12 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		[Import]
 		IDefaultTextViewMarginsProvider DefaultTextViewMarginsProvider { get; set; }
 
+		[Import]
+		IMouseCursorRegions MouseCursorRegions { get; set; }
+
+		[Import]
+		IMouseCursors MouseCursors { get; set; }
+
 		public ITextView ViewForFile(string fileName)
 		{
 			return CreateView(new TextViewCreationOptions {File = FileSystem.FileFor(fileName)});
@@ -36,7 +42,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		{
 			var file = options.File ?? TransientTextFile();
 			var document = DocumentFor(file);
-			var textView = new TextView(document, AppearanceFor(document), Adornments);
+			var textView = new TextView(document, AppearanceFor(document), Adornments, MouseCursors, MouseCursorRegions);
 			textView.Margins = options.Margins ?? DefaultMarginsFor(textView);
 			return textView;
 		}

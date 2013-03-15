@@ -10,14 +10,18 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		readonly ITextViewAppearance _appearance;
 		readonly ITextViewAdornments _adornments;
 		readonly Selection _selection;
+		readonly IMouseCursors _mouseCursors;
+		readonly IMouseCursorRegions _mouseCursorsRegions;
 		public Action<int, int> DoubleClicked {get; set;}
 		public bool ShowCursor { get; set; }
 
-		public TextView(ITextViewDocument document, ITextViewAppearance appearance, ITextViewAdornments adornments)
+		public TextView(ITextViewDocument document, ITextViewAppearance appearance, ITextViewAdornments adornments, IMouseCursors mouseCursors, IMouseCursorRegions mouseCursorRegions)
 		{
 			_appearance = appearance;
 			_adornments = adornments;
 			_document = document;
+			_mouseCursors = mouseCursors;
+			_mouseCursorsRegions = mouseCursorRegions;
 			_selection = new Selection(document.Caret);
 			_document.Caret.Moved += EnsureCursorIsVisible;
 		}
@@ -107,20 +111,30 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			HandleMouseCursorImage();
 		}
 
-		private bool IsShowingScrollbar ()
+		private bool verticalScrollbarVisible 
 		{
-			return ContentRect.height > ViewPort.height;
+			get { return ContentRect.height > ViewPort.height; }
+		}
+
+		private bool horizontalScrollbarVisible
+		{
+			get { return ContentRect.height > ViewPort.height; }
 		}
 
 		private void HandleMouseCursorImage()
 		{
+			if (_mouseCursorsRegions == null)
+				return;
+
 			Rect textAreaRect = ViewPort;
-			if (IsShowingScrollbar())
-			{
-				const float kScrollbarWidth = 17f;
+			textAreaRect.x += Margins.TotalWidth;
+			textAreaRect.width -= Margins.TotalWidth;
+			const float kScrollbarWidth = 17f;
+			if (verticalScrollbarVisible)
 				textAreaRect.width -= kScrollbarWidth;
-			}
-			//EditorGUIUtility.AddCursorRect(textAreaRect, MouseCursor.Text, 454545);
+			if (horizontalScrollbarVisible)
+				textAreaRect.height -= kScrollbarWidth;
+			_mouseCursorsRegions.AddMouseCursorRegion(textAreaRect, _mouseCursors.Text);
 		}
 
 		private void EraseBackground()
