@@ -21,14 +21,12 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		readonly ITextViewDocument _document;
 		readonly ITextViewAppearance _appearance;
 		readonly ITextViewAdornments _adornments;
-		readonly ITextViewTabs _tabs;
+		readonly ITextViewWhitespace _whitespace;
 		readonly Selection _selection;
 		readonly IMouseCursors _mouseCursors;
 		readonly IMouseCursorRegions _mouseCursorsRegions;
 		public Action<int, int> DoubleClicked {get; set;}
 		public bool ShowCursor { get; set; }
-		public bool ShowWhitespace { get; set; }
-
 
 		public TextView(ITextViewDocument document, ITextViewAppearance appearance, ITextViewAdornments adornments, IMouseCursors mouseCursors, IMouseCursorRegions mouseCursorRegions)
 		{
@@ -39,16 +37,16 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			_mouseCursorsRegions = mouseCursorRegions;
 			_selection = new Selection(document.Caret);
 			_document.Caret.Moved += EnsureCursorIsVisible;
-			_tabs = new TextViewTabs(); // TODO: pass in
+			_whitespace = new TextViewWhitespace(); // TODO: pass in
 		}
 
 		public ITextViewMargins Margins { get; set; }
 
 		public Rect ViewPort { get; set; }
 
-		public ITextViewTabs Tabs 
+		public ITextViewWhitespace Whitespace 
 		{
-			get { return _tabs; } 
+			get { return _whitespace; } 
 		}
 
 		public Vector2 ScrollOffset { get; set; }
@@ -281,7 +279,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			for (int row = loopBegin; row<=loopEnd; row++)
 			{
 				var line = Line(row);
-				string renderText = Tabs.ReplaceTabsWithWhiteSpaces(line.Text, false);
+				string renderText = ReplaceWhitespace(line.Text);
 				
 				Rect rowRect = GetLineRect(row);
 
@@ -333,7 +331,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			var line = Line(lineRow);
 			string text = line.Text;
 			int glyphCounter = 0;
-			int HalfNumberOfWhitespacesPerTab = Tabs.NumberOfWhitespacesPerTab / 2;
+			int HalfNumberOfWhitespacesPerTab = Whitespace.NumberOfSpacesPerTab / 2;
 			for (int i=0; i<=text.Length; i++)
 			{
 				if (glyphCounter >= graphicalCaretPos)
@@ -343,7 +341,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				{
 					if (glyphCounter + HalfNumberOfWhitespacesPerTab >= graphicalCaretPos)
 						return i; 
-					glyphCounter += Tabs.NumberOfWhitespacesPerTab;
+					glyphCounter += Whitespace.NumberOfSpacesPerTab;
 				}
 				else
 				{
@@ -361,7 +359,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			{
 				if (i == logicalCaretPos)
 					return glyphCounter;
-				glyphCounter += (line.Text[i] == '\t') ? Tabs.NumberOfWhitespacesPerTab : 1;
+				glyphCounter += (line.Text[i] == '\t') ? Whitespace.NumberOfSpacesPerTab : 1;
 			}
 			return -1;
 		}
@@ -372,15 +370,20 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 			DrawAdornments(line, lineRect);
 
-			string renderText = Tabs.ReplaceTabsWithWhiteSpaces(line.RichText, ShowWhitespace);
+			string renderText = ReplaceWhitespace(line.RichText);
 			LineStyle.Draw(lineRect, MissingEngineAPI.GUIContent_Temp(renderText), controlID);
 
 			if (ShowCursor && row == CursorRow)
 			{
-				string cursorText = Tabs.ReplaceTabsWithWhiteSpaces(line.Text, false);
+				string cursorText = ReplaceWhitespace(line.Text);
 				int graphicalCaretPos = LogicalCaretPosToGraphicalCaretPos(row, CursorPos);
 				LineStyle.DrawCursor(lineRect, MissingEngineAPI.GUIContent_Temp(cursorText), controlID, graphicalCaretPos);
 			}
+		}
+
+		string ReplaceWhitespace(string text)
+		{
+			return Whitespace.ReplaceWhitespace(text);
 		}
 
 		private void DrawAdornments(ITextViewLine line, Rect lineRect)
@@ -412,7 +415,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			var rect = GetLineRect(row);
 			rect.x += Margins.TotalWidth;
 
-			string renderText = Tabs.ReplaceTabsWithWhiteSpaces (Line(row).Text, false);
+			string renderText = ReplaceWhitespace(Line(row).Text);
 			GUIContent guiContent = new GUIContent(renderText);
 			
 			cursorPosition.y = (rect.yMin + rect.yMax)*0.5f; // use center of row to fix issue with incorrect string index between rows

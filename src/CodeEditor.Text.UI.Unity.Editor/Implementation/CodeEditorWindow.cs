@@ -29,7 +29,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		[SerializeField]
 		int _selectedFontSize = 14;
 		[SerializeField]
-		int _numberOfWhitespacesPerTab = 4;
+		int _numberOfSpacesPerTab = 4;
 
 		// Non serialized fields (reconstructed from serialized state above or recreated when needed)
 		// ---------------------
@@ -194,12 +194,12 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				
 					GUILayout.FlexibleSpace();
 
-					_numberOfWhitespacesPerTab = EditorGUILayout.IntField(_numberOfWhitespacesPerTab, GUILayout.Width(40));
-					_numberOfWhitespacesPerTab = Mathf.Max(_numberOfWhitespacesPerTab, 1);
-					_textView.Tabs.NumberOfWhitespacesPerTab = _numberOfWhitespacesPerTab;
+					_numberOfSpacesPerTab = EditorGUILayout.IntField(_numberOfSpacesPerTab, GUILayout.Width(40));
+					_numberOfSpacesPerTab = Mathf.Max(_numberOfSpacesPerTab, 1);
+					_textView.Whitespace.NumberOfSpacesPerTab = _numberOfSpacesPerTab;
 					GUILayout.Space(6);
 
-					_textView.ShowWhitespace = GUILayout.Toggle(_textView.ShowWhitespace, GUIContent.none);
+					_textView.Whitespace.Visible = GUILayout.Toggle(_textView.Whitespace.Visible, GUIContent.none);
 					GUILayout.Space(6);
 
 					EditorGUI.BeginChangeCheck();

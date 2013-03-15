@@ -6,7 +6,7 @@ namespace CodeEditor.Text.UI.Unity.Engine
 	{
 		ITextViewDocument Document { get; }
 		ITextViewAppearance Appearance { get; }
-		ITextViewTabs Tabs { get; }
+		ITextViewWhitespace Whitespace { get; }
 		float LineHeight { get; }
 		Rect SpanForCurrentCharacter();
 
@@ -20,7 +20,6 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		System.Action<int, int> DoubleClicked {get; set;}			// row, column
 		void EnsureCursorIsVisible();
 		bool ShowCursor { get; set; }
-		bool ShowWhitespace { get; set; }
 		void OnGUI();
 	}
 }
