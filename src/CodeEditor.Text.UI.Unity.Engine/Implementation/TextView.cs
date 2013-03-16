@@ -17,7 +17,8 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 	class TextView : ITextView
 	{
-		const int TopMargin = 6;
+		float TopMargin = 6;
+		float LeftMargin;
 		readonly ITextViewDocument _document;
 		readonly ITextViewAppearance _appearance;
 		readonly ITextViewAdornments _adornments;
@@ -117,6 +118,8 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			if (Repainting)
 				EraseBackground();
 
+			LeftMargin = LineHeight * 0.5f; // Make left margin proportional with font size
+
 			ScrollOffset = GUI.BeginScrollView(ViewPort, ScrollOffset, ContentRect);
 			{
 				if (ScrollOffset.y < 0) 
@@ -180,10 +183,15 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				else
 					Margins.HandleInputEvent(line, lineRect);
 
-				lineRect.x += Margins.TotalWidth;
+				lineRect.x += CodeOffset;
 				if (Repainting)
 					DrawLine(lineRect, row, row + 110101010);
 			}
+		}
+
+		float CodeOffset
+		{
+			get { return Margins.TotalWidth + LeftMargin; }
 		}
 
 		void HandleMouseDragSelection ()
@@ -314,7 +322,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				}
 
 				float extraWidth = (row != endRow) ? 8f : 0f;		// add extra width for all rows except the last to enhance selection
-				rowRect.x = textSpanRect.x + Margins.TotalWidth;
+				rowRect.x = textSpanRect.x + CodeOffset;
 				rowRect.width = textSpanRect.width + extraWidth; 	
 				GUIUtils.DrawRect (rowRect, selectionColor);
 			}
@@ -413,7 +421,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				row = LineCount-1;
 
 			var rect = GetLineRect(row);
-			rect.x += Margins.TotalWidth;
+			rect.x += CodeOffset;
 
 			string renderText = ReplaceWhitespace(Line(row).Text);
 			GUIContent guiContent = new GUIContent(renderText);
