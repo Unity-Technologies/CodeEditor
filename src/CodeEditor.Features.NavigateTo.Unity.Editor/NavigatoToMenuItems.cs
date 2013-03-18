@@ -4,7 +4,7 @@ namespace CodeEditor.Features.NavigateTo.Unity.Editor
 {
 	public static class NavigatoToMenuItems
 	{
-		[MenuItem("Window/NavigateTo %l")]
+		[MenuItem("Window/NavigateTo %.")]
 		public static void OpenNavigateToFileWindow()
 		{
 			NavigatorWindow.Open();
