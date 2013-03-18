@@ -72,7 +72,7 @@ namespace CodeEditor.Collections
 
 		class StringPiece : IPiece<char>
 		{
-			private readonly string _s;
+			readonly string _s;
 
 			public StringPiece(string s)
 			{
@@ -102,7 +102,7 @@ namespace CodeEditor.Collections
 
 		class ArrayPiece<T> : IPiece<T>
 		{
-			private readonly T[] _array;
+			readonly T[] _array;
 
 			public ArrayPiece(T[] array)
 			{
@@ -132,9 +132,9 @@ namespace CodeEditor.Collections
 
 		class PieceRange<T> : IPiece<T>
 		{
-			private readonly IPiece<T> _piece;
-			private readonly int _index;
-			private readonly int _length;
+			readonly IPiece<T> _piece;
+			readonly int _index;
+			readonly int _length;
 
 			public PieceRange(IPiece<T> piece, int index, int length)
 			{

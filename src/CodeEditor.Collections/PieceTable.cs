@@ -30,15 +30,15 @@ namespace CodeEditor.Collections
 	/// <typeparam name="T"></typeparam>
 	public class PieceTable<T> : IPiece<T>
 	{
-		private const int PartitionThreshold = 64;
+		const int PartitionThreshold = 64;
 
-		private readonly InsertionBuffer<T> _insertionBuffer;
+		readonly InsertionBuffer<T> _insertionBuffer;
 
-		private readonly PieceSpan<T>[] _pieceSpans;
+		readonly PieceSpan<T>[] _pieceSpans;
 
 		public PieceTable(IPiece<T> piece)
 		{
-			_pieceSpans = new[] { PieceSpan.For(piece, 0) };
+			_pieceSpans = new[] {PieceSpan.For(piece, 0)};
 			_insertionBuffer = new InsertionBuffer<T>();
 		}
 
@@ -62,8 +62,8 @@ namespace CodeEditor.Collections
 		{
 			public readonly int Position;
 
-			private readonly PieceSpan<T>[] _pieceSpans;
-			private readonly int _pieceIndex;
+			readonly PieceSpan<T>[] _pieceSpans;
+			readonly int _pieceIndex;
 
 			public Point(int position, PieceSpan<T>[] pieceSpans, int pieceIndex)
 			{
@@ -104,7 +104,7 @@ namespace CodeEditor.Collections
 				}
 			}
 
-			private PieceSpan<T> PieceSpan
+			PieceSpan<T> PieceSpan
 			{
 				get { return _pieceSpans[_pieceIndex]; }
 			}
@@ -203,25 +203,26 @@ namespace CodeEditor.Collections
 				newStartingPieceSpan, newEndingPieceSpan);
 		}
 
-		private void CheckPosition(int position, int maxValue)
+		void CheckPosition(int position, int maxValue)
 		{
 			if (position < 0 || position > maxValue)
-				throw new ArgumentOutOfRangeException("position", position, string.Format("position must be between 0 and {0}", maxValue));
+				throw new ArgumentOutOfRangeException("position", position,
+					string.Format("position must be between 0 and {0}", maxValue));
 		}
 
-		private PieceTable<T> InsertFirst(T value)
+		PieceTable<T> InsertFirst(T value)
 		{
 			return NewPieceTableWith(NewSpanWith(value, 0));
 		}
 
-		private PieceTable<T> Append(T value)
+		PieceTable<T> Append(T value)
 		{
 			return Piece.IsAppendable(LastPiece)
 				? AppendTo(LastIndex, value)
 				: AppendNew(value);
 		}
 
-		private PieceTable<T> AppendTo(int pieceIndex, T value)
+		PieceTable<T> AppendTo(int pieceIndex, T value)
 		{
 			var pieceSpan = _pieceSpans[pieceIndex];
 			var appendablePiece = (IAppendablePiece<T>)pieceSpan.Piece;
@@ -229,23 +230,23 @@ namespace CodeEditor.Collections
 			return ReplacePieceSpan(pieceIndex, appended);
 		}
 
-		private PieceTable<T> AppendNew(T value)
+		PieceTable<T> AppendNew(T value)
 		{
 			var newPieceSpans = _pieceSpans.Append(NewSpanWith(value, Length));
 			return NewPieceTableWith(newPieceSpans);
 		}
 
-		private PieceSpan<T> NewSpanWith(T value, int start)
+		PieceSpan<T> NewSpanWith(T value, int start)
 		{
 			return PieceSpan.For(NewPieceWith(value), start);
 		}
 
-		private IPiece<T> NewPieceWith(T value)
+		IPiece<T> NewPieceWith(T value)
 		{
 			return _insertionBuffer.Insert(value);
 		}
 
-		private int PieceIndexForPosition(int position, int min = 0)
+		int PieceIndexForPosition(int position, int min = 0)
 		{
 			var max = LastIndex;
 			while (max >= min)
@@ -264,7 +265,7 @@ namespace CodeEditor.Collections
 			throw new InvalidOperationException();
 		}
 
-		private PieceTable<T> NewPieceTableWith(params PieceSpan<T>[] newPieceSpans)
+		PieceTable<T> NewPieceTableWith(params PieceSpan<T>[] newPieceSpans)
 		{
 			var newPieceTable = new PieceTable<T>(newPieceSpans, _insertionBuffer);
 			return newPieceTable.PieceCount >= PartitionThreshold
@@ -272,7 +273,7 @@ namespace CodeEditor.Collections
 				: newPieceTable;
 		}
 
-		private static PieceTable<T> PartitionedPieceTableFor(PieceTable<T> p)
+		static PieceTable<T> PartitionedPieceTableFor(PieceTable<T> p)
 		{
 			var pivot = p.Length / 2;
 			var parts = p.SplitAt(pivot);
@@ -281,7 +282,7 @@ namespace CodeEditor.Collections
 			return new PieceTable<T>(new[] {first, second}, new InsertionBuffer<T>());
 		}
 
-		private static void UpdateSpans(PieceSpan<T>[] spans, int startingIndex)
+		static void UpdateSpans(PieceSpan<T>[] spans, int startingIndex)
 		{
 			for (var i = startingIndex; i < spans.Length; ++i)
 			{
@@ -290,12 +291,12 @@ namespace CodeEditor.Collections
 			}
 		}
 
-		private PieceTable<T> ReplacePieceSpan(int pieceIndex, params PieceSpan<T>[] replacementPieces)
+		PieceTable<T> ReplacePieceSpan(int pieceIndex, params PieceSpan<T>[] replacementPieces)
 		{
 			return ReplacePieceSpans(pieceIndex, 1, replacementPieces);
 		}
 
-		private PieceTable<T> ReplacePieceSpans(int pieceIndex, int count, params PieceSpan<T>[] replacementPieces)
+		PieceTable<T> ReplacePieceSpans(int pieceIndex, int count, params PieceSpan<T>[] replacementPieces)
 		{
 			var nonEmptySpans = NonEmptySpans(replacementPieces);
 			var newPieceSpans = _pieceSpans.ReplaceRange(pieceIndex, count, nonEmptySpans);
@@ -303,7 +304,7 @@ namespace CodeEditor.Collections
 			return NewPieceTableWith(newPieceSpans);
 		}
 
-		private static PieceSpan<T>[] NonEmptySpans(PieceSpan<T>[] spans)
+		static PieceSpan<T>[] NonEmptySpans(PieceSpan<T>[] spans)
 		{
 			var nonEmptyCount = NonEmptyCount(spans);
 			return nonEmptyCount == spans.Length
@@ -311,7 +312,7 @@ namespace CodeEditor.Collections
 				: NonEmptySpans(spans, nonEmptyCount);
 		}
 
-		private static PieceSpan<T>[] NonEmptySpans(PieceSpan<T>[] spans, int nonEmptyCount)
+		static PieceSpan<T>[] NonEmptySpans(PieceSpan<T>[] spans, int nonEmptyCount)
 		{
 			var nonEmpty = new PieceSpan<T>[nonEmptyCount];
 
@@ -323,7 +324,7 @@ namespace CodeEditor.Collections
 			return nonEmpty;
 		}
 
-		private static int NonEmptyCount(PieceSpan<T>[] spans)
+		static int NonEmptyCount(PieceSpan<T>[] spans)
 		{
 			var nonEmptyCount = 0;
 // ReSharper disable LoopCanBeConvertedToQuery
@@ -334,30 +335,30 @@ namespace CodeEditor.Collections
 			return nonEmptyCount;
 		}
 
-		private IPiece<T> LastPiece
+		IPiece<T> LastPiece
 		{
 			get { return LastPieceSpan.Piece; }
 		}
 
-		private PieceSpan<T> LastPieceSpan
+		PieceSpan<T> LastPieceSpan
 		{
 			get { return _pieceSpans[LastIndex]; }
 		}
 
-		private int LastIndex
+		int LastIndex
 		{
 			get { return _pieceSpans.Length - 1; }
 		}
 
 		struct Insertion
 		{
-			private readonly PieceTable<T> _table;
-			private readonly int _position;
-			private readonly T _value;
-			private readonly int _pieceIndex;
-			private readonly PieceSpan<T>[] _pieceSpans;
-			private readonly PieceSpan<T> _pieceSpan;
-			private readonly IPiece<T> _piece;
+			readonly PieceTable<T> _table;
+			readonly int _position;
+			readonly T _value;
+			readonly int _pieceIndex;
+			readonly PieceSpan<T>[] _pieceSpans;
+			readonly PieceSpan<T> _pieceSpan;
+			readonly IPiece<T> _piece;
 
 			public Insertion(PieceTable<T> table, int position, T value)
 			{
@@ -377,54 +378,54 @@ namespace CodeEditor.Collections
 					: InsertBySplitting();
 			}
 
-			private bool CanInsertByAppendingToPreviousPiece()
+			bool CanInsertByAppendingToPreviousPiece()
 			{
 				return InsertingAtTheBeginning
 					&& HasPreviousPiece
 					&& PreviousPieceIsAppendable;
 			}
 
-			private bool InsertingAtTheBeginning
+			bool InsertingAtTheBeginning
 			{
 				get { return _position == _pieceSpan.Start; }
 			}
 
-			private bool HasPreviousPiece
+			bool HasPreviousPiece
 			{
 				get { return _pieceIndex > 0; }
 			}
 
-			private bool PreviousPieceIsAppendable
+			bool PreviousPieceIsAppendable
 			{
 				get { return Piece.IsAppendable(Previous.Piece); }
 			}
 
-			private PieceSpan<T> Previous
+			PieceSpan<T> Previous
 			{
 				get { return _pieceSpans[PreviousIndex]; }
 			}
 
-			private int PreviousIndex
+			int PreviousIndex
 			{
 				get { return _pieceIndex - 1; }
 			}
 
-			private PieceTable<T> InsertByAppending()
+			PieceTable<T> InsertByAppending()
 			{
 				return _table.AppendTo(PreviousIndex, _value);
 			}
 
-			private PieceTable<T> InsertBySplitting()
+			PieceTable<T> InsertBySplitting()
 			{
 				var pieceStart = _pieceSpan.Start;
 				var positionInPiece = _position - pieceStart;
 				var parts = _piece.SplitAt(positionInPiece);
 				var replacementPieces = new[]
-        {
-		PieceSpan.For(parts.First, pieceStart),
-		_table.NewSpanWith(_value, _position),
-		PieceSpan.For(parts.Second, _position + 1)
-        };
+				{
+					PieceSpan.For(parts.First, pieceStart),
+					_table.NewSpanWith(_value, _position),
+					PieceSpan.For(parts.Second, _position + 1)
+				};
 				return _table.ReplacePieceSpan(_pieceIndex, replacementPieces);
 			}
 		}
