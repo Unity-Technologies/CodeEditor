@@ -48,6 +48,11 @@ namespace CodeEditor.Reactive
 			return Observable.Start(func).ToObservableX();
 		}
 
+		/// <summary>
+		/// Delays the observable sequence by <paramref name="dueTimeout"/>.
+		/// 
+		/// OnError notifications ARE NOT DELAYED!
+		/// </summary>
 		public static IObservableX<T> Delay<T>(this IObservableX<T> source, TimeSpan dueTimeout)
 		{
 			return source.Map(_ => _.Delay(dueTimeout));
@@ -61,6 +66,11 @@ namespace CodeEditor.Reactive
 		public static IObservableX<T> Return<T>(T value)
 		{
 			return Observable.Return(value).ToObservableX();
+		}
+
+		public static IObservableX<T> Never<T>()
+		{
+			return Observable.Never<T>().ToObservableX();
 		}
 
 		public static IObservableX<T> Throw<T>(Exception exception)
@@ -81,6 +91,16 @@ namespace CodeEditor.Reactive
 		public static IDisposable Subscribe<T>(this IObservableX<T> source, Action<T> onNext)
 		{
 			return source.ToObservable().Subscribe(onNext);
+		}
+
+		public static IDisposable Subscribe<T>(this IObservableX<T> source, Action<T> onNext, Action<Exception> onError)
+		{
+			return source.ToObservable().Subscribe(onNext, onError);
+		}
+
+		public static IDisposable Subscribe<T>(this IObservableX<T> source, Action<T> onNext, Action<Exception> onError, Action onCompleted)
+		{
+			return source.ToObservable().Subscribe(onNext, onError, onCompleted);
 		}
 
 		public static IObservableX<TResult> Select<T, TResult>(this IObservableX<T> source, Func<T, TResult> selector)
@@ -138,6 +158,16 @@ namespace CodeEditor.Reactive
 		public static T FirstOrTimeout<T>(this IObservableX<T> source, TimeSpan timeout)
 		{
 			return source.ToObservable().Timeout(timeout).First();
+		}
+
+		public static IObservableX<T> Timeout<T>(this IObservableX<T> source, TimeSpan timeout)
+		{
+			return source.Map(_ => _.Timeout(timeout));
+		}
+
+		public static IObservableX<T> Timeout<T>(this IObservableX<T> source, TimeSpan timeout, IObservableX<T> other)
+		{
+			return source.Map(_ => _.Timeout(timeout, other.ToObservable()));
 		}
 
 		public static IObservableX<IList<T>> ToList<T>(this IObservableX<T> source)

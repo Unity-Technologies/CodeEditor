@@ -46,8 +46,10 @@ namespace CodeEditor.ServiceClient
 					.Catch(
 						(Exception e) =>
 							ObservableX
-							.Throw<IObservableServiceClient>(e)
-							.Delay(TimeSpan.FromMilliseconds(500)))
+							.Never<IObservableServiceClient>()
+							.Timeout(
+								TimeSpan.FromMilliseconds(500),
+								ObservableX.Throw<IObservableServiceClient>(e)))
 					.Retry();
 			}
 		}
