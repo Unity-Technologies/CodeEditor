@@ -389,9 +389,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		private void MoveCaretVertically (int rowOffset)
 		{
-			int newRow = Caret.Row + rowOffset;
-			if (newRow < 0 || newRow >= _document.LineCount)
-				return;
+			int newRow = Mathf.Clamp(Caret.Row + rowOffset, 0, _document.LineCount-1);
 
 			int graphicalColumn = _targetColumnWhenMovingVertically;
 			if (graphicalColumn == -1)
