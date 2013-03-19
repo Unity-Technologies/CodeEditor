@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -163,7 +164,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		public Rect SpanForCurrentCharacter()
 		{
-			return GetTextSpanRect(GetLineRect(CursorRow), CurrentLine.Text, Math.Max(0, CursorPos - 1), 1);
+			return GetTextSpanRect(GetLineRect(CaretRow), CurrentLine.Text, Math.Max(0, CaretColumn - 1), 1);
 		}
 
 		void DoGUIOnElements()
@@ -270,11 +271,11 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			int startCol = _selection.BeginDrawPos.Column;
 			int endCol = _selection.EndDrawPos.Column;
 
-			startCol = LogicalCaretPosToGraphicalCaretPos(startRow, startCol);
-			endCol = LogicalCaretPosToGraphicalCaretPos(endRow, endCol);
-
 			if (endRow < firstRowVisible || startRow > lastRowVisible)
 				return; // Selection outside view
+
+			int startColumn = Whitespace.ConvertToGraphicalCaretColumn(startCol, Line(startRow));
+			int endColumn = Whitespace.ConvertToGraphicalCaretColumn(endCol, Line(endRow));
 
 			int loopBegin = firstRowVisible > startRow ? firstRowVisible : startRow;
 			int loopEnd = lastRowVisible < endRow ? lastRowVisible : endRow;
@@ -287,41 +288,40 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			for (int row = loopBegin; row<=loopEnd; row++)
 			{
 				var line = Line(row);
-				string renderText = ReplaceWhitespace(line.Text);
+				string renderText = Whitespace.FormatBaseText(line.Text);
 				
 				Rect rowRect = GetLineRect(row);
-
 				Rect textSpanRect;
 				if (row == startRow && row == endRow)
 				{
-					textSpanRect = GetTextSpanRect(rowRect, renderText, startCol, endCol - startCol);
+					textSpanRect = GetTextSpanRect(rowRect, renderText, startColumn, endColumn - startColumn);
 				}
 				else if (row == startRow)
 				{
-					int len = renderText.Length - startCol;
+					int len = renderText.Length - startColumn;
 					if (len > 0)
 					{
-						textSpanRect = GetTextSpanRect(rowRect, renderText, startCol, len);
+						textSpanRect = GetTextSpanRect(rowRect, renderText, startColumn, len);
 					}
 					else
 					{
 						// We are at end of line so we get the span for the previous character and
 						// use xMax from that character as startpos.
-						textSpanRect = GetTextSpanRect(rowRect, renderText, Mathf.Max(0, startCol - 1), 1);
+						textSpanRect = GetTextSpanRect(rowRect, renderText, Mathf.Max(0, startColumn - 1), 1);
 						textSpanRect.x = textSpanRect.xMax;
 						textSpanRect.width = 0;
 					}
 				}
 				else if (row == endRow)
 				{
-					textSpanRect = GetTextSpanRect(rowRect, renderText, 0, endCol);
+					textSpanRect = GetTextSpanRect(rowRect, renderText, 0, endColumn);
 				}
 				else
 				{
 					textSpanRect = GetTextSpanRect(rowRect, renderText, 0, renderText.Length);
 				}
 
-				float extraWidth = (row != endRow) ? 8f : 0f;		// add extra width for all rows except the last to enhance selection
+				float extraWidth = (row != endRow) ? LineHeight*0.5f : 0f;		// add extra width for all rows except the last to enhance selection
 				rowRect.x = textSpanRect.x + CodeOffset;
 				rowRect.width = textSpanRect.width + extraWidth; 	
 				GUIUtils.DrawRect (rowRect, selectionColor);
@@ -333,65 +333,23 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			get { return Event.current.type == EventType.repaint; }
 		}
 
-	
-		int GraphicalCaretPosToLogicalCaretPos(int lineRow, int graphicalCaretPos)
-		{
-			var line = Line(lineRow);
-			string text = line.Text;
-			int glyphCounter = 0;
-			int HalfNumberOfWhitespacesPerTab = Whitespace.NumberOfSpacesPerTab / 2;
-			for (int i=0; i<=text.Length; i++)
-			{
-				if (glyphCounter >= graphicalCaretPos)
-					return i;
-
-				if (text[i] == '\t')
-				{
-					if (glyphCounter + HalfNumberOfWhitespacesPerTab >= graphicalCaretPos)
-						return i; 
-					glyphCounter += Whitespace.NumberOfSpacesPerTab;
-				}
-				else
-				{
-					glyphCounter += 1;
-				}
-			}
-			return -1;
-		}
-
-		int LogicalCaretPosToGraphicalCaretPos(int lineRow, int logicalCaretPos)
-		{
-			var line = Line(lineRow);
-			int glyphCounter = 0;
-			for (int i = 0; i <= line.Text.Length; i++)
-			{
-				if (i == logicalCaretPos)
-					return glyphCounter;
-				glyphCounter += (line.Text[i] == '\t') ? Whitespace.NumberOfSpacesPerTab : 1;
-			}
-			return -1;
-		}
-
 		void DrawLine(Rect lineRect, int row, int controlID)
 		{
 			var line = Line(row);
 
 			DrawAdornments(line, lineRect);
 
-			string renderText = ReplaceWhitespace(line.RichText);
+			List<int> tabSizes;
+			string baseTextFormatted = Whitespace.FormatBaseText(line.Text, out tabSizes);
+			string renderText = Whitespace.FormatRichText(line.RichText, tabSizes);
+
 			LineStyle.Draw(lineRect, MissingEngineAPI.GUIContent_Temp(renderText), controlID);
 
-			if (ShowCursor && row == CursorRow)
+			if (ShowCursor && row == CaretRow)
 			{
-				string cursorText = ReplaceWhitespace(line.Text);
-				int graphicalCaretPos = LogicalCaretPosToGraphicalCaretPos(row, CursorPos);
-				LineStyle.DrawCursor(lineRect, MissingEngineAPI.GUIContent_Temp(cursorText), controlID, graphicalCaretPos);
+				int graphicalCaretPos = Whitespace.ConvertToGraphicalCaretColumn(CaretColumn, line, tabSizes);
+				LineStyle.DrawCursor(lineRect, MissingEngineAPI.GUIContent_Temp(baseTextFormatted), controlID, graphicalCaretPos);
 			}
-		}
-
-		string ReplaceWhitespace(string text)
-		{
-			return Whitespace.ReplaceWhitespace(text);
 		}
 
 		private void DrawAdornments(ITextViewLine line, Rect lineRect)
@@ -423,12 +381,14 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			var rect = GetLineRect(row);
 			rect.x += CodeOffset;
 
-			string renderText = ReplaceWhitespace(Line(row).Text);
+			List<int> tabSizes;
+			string renderText = Whitespace.FormatBaseText(Line(row).Text, out tabSizes);
+
 			GUIContent guiContent = new GUIContent(renderText);
 			
 			cursorPosition.y = (rect.yMin + rect.yMax)*0.5f; // use center of row to fix issue with incorrect string index between rows
 			var renderColumn = LineStyle.GetCursorStringIndex(rect, guiContent, cursorPosition);
-			var column = GraphicalCaretPosToLogicalCaretPos(row, renderColumn);
+			var column = Whitespace.ConvertToLogicalCaretColumn(renderColumn, Line(row), tabSizes);
 			return new Position(row, column);
 		}
 
@@ -436,11 +396,11 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		{
 			Vector2 scrollOffset = ScrollOffset;
 
-			var topPixelOfRow = LineHeight * CursorRow;
+			var topPixelOfRow = LineHeight * CaretRow;
 			var scrollBottom = topPixelOfRow - ViewPort.height + 2 * LineHeight + 2 * TopMargin;
 			scrollOffset.y = Mathf.Clamp(scrollOffset.y, scrollBottom, topPixelOfRow);
-			var lineRect = GetLineRect(CursorRow);
-			var cursorRect = GetTextSpanRect(lineRect, CurrentLine.Text, Mathf.Max(CursorPos - 2, 0), 1);
+			var lineRect = GetLineRect(CaretRow);
+			var cursorRect = GetTextSpanRect(lineRect, CurrentLine.Text, Mathf.Max(CaretColumn - 2, 0), 1);
 
 			var scrollRight = Mathf.Max(cursorRect.x - ViewPort.width + 40f, 0f);
 			scrollOffset.x = Mathf.Clamp(scrollOffset.x, scrollRight, 1000);
@@ -487,12 +447,12 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				GUIUtils.DrawRect(GetLineRect(row), new Color(0.8f, 0.1f, 0.1f, 0.5f));
 		}
 
-		int CursorPos
+		int CaretColumn
 		{
 			get { return _document.Caret.Column; }
 		}
 
-		int CursorRow
+		int CaretRow
 		{
 			get { return _document.Caret.Row; }
 		}
