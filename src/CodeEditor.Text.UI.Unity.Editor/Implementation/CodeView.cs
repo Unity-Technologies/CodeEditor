@@ -17,6 +17,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		private bool m_GrabKeyboardControl = true;
 		private double _showCursorDuration = 0.5;
 		private double _nextToggleCursor = 0;
+		private int _targetColumnWhenMovingVertically = -1;
 
 		private readonly EditorWindow m_Owner;
 		private readonly ITextViewDocument _document;
@@ -33,7 +34,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			_font = textFont ? textFont : GUI.skin.font;
 			_navigator = new DefaultTextStructureNavigator();
 			Caret.Moved += OnCaretMoved;
-			_textView.DoubleClicked = DoubleClickedDocument;
+			_textView.Clicked = OnTextViewClicked;
 		}
 
 		private void OnCaretMoved()
@@ -99,6 +100,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				Event.current.Use();
 				return;
 			}
+			ResetMoveVerticallyTargetColumn();
 
 			var c = Event.current.character;
 			if(!_font.HasCharacter(c) && c != '\t' && c != '\n')
@@ -311,11 +313,16 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			MoveToPosition(next.Start);
 		}
 
-		private void DoubleClickedDocument(int row, int column)
+		private void OnTextViewClicked(int row, int column, int clickcount)
 		{
-			PreviousWord();
-			SetSelectionAnchorIfNeeded();
-			NextWord();
+			ResetMoveVerticallyTargetColumn();
+
+			if (clickcount == 2)
+			{
+				PreviousWord();
+				SetSelectionAnchorIfNeeded();
+				NextWord();
+			}
 		}
 
 		private void MoveToPosition(int position)
@@ -380,8 +387,58 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			ClearSelection();
 		}
 
+		private void MoveCaretVertically (int rowOffset)
+		{
+			int newRow = Caret.Row + rowOffset;
+			if (newRow < 0 || newRow >= _document.LineCount)
+				return;
+
+			int graphicalColumn = _targetColumnWhenMovingVertically;
+			if (graphicalColumn == -1)
+			{
+				graphicalColumn = _textView.Whitespace.ConvertToGraphicalCaretColumn(Caret.Column, _document.Line(Caret.Row));
+				_targetColumnWhenMovingVertically = graphicalColumn;
+			}
+
+			if (graphicalColumn == -1)
+				return;
+
+			int logicalColumn = _textView.Whitespace.ConvertToLogicalCaretColumn(graphicalColumn, _document.Line(newRow));
+			if (logicalColumn == -1)
+				logicalColumn = _document.Line(newRow).Text.Length;
+
+			Caret.SetPosition(newRow, logicalColumn);
+		}
+
+		void ResetMoveVerticallyTargetColumn()
+		{
+			_targetColumnWhenMovingVertically = -1;
+		}
+
+		bool IsVerticallyMoveOperation (TextEditOp operation)
+		{
+			switch (operation)
+			{
+				case TextEditOp.MoveUp:
+				case TextEditOp.MoveDown:
+				case TextEditOp.SelectUp:
+				case TextEditOp.SelectDown:
+				case TextEditOp.MovePageUp:
+				case TextEditOp.MovePageDown:
+				case TextEditOp.SelectPageUp:
+				case TextEditOp.SelectPageDown:
+					return true;
+			}
+			return false;
+		}
+
+		int NumberOfLinesPerPage { get { return VisibleLines - 2; } }
+
 		private void PerformOperation(TextEditOp operation)
 		{
+			if (!IsVerticallyMoveOperation(operation))
+				ResetMoveVerticallyTargetColumn();
+
 			switch(operation)
 			{
 				case TextEditOp.MoveLeft:
@@ -400,13 +457,13 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					if(HasSelection())
 						MoveCaretToBeginingOfSelectionAndClear();
 					else
-						Caret.MoveUp(1);
+						MoveCaretVertically(-1); 
 					break;
 				case TextEditOp.MoveDown:
 					if(HasSelection())
 						MoveCaretToEndOfSelectionAndClear();
 					else
-						Caret.MoveDown(1);
+						MoveCaretVertically(1);
 					break;
 				case TextEditOp.MoveLineStart:
 					ClearSelection();
@@ -438,11 +495,11 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					//case TextEditOp.MoveParagraphBackward: MoveParagraphBackward(); break;
 				case TextEditOp.MovePageUp:
 					ClearSelection();
-					Caret.MoveUp(VisibleLines - 2);
+					MoveCaretVertically(-NumberOfLinesPerPage);
 					break;
 				case TextEditOp.MovePageDown:
 					ClearSelection();
-					Caret.MoveDown(VisibleLines - 2);
+					MoveCaretVertically(NumberOfLinesPerPage);
 					break;
 				case TextEditOp.MoveGraphicalLineStart:
 					ClearSelection();
@@ -462,11 +519,11 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					break;
 				case TextEditOp.SelectUp:
 					SetSelectionAnchorIfNeeded();
-					Caret.MoveUp(1);
+					MoveCaretVertically(-1);
 					break;
 				case TextEditOp.SelectDown:
 					SetSelectionAnchorIfNeeded();
-					Caret.MoveDown(1);
+					MoveCaretVertically(1);
 					break;
 				case TextEditOp.SelectToStartOfNextWord:
 					SetSelectionAnchorIfNeeded();
@@ -486,11 +543,11 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					break;
 				case TextEditOp.SelectPageUp:
 					SetSelectionAnchorIfNeeded();
-					Caret.MoveUp(VisibleLines - 2);
+					MoveCaretVertically(-NumberOfLinesPerPage);
 					break;
 				case TextEditOp.SelectPageDown:
 					SetSelectionAnchorIfNeeded();
-					Caret.MoveDown(VisibleLines - 2);
+					MoveCaretVertically(NumberOfLinesPerPage);
 					break;
 				case TextEditOp.SelectGraphicalLineStart:
 					SetSelectionAnchorIfNeeded();
@@ -556,6 +613,9 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			MapKey("#up", TextEditOp.SelectUp);
 			MapKey("#down", TextEditOp.SelectDown);
 
+			MapKey ("#page up", TextEditOp.SelectPageUp);
+			MapKey ("#page down", TextEditOp.SelectPageDown);
+
 			MapKey("delete", TextEditOp.Delete);
 			MapKey("backspace", TextEditOp.Backspace);
 			MapKey("#backspace", TextEditOp.Backspace);
@@ -588,8 +648,6 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 				MapKey("#home", TextEditOp.SelectTextStart);
 				MapKey("#end", TextEditOp.SelectTextEnd);
-				// TODO			MapKey ("#page up", TextEditOp.SelectPageUp);
-				// TODO			MapKey ("#page down", TextEditOp.SelectPageDown);
 
 				MapKey("#^left", TextEditOp.ExpandSelectGraphicalLineStart);
 				MapKey("#^right", TextEditOp.ExpandSelectGraphicalLineEnd);

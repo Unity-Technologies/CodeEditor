@@ -27,7 +27,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		readonly Selection _selection;
 		readonly IMouseCursors _mouseCursors;
 		readonly IMouseCursorRegions _mouseCursorsRegions;
-		public Action<int, int> DoubleClicked {get; set;}
+		public Action<int, int, int> Clicked {get; set;}
 		public bool ShowCursor { get; set; }
 
 		public TextView(ITextViewDocument document, ITextViewAppearance appearance, ITextViewAdornments adornments, IMouseCursors mouseCursors, IMouseCursorRegions mouseCursorRegions)
@@ -207,10 +207,10 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 					bool alreadyHotcontrol = GUIUtility.hotControl == controlID; 
 					if ((GUIUtility.hotControl == 0 || alreadyHotcontrol) && evt.button == 0)	
 					{
+						Position pos = GetCaretPositionUnderMouseCursor(Event.current.mousePosition);
 						if (evt.clickCount == 1)
 						{
 							GUIUtility.hotControl = controlID;	// Grab mouse focus
-							Position pos = GetCaretPositionUnderMouseCursor(Event.current.mousePosition);
 							_selection.Clear();
 							if (pos.Column >= 0)
 							{
@@ -220,13 +220,12 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 						}
 						if (evt.clickCount == 2)
 						{
-							if (DoubleClicked != null)
-							{
-								_selection.Clear ();
-								Position pos = GetCaretPositionUnderMouseCursor(Event.current.mousePosition);
-								DoubleClicked (pos.Row, pos.Column);
-							}
+							_selection.Clear ();
 						}
+
+						if (Clicked != null)
+							Clicked(pos.Row, pos.Column, evt.clickCount);
+
 						evt.Use();
 					}
 					break;

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Engine
 {
@@ -14,10 +15,10 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		Vector2 ScrollOffset { get; set; }
 		bool HasSelection {get;}
 		Position SelectionAnchor {get; set;}
-		bool GetSelectionStart (out int row, out int column);		
+		bool GetSelectionStart (out int row, out int column);
 		bool GetSelectionEnd (out int row, out int column);
 		bool GetSelectionInDocument (out int pos, out int length);
-		System.Action<int, int> DoubleClicked {get; set;}			// row, column
+		Action<int, int, int> Clicked { get; set; }	// row, column, clickcount
 		void EnsureCursorIsVisible();
 		bool ShowCursor { get; set; }
 		void OnGUI();
