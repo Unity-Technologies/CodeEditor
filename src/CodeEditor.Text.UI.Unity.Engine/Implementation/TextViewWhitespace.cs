@@ -128,7 +128,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			int tabCounter = 0;
 			for (int i = 0; i <= text.Length; i++)
 			{
-				if (glyphCounter >= graphicalCaretColumn)
+				if (glyphCounter >= graphicalCaretColumn || i == text.Length)
 					return i;
 
 				if (text[i] == '\t')
