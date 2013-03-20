@@ -7,11 +7,29 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 	public class TextViewWhitespace : ITextViewWhitespace
 	{
 		int _spacesPerTab = 4;
-		string _dot = "\u00B7";
-		char _rightArrow = '\u2192';
+		char _visibleSpace = '\u00B7';
+		char _visibleTab = '\u2192';
 		string _tabStringWithRightArrow;
 		string[] _spaces;
 		bool _initialized;
+
+		void Init()
+		{
+			_spaces = new string[_spacesPerTab + 1];
+			for (int i = 1; i <= _spacesPerTab; ++i)
+				_spaces[i] = new string(' ', i);
+
+			StringBuilder sb = new StringBuilder(new string(' ', _spacesPerTab));
+			sb[0] = _visibleTab;
+			_tabStringWithRightArrow = sb.ToString();
+
+			_initialized = true;
+		}
+
+		public char VisibleSpaceChar { get { return _visibleSpace; } set { _visibleSpace = value; } }
+		public char VisibleTabChar { get { return _visibleTab; } set { _visibleTab = value; Init(); } }
+
+		public bool Visible { get; set; }
 
 		public int NumberOfSpacesPerTab
 		{
@@ -29,20 +47,10 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			}
 		}
 
-		void Init()
+		int TabStopSpaces(int pos)
 		{
-			_spaces = new string[_spacesPerTab + 1];
-			for (int i = 1; i <= _spacesPerTab; ++i)
-				_spaces[i] = new string(' ', i);
-
-			StringBuilder sb = new StringBuilder(new string(' ', _spacesPerTab));
-			sb[0] = _rightArrow;
-			_tabStringWithRightArrow = sb.ToString();
-
-			_initialized = true;
+			return NumberOfSpacesPerTab - ((pos) % NumberOfSpacesPerTab);
 		}
-
-		public bool Visible { get; set; }
 
 		public List<int> GetTabSizes(string baseText)
 		{
@@ -64,10 +72,13 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 			tabSizes = new List<int>();
 
+			if (Visible)
+				baseText = baseText.Replace(" ", new string(VisibleSpaceChar, 1));
+
 			StringBuilder sb = new StringBuilder(baseText.Replace("\t", _tabStringWithRightArrow));
 			for (int i=0; i<sb.Length; ++i)
 			{
-				if (sb[i] == _rightArrow)
+				if (sb[i] == VisibleTabChar)
 				{
 					int wantedSpaces = TabStopSpaces(i);
 					int removeCount = NumberOfSpacesPerTab - wantedSpaces;
@@ -81,15 +92,10 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			return sb.ToString();
 		}
 
-		int TabStopSpaces(int pos)
-		{
-			return NumberOfSpacesPerTab - ((pos) % NumberOfSpacesPerTab);
-		}
-
 		public string FormatRichText(string richText, List<int> tabSizes)
 		{
 			if (Visible)
-				richText = richText.Replace(" ", _dot);
+				richText = richText.Replace(" ", new string(VisibleSpaceChar,1));
 
 			StringBuilder sb = new StringBuilder();
 			int startIndex = 0;
@@ -104,7 +110,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 					int insertNumSpaces = tabSizes[tabCounter++];
 					sb.Append(_spaces[insertNumSpaces]);
 					if (Visible)
-						sb[sb.Length - insertNumSpaces] = _rightArrow;
+						sb[sb.Length - insertNumSpaces] = VisibleTabChar;
 					startIndex = pos + 1;
 				}
 				else

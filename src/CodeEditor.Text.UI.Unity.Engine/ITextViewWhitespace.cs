@@ -7,6 +7,8 @@ namespace CodeEditor.Text.UI.Unity.Engine
 	{
 		int NumberOfSpacesPerTab { get; set; }
 		bool Visible { get; set; }
+		char VisibleSpaceChar { get; set; }
+		char VisibleTabChar { get; set; }
 		List<int> GetTabSizes(string baseText);
 		string FormatBaseText(string baseText);
 		string FormatBaseText(string baseText, out List<int> tabSizes);
