@@ -2,9 +2,7 @@
 * move File search also to the server (using the client search only as a fallback)
 * rename all Implementation folders to Internal
 * rename all gradle files to build.gradle
-* integrate undo
 * multi level undo
 * fix dead keys on osx
-* adjust spacing according to font size
 * register MonoScript inspector
 
