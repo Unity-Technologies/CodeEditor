@@ -50,6 +50,7 @@ vs {
 		}
 
 		def framework = categorize { p -> frameworkProjects.any({ p.path.startsWith(it) }) }
+		def monitoring = categorize { it.name.contains('Monitoring') }
 		def navigateTo = categorize { it.name.contains('NavigateTo') }
 		def language = categorize { it.name.contains('Languages') }
 
@@ -62,6 +63,11 @@ vs {
 			folder('Features') { features ->
 				features.folder('NavigateTo') { f ->
 					navigateTo.each {
+						f.project(it.path)
+					}
+				}
+				features.folder('Monitoring') { f ->
+					monitoring.each {
 						f.project(it.path)
 					}
 				}

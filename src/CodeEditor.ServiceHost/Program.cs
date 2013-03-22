@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -51,12 +52,12 @@ namespace CodeEditor.ServiceHost
 		public class AppHost : AppHostHttpListenerBase
 		{
 			public AppHost(Assembly[] assemblies)
-				: base(typeof(AppHost).Namespace, assemblies.Where(_ => _.References(typeof(IService).Assembly)).ToArray())
+				: base(typeof(AppHost).Namespace, AssembliesWithServicesFrom(assemblies))
 			{
 				CompositionContainer = new CompositionContainer(AssemblyCatalog.For(assemblies));
 			}
 
-			protected CompositionContainer CompositionContainer { get; private set; }
+			CompositionContainer CompositionContainer { get; set; }
 
 			public override void Configure(Container container)
 			{
@@ -79,13 +80,22 @@ namespace CodeEditor.ServiceHost
 					var singleOrDefaultExport = _compositionContainer.GetExports(typeof(T)).SingleOrDefault();
 					if (singleOrDefaultExport == null)
 						return default(T);
-					return (T) singleOrDefaultExport.Value;
+					return (T)singleOrDefaultExport.Value;
 				}
 
 				T IContainerAdapter.Resolve<T>()
 				{
 					return _compositionContainer.GetExportedValue<T>();
 				}
+			}
+
+			static Assembly[] AssembliesWithServicesFrom(IEnumerable<Assembly> assemblies)
+			{
+				var serviceInterfaceAssembly = typeof(IService).Assembly;
+				var serviceAssembly = typeof(ServiceStack.ServiceInterface.Service).Assembly;
+				return assemblies
+					.Where(_ => _.References(serviceInterfaceAssembly) || _.References(serviceAssembly))
+					.ToArray();
 			}
 		}
 	}

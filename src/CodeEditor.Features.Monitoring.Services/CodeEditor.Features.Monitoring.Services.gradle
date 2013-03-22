@@ -1,0 +1,6 @@
+version = '0.1.0'
+
+dependencies {
+	'default' rootProject.references.serviceStack
+	'default' project(':CodeEditor.ContentTypes')
+}
