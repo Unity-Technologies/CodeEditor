@@ -1,10 +1,9 @@
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using CodeEditor.Composition;
 using CodeEditor.IO;
 using CodeEditor.Logging;
 using CodeEditor.Reactive;
+using ServiceStack.Net30.Collections.Concurrent;
 
 namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 {
@@ -37,48 +36,51 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 
 	class SourceSymbolIndex : ISourceSymbolIndex
 	{
-		readonly IFolder _assetsFolder;
 		readonly ISourceSymbolProviderSelector _symbolProviderSelector;
+		readonly IObservableX<IFileNotification> _sourceFileNotifications;
+		readonly ConcurrentDictionary<IFile, ISourceSymbol[]> _sourceFileIndices = new ConcurrentDictionary<IFile, ISourceSymbol[]>();
+		readonly ILogger _logger;
 
-		IObservableX<ISourceSymbol> _allSymbols;
-
-		public SourceSymbolIndex(IFolder assetsFolder, ISourceSymbolProviderSelector symbolProviderSelector)
+		public SourceSymbolIndex(ISourceSymbolProviderSelector symbolProviderSelector, IObservableX<IFileNotification> sourceFileNotifications, ILogger logger)
 		{
-			_assetsFolder = assetsFolder;
+			_sourceFileNotifications = sourceFileNotifications;
+			_logger = logger;
 			_symbolProviderSelector = symbolProviderSelector;
 		}
 
 		public IObservableX<ISourceSymbol> SearchSymbol(string filter)
 		{
-			if (string.IsNullOrEmpty(filter))
-				return _allSymbols;
-			return _allSymbols
-				.Where(symbol => symbol.DisplayText.Contains(filter));
+			return string.IsNullOrEmpty(filter)
+				? AllSymbols
+				: AllSymbols.Where(symbol => symbol.DisplayText.Contains(filter));
+		}
+
+		IObservableX<ISourceSymbol> AllSymbols
+		{
+			get { return _sourceFileIndices.Values.ToObservableX().SelectMany(_ => _); }
 		}
 
 		public void Start()
 		{
-			_allSymbols = SymbolsFromSourceFiles().Merge().SelectMany(_ => _);
+			_sourceFileNotifications
+				.ObserveOnThreadPool()
+				.Subscribe(OnSourceFileNotification);
 		}
 
-		List<IObservableX<ISourceSymbol[]>> SymbolsFromSourceFiles()
+		void OnSourceFileNotification(IFileNotification notification)
 		{
-			return SourceFiles.Select(file => ObservableSymbolsOf(file)).ToList();
-		}
-
-		protected IEnumerable<IFile> SourceFiles
-		{
-			get { return _assetsFolder.GetFiles("*.cs", SearchOption.AllDirectories); }
-		}
-
-		IObservableX<ISourceSymbol[]> ObservableSymbolsOf(IFile file)
-		{
-			return ObservableX.Start(() => SourceSymbolsFor(file));
+			Log(notification);
+			_sourceFileIndices.AddOrUpdate(notification.File, SourceSymbolsFor, (file, oldValue) => SourceSymbolsFor(file));
 		}
 
 		ISourceSymbol[] SourceSymbolsFor(IFile file)
 		{
 			return _symbolProviderSelector.SourceSymbolsFor(file);
+		}
+
+		void Log(object o)
+		{
+			_logger.Log(o);
 		}
 	}
 
@@ -86,10 +88,13 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 	class SourceSymbolIndexProvider : ISourceSymbolIndexProvider
 	{
 		[Import]
-		public IUnityAssetsFolderProvider AssetsFolderProvider { get; set; }
+		public ISourceFilesProvider SourceFilesProvider { get; set; }
 
 		[Import]
 		public ISourceSymbolProviderSelector SymbolProviderSelector { get; set; }
+
+		[Import]
+		public ILogger Logger { get; set; }
 
 		public ISourceSymbolIndex Index
 		{
@@ -105,7 +110,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 
 		ISourceSymbolIndex CreateIndex()
 		{
-			var project = new SourceSymbolIndex(AssetsFolderProvider.AssetsFolder, SymbolProviderSelector);
+			var project = new SourceSymbolIndex(SymbolProviderSelector, SourceFilesProvider.SourceFiles, Logger);
 			project.Start();
 			return project;
 		}

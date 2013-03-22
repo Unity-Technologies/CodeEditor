@@ -8,12 +8,14 @@ namespace CodeEditor.ContentTypes.Tests
 	[TestFixture]
 	public class ContentTypeRegistryTest
 	{
-		private IContentTypeRegistry _registry;
+		IContentTypeRegistry _registry;
 
 		[SetUp]
 		public void SetUp()
 		{
-			var container = new CompositionContainer(AssemblyOf<IContentTypeSpecificService>(), AssemblyOf<IContentTypeRegistry>());
+			var container = new CompositionContainer(
+				AssemblyOf<IContentTypeSpecificService>(),
+				AssemblyOf<IContentTypeRegistry>());
 			_registry = container.GetExportedValue<IContentTypeRegistry>();
 		}
 
@@ -35,8 +37,10 @@ namespace CodeEditor.ContentTypes.Tests
 		[Test]
 		public void TextContentTypeIsAvailable()
 		{
-			Assert.AreEqual("text", _registry.ForName("text").Name);
+			var contentType = _registry.ForName("text");
+			Assert.AreEqual("text", contentType.Name);
 			Assert.AreEqual("text", _registry.ForFileExtension(".txt").Name);
+			Assert.AreEqual(new[] {".txt"}, _registry.FileExtensionsFor(contentType));
 		}
 
 		[Test]
@@ -45,7 +49,7 @@ namespace CodeEditor.ContentTypes.Tests
 			Assert.IsNull(_registry.ForName("bagoonfleskish"));
 		}
 
-		private static Assembly AssemblyOf<T>()
+		static Assembly AssemblyOf<T>()
 		{
 			return typeof(T).Assembly;
 		}

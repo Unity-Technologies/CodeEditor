@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using CodeEditor.Composition;
 using CodeEditor.Composition.Primitives;
 
@@ -32,7 +33,19 @@ namespace CodeEditor.ContentTypes.Internal
 				: new ContentType(ExportProvider, contentTypeName, definition);
 		}
 
-		private IContentTypeDefinition ContentTypeDefinitionForName(string contentTypeName)
+		public IEnumerable<IContentType> ContentTypes
+		{
+			get { return ContentTypeDefinitions.Select(_ => ForName(_.Metadata.ContentTypeName)); }
+		}
+
+		public IEnumerable<string> FileExtensionsFor(IContentType contentType)
+		{
+			return FileExtensions
+				.Where(_ => _.Metadata.ContentTypeName == contentType.Name)
+				.Select(_ => _.Metadata.FileExtension);
+		}
+
+		IContentTypeDefinition ContentTypeDefinitionForName(string contentTypeName)
 		{
 			return ContentTypeDefinitions
 				.Where(d => d.Metadata.ContentTypeName == contentTypeName)
@@ -40,7 +53,7 @@ namespace CodeEditor.ContentTypes.Internal
 				.SingleOrDefault();
 		}
 
-		private string ContentTypeNameFromFileExtension(string fileExtension)
+		string ContentTypeNameFromFileExtension(string fileExtension)
 		{
 			return FileExtensions
 				.Where(e => e.Metadata.FileExtension == fileExtension)

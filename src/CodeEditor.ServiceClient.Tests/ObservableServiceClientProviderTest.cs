@@ -31,6 +31,8 @@ namespace CodeEditor.ServiceClient.Tests
 				.Setup(_ => _.FileFor(serverUrilFile))
 				.Returns(uriFile.Object);
 
+			// throw IOException when provider tries to delete the file
+			// to signal server is already running
 			uriFile
 				.Setup(_ => _.Delete())
 				.Throws(new IOException());

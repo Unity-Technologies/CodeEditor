@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CodeEditor.Composition;
 
 namespace CodeEditor.ContentTypes
@@ -32,6 +33,11 @@ namespace CodeEditor.ContentTypes
 		public static T GetService<T>(this IContentType contentType)
 		{
 			return (T)contentType.GetService(typeof(T));
+		}
+
+		public static bool HasService<T>(this IContentType contentType)
+		{
+			return contentType.GetService(typeof(T)) != null;
 		}
 	}
 
@@ -92,6 +98,9 @@ namespace CodeEditor.ContentTypes
 			FileExtension = fileExtension;
 		}
 
+		/// <summary>
+		/// File extension including the leading dot.
+		/// </summary>
 		public string FileExtension { get; private set; }
 		public string ContentTypeName { get; private set; }
 	}
@@ -128,6 +137,8 @@ namespace CodeEditor.ContentTypes
 	{
 		IContentType ForFileExtension(string fileExtension);
 		IContentType ForName(string contentTypeName);
+		IEnumerable<IContentType> ContentTypes { get; }
+		IEnumerable<string> FileExtensionsFor(IContentType contentType);
 	}
 
 	public static class ContentTypeRegistryExtensions

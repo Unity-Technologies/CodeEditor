@@ -7,6 +7,7 @@ dependencies {
 	[
 		':CodeEditor.Features.NavigateTo.SourceSymbols.ServiceInterface',
 		':CodeEditor.IO',
+		':CodeEditor.Logging',
 		':CodeEditor.Composition',
 		':CodeEditor.ContentTypes',
 		':CodeEditor.Reactive',

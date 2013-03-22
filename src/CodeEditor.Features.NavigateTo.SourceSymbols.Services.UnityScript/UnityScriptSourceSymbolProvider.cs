@@ -1,11 +1,16 @@
 using System.Collections.Generic;
 using Boo.Lang.Compiler;
 using Boo.Lang.Compiler.Ast;
+using CodeEditor.Composition;
+using CodeEditor.ContentTypes;
 using CodeEditor.IO;
+using CodeEditor.Languages.UnityScript.ContentType;
 using UnityScript.Parser;
 
 namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.UnityScript
 {
+	[Export(typeof(ISourceSymbolProvider))]
+	[ContentType(UnityScriptContentType.Name)]
 	public class UnityScriptSourceSymbolProvider : ISourceSymbolProvider
 	{
 		public ISourceSymbol[] SourceSymbolsFor(IFile file)
