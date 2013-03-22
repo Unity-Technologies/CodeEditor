@@ -18,7 +18,7 @@ namespace CodeEditor.Composition
 			return new Lazy<T, TMetadata>(() => (T)untyped(), metadata);
 		}
 
-		private readonly TMetadata _metadata;
+		readonly TMetadata _metadata;
 
 		public Lazy(Func<T> valueFactory, TMetadata metadata) : base(valueFactory)
 		{
@@ -31,16 +31,16 @@ namespace CodeEditor.Composition
 		}
 	}
 
-	public class Lazy<T> where T : class
+	public class Lazy<T> where T: class
 	{
 		public static Lazy<T> FromUntyped(Func<object> untyped)
 		{
 			return new Lazy<T>(() => (T)untyped());
 		}
 
-		private Func<T> _valueFactory;
-		private bool _hasValue;
-		private T _value;
+		Func<T> _valueFactory;
+		bool _hasValue;
+		T _value;
 
 		public Lazy(Func<T> valueFactory)
 		{
