@@ -4,6 +4,8 @@ An embedded text editor for [Unity](http://unity3d.com/).
 
 ## Hacking
 
+Join the [conversation](https://groups.google.com/forum/?fromgroups#!forum/codeeditor).
+
     git clone it
     cd CodeEditor
     ./gradlew assemble vs test
