@@ -19,5 +19,5 @@ dependencies {
 		'default' rootProject.references.boo(it)
 	}
 
-	'default' 'unityscript:UnityScript:0.1.3'
+	'default' 'unityscript:UnityScript:0.1.4'
 }

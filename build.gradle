@@ -125,9 +125,9 @@ ext {
 	references = [
 		'nunitFramework': "nunit:nunit.framework:${nunit.version}",
 		'moq': 'Moq:Moq:4.0+',
-		'adt': 'boo-extensions:Boo.Adt:0.1.1+',
-		'ometa': 'boo-extensions:Boo.OMeta:0.1.1+',
-		'boo': { assembly -> "boo:$assembly:0.9.6+" },
+		'adt': 'boo-extensions:Boo.Adt:0.1.3+',
+		'ometa': 'boo-extensions:Boo.OMeta:0.1.3+',
+		'boo': { assembly -> "boo:$assembly:0.9.7+" },
 		'unityEngine': unityAssembly('UnityEngine'),
 		'unityEditor': [
 			unityAssembly('UnityEngine'),
