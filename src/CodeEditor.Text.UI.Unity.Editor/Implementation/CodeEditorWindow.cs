@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using CodeEditor.Text.Data;
 using CodeEditor.Text.UI.Completion;
 using CodeEditor.Text.UI.Unity.Engine;
+using CodeEditor.Text.UI.Unity.Engine.Implementation;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		{
 			public int caretRow, caretColumn;
 			public Vector2 scrollOffset;
-			public Vector2 selectionAnchor; // argh: Unity cannot serialize Position since its a struct... so we store it as a Vector2
+			public Vector2 selectionAnchor; // argh: Unity cannot serialize Position since its a custom struct... so we store it as a Vector2
 		}
 	
 		// Serialized fields (between assembly reloads but NOT between sessions)
@@ -24,12 +25,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		string _filePath;
 		string _fileNameWithExtension;
 		BackupData _backupData;
-
-		// Serialized fields (between assembly reloads AND between sessions)
-		[SerializeField]
-		int _selectedFontSize = 14;
-		[SerializeField]
-		int _numberOfSpacesPerTab = 4;
+		bool _showingSettings;
 
 		// Non serialized fields (reconstructed from serialized state above or recreated when needed)
 		// ---------------------
@@ -37,6 +33,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		CodeView _codeView;
 		[NonSerialized]
 		ITextView _textView;
+		[NonSerialized]
+		SettingsDialog _settingsDialog;
 		[NonSerialized]
 		int[] _fontSizes = null;
 		[NonSerialized]
@@ -47,9 +45,10 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		class Styles
 		{
 			public GUIContent saveText = new GUIContent ("Save");
-			public GUIContent showWhitespace = new GUIContent("Show Whitespace");
+			public GUIContent optionsIcon = new GUIContent("",EditorGUIUtility.FindTexture("_Popup"));
 		}
 		static Styles s_Styles;
+	
 
 		static public CodeEditorWindow OpenOrFocusExistingWindow()
 		{
@@ -138,8 +137,10 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				OpenFile(_filePath, _backupData.caretRow, _backupData.caretColumn);
 				_textView.ScrollOffset = _backupData.scrollOffset;
 				_textView.SelectionAnchor = new Position((int)_backupData.selectionAnchor.y, (int)_backupData.selectionAnchor.x);
-				_textView.Appearance.SetFontSize(_selectedFontSize);
 			}
+
+			if (_settingsDialog == null && _textView != null)
+				_settingsDialog = new SettingsDialog(_textView);
 		}
 
 		void SetPosition(int row, int column)
@@ -154,9 +155,13 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			const float topAreaHeight = 30f;
 			Rect topAreaRect = new Rect (0,0, position.width, topAreaHeight);
 			Rect codeViewRect = new Rect(0, topAreaHeight, position.width, position.height - topAreaHeight);
-			
+
+			BeginWindows();
+			if (_showingSettings)
+				_settingsDialog.OnGUI(codeViewRect);
 			TopArea(topAreaRect);
 			CodeViewArea(codeViewRect);
+			EndWindows();
 
 			BackupState ();
 		}
@@ -175,7 +180,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 			if(_fontSizes == null)
 			{
-				_fontSizes = _textView.Appearance.GetSupportedFontSizes();
+				_fontSizes = _textView.FontManager.GetCurrentFontSizes();
 				var names = new List<string>();
 				foreach(int size in _fontSizes)
 					names.Add(size.ToString());
@@ -190,27 +195,18 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				{
 					GUILayout.Space(10f);
 					
-					GUILayout.Label (_fileNameWithExtension);
-				
-					GUILayout.FlexibleSpace();
-
-					_numberOfSpacesPerTab = EditorGUILayout.IntField(_numberOfSpacesPerTab, GUILayout.Width(40));
-					_numberOfSpacesPerTab = Mathf.Max(_numberOfSpacesPerTab, 1);
-					_textView.Whitespace.NumberOfSpacesPerTab = _numberOfSpacesPerTab;
-					GUILayout.Space(6);
-
-					_textView.Whitespace.Visible = GUILayout.Toggle(_textView.Whitespace.Visible, GUIContent.none);
-					GUILayout.Space(6);
-
-					EditorGUI.BeginChangeCheck();
-					_selectedFontSize = EditorGUILayout.IntPopup(_selectedFontSize, _fontSizesNames, _fontSizes, GUILayout.Width(40));
-					if(EditorGUI.EndChangeCheck())
-						AppearanceChanged();
-
-					GUILayout.Space(6);
-
 					if (GUILayout.Button(s_Styles.saveText, EditorStyles.miniButton))
 						_textView.Document.Save();
+					GUILayout.FlexibleSpace();
+
+					GUILayout.Label(_fileNameWithExtension);
+
+					GUILayout.FlexibleSpace();
+
+					if (GUILayout.Button(s_Styles.optionsIcon, EditorStyles.label))
+					{
+						_showingSettings = !_showingSettings;
+					}
 
 					GUILayout.Space(10f);
 
@@ -218,11 +214,6 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				GUILayout.FlexibleSpace();
 				GUILayout.EndVertical ();
 			} GUILayout.EndArea();
-		}
-
-		private void AppearanceChanged()
-		{
-			_textView.Appearance.SetFontSize(_selectedFontSize);
 		}
 
 		void BackupState ()
@@ -248,15 +239,15 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				Event.current.Use();
 	
 				int sign = Event.current.delta.y > 0 ? -1 : 1;
-				int orgSize = _selectedFontSize;
-				int index = Array.IndexOf(_fontSizes, _selectedFontSize);
+				int orgSize = _textView.FontManager.CurrentFontSize;
+				int index = Array.IndexOf(_fontSizes, orgSize);
 
 				index = Mathf.Clamp(index + sign, 0, _fontSizes.Length-1);
-				_selectedFontSize = _fontSizes[index];
+				int newSize = _fontSizes[index];
 
-				if (_selectedFontSize != orgSize)
+				if (newSize != orgSize)
 				{
-					AppearanceChanged();
+					_textView.FontManager.CurrentFontSize = newSize;
 					GUI.changed = true;
 				}
 

@@ -2,6 +2,15 @@ using System;
 using CodeEditor.Composition;
 using CodeEditor.IO;
 
+/*
+ Notes:
+ * Considerations when adding new Imports:
+ *	- Is the component stateless? if so it can be reused in all CreateView calls (can be a singleton)
+ *	- If not then create a Provider that creates a new instance for the textview
+ *	- E.g Settings live per textview (reads/writes from/to global prefs but once in memory it has its own state -> this way we can have multiple CodeEditorWindows)
+ *  - All components that uses settings (state) needs to be owned by textview and should have a Provider
+ */
+
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 {
 	[Export(typeof(ITextViewFactory))]
@@ -12,15 +21,27 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		[Import]
 		ITextViewAppearanceProvider AppearanceProvider { get; set; }
+		
+		[Import]
+		IFontManagerProvider FontManagerProvider { get; set; }
+
+		[Import]
+		IDefaultTextViewMarginsProvider DefaultTextViewMarginsProvider { get; set; }
+
+		[Import]
+		ITextViewWhitespaceProvider WhitespaceProvider { get; set; }
+
+		[Import]
+		ISettingsProvider SettingsProvider { get; set; }
+
+		[Import]
+		IPreferences Preferences { get; set; }
 
 		[Import]
 		IFileSystem FileSystem { get; set; }
 
 		[Import]
 		ITextViewAdornments Adornments { get; set; }
-
-		[Import]
-		IDefaultTextViewMarginsProvider DefaultTextViewMarginsProvider { get; set; }
 
 		[Import]
 		IMouseCursorRegions MouseCursorRegions { get; set; }
@@ -42,7 +63,9 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		{
 			var file = options.File ?? TransientTextFile();
 			var document = DocumentFor(file);
-			var textView = new TextView(document, AppearanceFor(document), Adornments, MouseCursors, MouseCursorRegions);
+			var settings = SettingsProvider.GetSettings(Preferences);
+			var fontManager = FontManagerProvider.GetFontManager(settings);
+			var textView = new TextView(document, AppearanceFor(document, fontManager), Adornments, MouseCursors, MouseCursorRegions, WhiteSpace(settings), settings, fontManager);
 			textView.Margins = options.Margins ?? DefaultMarginsFor(textView);
 			return textView;
 		}
@@ -57,9 +80,14 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			return DocumentFactory.DocumentForFile(file);
 		}
 
-		private ITextViewAppearance AppearanceFor(ITextViewDocument document)
+		private ITextViewWhitespace WhiteSpace(ISettings settings)
 		{
-			return AppearanceProvider.AppearanceFor(document);
+			return WhitespaceProvider.GetWhitespace(settings);
+		}
+
+		private ITextViewAppearance AppearanceFor(ITextViewDocument document, IFontManager fontManager)
+		{
+			return AppearanceProvider.AppearanceFor(document, fontManager);
 		}
 
 		private ITextViewMargins DefaultMarginsFor(ITextView textView)

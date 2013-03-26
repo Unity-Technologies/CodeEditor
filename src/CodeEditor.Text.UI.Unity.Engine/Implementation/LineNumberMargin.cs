@@ -1,3 +1,4 @@
+using CodeEditor.Composition;
 using CodeEditor.Text.Data;
 using UnityEngine;
 
@@ -8,16 +9,19 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		private readonly ITextViewAppearance _appearance;
 		private readonly ITextBuffer _buffer;
 		private float _width;
+		BoolSetting _visibilitySetting;
 
-		public LineNumberMargin(ITextView textView)
+		public LineNumberMargin(ITextView textView, BoolSetting visibilitySetting)
 		{
 			_appearance = textView.Appearance;
 			_appearance.Changed += (sender, args) => CalculateWidth();
 			_buffer = textView.Document.Buffer;
 			_buffer.Changed += (sender, args) => CalculateWidth();
-
 			CalculateWidth();
+			_visibilitySetting = visibilitySetting;
 		}
+
+		public bool Visible { get { return _visibilitySetting.Value;  } set {_visibilitySetting.Value = value;} }
 
 		private void CalculateWidth()
 		{

@@ -31,6 +31,8 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		{
 			foreach (var margin in Margins)
 			{
+				if (!margin.Visible)
+					continue;
 				lineRect.x += Spacing;
 				lineRect.width = margin.Width;
 
@@ -41,7 +43,20 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		public float TotalWidth
 		{
-			get { return Margins.Sum(m => m.Width) + Spacing * (Margins.Length + 1); }
+			get
+			{
+				float totalWidth = 0;
+				int count = 0;
+				foreach (var margin in Margins)
+				{
+					if (!margin.Visible)
+						continue;
+					totalWidth += margin.Width;
+					count++;
+				}
+				return count == 0 ? 0 : totalWidth + Spacing * (count + 1); 
+			}
+
 		}
 	}
 }

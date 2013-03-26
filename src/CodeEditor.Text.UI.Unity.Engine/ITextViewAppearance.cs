@@ -5,8 +5,6 @@ namespace CodeEditor.Text.UI.Unity.Engine
 {
 	public interface ITextViewAppearance
 	{
-		int[] GetSupportedFontSizes();
-		void SetFontSize(int fontSize);
 		GUIStyle Background { get; }
 		GUIStyle Text { get; }
 		GUIStyle LineNumber { get; }

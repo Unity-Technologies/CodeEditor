@@ -24,22 +24,34 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		readonly ITextViewAppearance _appearance;
 		readonly ITextViewAdornments _adornments;
 		readonly ITextViewWhitespace _whitespace;
+		readonly IFontManager _fontManager;
 		readonly Selection _selection;
 		readonly IMouseCursors _mouseCursors;
 		readonly IMouseCursorRegions _mouseCursorsRegions;
+		readonly ISettings _settings;
 		public Action<int, int, int> Clicked {get; set;}
 		public bool ShowCursor { get; set; }
 
-		public TextView(ITextViewDocument document, ITextViewAppearance appearance, ITextViewAdornments adornments, IMouseCursors mouseCursors, IMouseCursorRegions mouseCursorRegions)
+		public TextView(
+			ITextViewDocument document,
+			ITextViewAppearance appearance,
+			ITextViewAdornments adornments,
+			IMouseCursors mouseCursors,
+			IMouseCursorRegions mouseCursorRegions,
+			ITextViewWhitespace whitespace,
+			ISettings settings, 
+			IFontManager fontManager)
 		{
 			_appearance = appearance;
 			_adornments = adornments;
 			_document = document;
 			_mouseCursors = mouseCursors;
 			_mouseCursorsRegions = mouseCursorRegions;
+			_whitespace = whitespace;
+			_settings = settings;
+			_fontManager = fontManager;
 			_selection = new Selection(document.Caret);
 			_document.Caret.Moved += EnsureCursorIsVisible;
-			_whitespace = new TextViewWhitespace(); // TODO: pass in
 		}
 
 		public ITextViewMargins Margins { get; set; }
@@ -49,6 +61,16 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		public ITextViewWhitespace Whitespace 
 		{
 			get { return _whitespace; } 
+		}
+
+		public IFontManager FontManager 
+		{
+			get { return _fontManager; } 
+		}
+
+		public ISettings Settings
+		{
+			get { return _settings; }
 		}
 
 		public Vector2 ScrollOffset { get; set; }
@@ -61,6 +83,16 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		public ITextViewAppearance Appearance
 		{
 			get { return _appearance; }
+		}
+
+		public IMouseCursors MouseCursors
+		{
+			get { return _mouseCursors; }
+		}
+
+		public IMouseCursorRegions MouseCursorsRegions
+		{
+			get { return _mouseCursorsRegions;}
 		}
 
 		public float LineHeight
@@ -341,7 +373,6 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			List<int> tabSizes;
 			string baseTextFormatted = Whitespace.FormatBaseText(line.Text, out tabSizes);
 			string renderText = Whitespace.FormatRichText(line.RichText, tabSizes);
-
 			LineStyle.Draw(lineRect, MissingEngineAPI.GUIContent_Temp(renderText), controlID);
 
 			if (ShowCursor && row == CaretRow)

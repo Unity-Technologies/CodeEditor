@@ -5,6 +5,6 @@ namespace CodeEditor.Text.UI.Unity.Engine
 	/// </summary>
 	public interface ITextViewAppearanceProvider
 	{
-		ITextViewAppearance AppearanceFor(ITextViewDocument document);
+		ITextViewAppearance AppearanceFor(ITextViewDocument document, IFontManager fontManager);
 	}
 }

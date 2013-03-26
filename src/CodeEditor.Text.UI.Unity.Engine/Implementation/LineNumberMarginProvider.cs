@@ -1,4 +1,5 @@
 using CodeEditor.Composition;
+using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 {
@@ -7,7 +8,8 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 	{
 		public ITextViewMargin MarginFor(ITextView textView)
 		{
-			return new LineNumberMargin(textView);
+			var visibilitySetting = new BoolSetting ("LineNumberVisiblitySetting", true, textView.Settings);
+			return new LineNumberMargin(textView, visibilitySetting);
 		}
 	}
 }

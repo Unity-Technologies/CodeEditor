@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
@@ -6,46 +6,43 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 {
 	public class TextViewWhitespace : ITextViewWhitespace
 	{
-		int _spacesPerTab = 4;
-		char _visibleSpace = '\u00B7';
-		char _visibleTab = '\u2192';
+		char _visibleSpaceChar = '\u00B7';
+		char _visibleTabChar = '\u2192';
 		string _tabStringWithRightArrow;
 		string[] _spaces;
 		bool _initialized;
+		BoolSetting _showWhitespace;
+		IntSetting _numSpacesPerTab;
+
+		public TextViewWhitespace(ISettings settings, BoolSetting showWhitespace, IntSetting numSpacesPerTab)
+		{
+			_showWhitespace = showWhitespace;
+			_numSpacesPerTab = numSpacesPerTab;
+			_numSpacesPerTab.Changed += (sender, args) => Init();
+
+			if (_numSpacesPerTab.Value < 1)
+				_numSpacesPerTab.Value = 1;
+		}
 
 		void Init()
 		{
-			_spaces = new string[_spacesPerTab + 1];
-			for (int i = 1; i <= _spacesPerTab; ++i)
+			_numSpacesPerTab.Value = Mathf.Max(_numSpacesPerTab.Value, 1);
+
+			_spaces = new string[_numSpacesPerTab.Value + 1];
+			for (int i = 1; i <= _numSpacesPerTab.Value; ++i)
 				_spaces[i] = new string(' ', i);
 
-			StringBuilder sb = new StringBuilder(new string(' ', _spacesPerTab));
-			sb[0] = _visibleTab;
+			StringBuilder sb = new StringBuilder(new string(' ', _numSpacesPerTab.Value));
+			sb[0] = _visibleTabChar;
 			_tabStringWithRightArrow = sb.ToString();
 
 			_initialized = true;
 		}
 
-		public char VisibleSpaceChar { get { return _visibleSpace; } set { _visibleSpace = value; } }
-		public char VisibleTabChar { get { return _visibleTab; } set { _visibleTab = value; Init(); } }
-
-		public bool Visible { get; set; }
-
-		public int NumberOfSpacesPerTab
-		{
-			get 
-			{
-				return _spacesPerTab;
-			}
-			set 
-			{
-				if (_spacesPerTab != value)
-				{
-					_spacesPerTab = Mathf.Max(value, 1);
-					Init();
-				}
-			}
-		}
+		public char VisibleSpaceChar { get { return _visibleSpaceChar; } set { _visibleSpaceChar = value; } }
+		public char VisibleTabChar { get { return _visibleTabChar; } set { _visibleTabChar = value; Init(); } }
+		public bool Visible { get { return _showWhitespace.Value;} set{ _showWhitespace.Value = value;} }
+		public int NumberOfSpacesPerTab { get { return _numSpacesPerTab.Value; } set { _numSpacesPerTab.Value = value; } }
 
 		int TabStopSpaces(int pos)
 		{

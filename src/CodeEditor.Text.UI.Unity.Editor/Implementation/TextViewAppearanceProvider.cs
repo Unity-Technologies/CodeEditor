@@ -9,9 +9,9 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 	[Export(typeof(ITextViewAppearanceProvider))]
 	class TextViewAppearanceProvider : ITextViewAppearanceProvider
 	{
-		public ITextViewAppearance AppearanceFor(ITextViewDocument document)
+		public ITextViewAppearance AppearanceFor(ITextViewDocument document, IFontManager fontManager)
 		{
-			return new TextViewAppearance();
+			return new TextViewAppearance(fontManager);
 		}
 	}
 
@@ -22,14 +22,14 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		private readonly GUIStyle _lineNumber;
 		private readonly Color _lineNumberColor;
 		private readonly Color _selectionColor;
-		private Font[] _availableFonts;
-		private int[] _availableFontSizes;
+		private readonly IFontManager _fontManager;
 
 		public event EventHandler Changed;
 
-		public TextViewAppearance()
+		public TextViewAppearance(IFontManager fontManager)
 		{
-			FindAvailableFontSizes();
+			_fontManager = fontManager;
+			_fontManager.Changed += (Sender, Args) => OnFontChanged();
 
 			_background = "AnimationCurveEditorBackground";
 			string userSkinPath = "Assets/Editor/CodeEditor/CodeEditorSkin.guiskin";
@@ -62,30 +62,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			_lineNumberColor = new Color(1, 1, 1, 0.5f);
 
 			_selectionColor = new Color(80/255f, 80/255f, 80/255f, 1f);
-		}
 
-		void FindAvailableFontSizes()
-		{
-			string fontBasePath = "Assets/Editor/CodeEditor/Fonts/"; // TODO make this not so hardcoded...
-			string fontName = "SourceCodePro-Regular";
-			List<Font> fonts = new List<Font>();
-			List<int> fontSizes = new List<int>();
-
-			// Search for font sizes in the following range:
-			const int minFontSize = 6;
-			const int maxFontSize = 40;
-			for (int i = minFontSize; i <= maxFontSize; ++i)
-			{
-				string fontPath = System.IO.Path.Combine(fontBasePath, fontName + i + ".ttf");
-				Font font = UnityEditor.AssetDatabase.LoadAssetAtPath(fontPath, typeof(Font)) as Font;
-				if (font != null)
-				{
-					fonts.Add(font);
-					fontSizes.Add(i);
-				}
-			}
-			_availableFonts = fonts.ToArray();
-			_availableFontSizes = fontSizes.ToArray();
+			_text.font = _lineNumber.font = _fontManager.CurrentFont;
 		}
 
 		protected void OnChanged()
@@ -94,20 +72,10 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				Changed(this, EventArgs.Empty);
 		}
 
-		public int[] GetSupportedFontSizes()
+		void OnFontChanged()
 		{
-			return _availableFontSizes;
-		}
-
-		public void SetFontSize(int fontSize)
-		{
-			int index = Array.IndexOf(_availableFontSizes, fontSize);
-			if(index >= 0)
-			{
-				_text.font = _availableFonts[index];
-				_lineNumber.font = _text.font;
-				OnChanged();
-			}
+			_text.font = _lineNumber.font = _fontManager.CurrentFont;
+			OnChanged();
 		}
 
 		public GUIStyle Background

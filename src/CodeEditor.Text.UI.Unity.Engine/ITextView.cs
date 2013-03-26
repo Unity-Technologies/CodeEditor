@@ -8,9 +8,14 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		ITextViewDocument Document { get; }
 		ITextViewAppearance Appearance { get; }
 		ITextViewWhitespace Whitespace { get; }
+		ITextViewMargins Margins { get; }
+		ISettings Settings { get; }
+		IMouseCursorRegions MouseCursorsRegions { get; }
+		IMouseCursors MouseCursors  { get ; }
+		IFontManager FontManager { get; }
+		
 		float LineHeight { get; }
 		Rect SpanForCurrentCharacter();
-
 		Rect ViewPort { get; set; }
 		Vector2 ScrollOffset { get; set; }
 		bool HasSelection {get;}

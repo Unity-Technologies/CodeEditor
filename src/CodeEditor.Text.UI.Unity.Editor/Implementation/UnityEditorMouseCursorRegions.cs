@@ -8,11 +8,13 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 	[Export(typeof(IMouseCursors))]
 	class UnityEditorMouseCursors: IMouseCursorRegions, IMouseCursors
 	{
+		public IMouseCursor Arrow { get; private set; }
 		public IMouseCursor Text { get; private set; }
 		public IMouseCursor Finger { get; private set; }
 
 		public UnityEditorMouseCursors()
 		{
+			Arrow = new UnityEditorMouseCursor(UnityEditor.MouseCursor.Arrow);
 			Text = new UnityEditorMouseCursor(UnityEditor.MouseCursor.Text);
 			Finger = new UnityEditorMouseCursor(UnityEditor.MouseCursor.Orbit);// UnityEditor api lacks a finger mouse cursor
 		}

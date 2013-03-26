@@ -15,6 +15,7 @@ namespace CodeEditor.Text.UI.Unity.Engine
 	/// </summary>
 	public interface IMouseCursors
 	{
+		IMouseCursor Arrow { get; }
 		IMouseCursor Text { get; }
 		IMouseCursor Finger { get; }
 	}
