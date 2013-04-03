@@ -8,7 +8,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath 'kaizen:kaizen:0.3.1'
+		classpath 'kaizen:kaizen:0.3.2'
 	}
 }
 
@@ -104,6 +104,7 @@ configurations {
 }
 
 apply plugin: 'assembly-bundle'
+apply plugin: 'project-refactorings'
 apply plugin: 'nunit'
 apply plugin: 'idea'
 
@@ -267,63 +268,3 @@ task open {
 	}
 }
 
-def fileReplace(File file, pattern, replacementPattern) {
-	def oldText = file.text
-	def newText = oldText.replaceAll(pattern, replacementPattern)
-	if (oldText == newText)
-		return
-	print "Updating ${file.name}... "
-	file.text = newText
-	println "done."
-}
-
-def applyProjectRenaming(String oldName, String newName) {
-	def oldDir = project(":$oldName").projectDir
-	def srcDir = oldDir.parentFile
-	def newDir = new File(srcDir, newName)
-
-	// rename project directory
-	println "$oldDir -> $newDir"
-	oldDir.renameTo newDir
-
-	// rename .gradle file
-	new File(newDir, "${oldName}.gradle").renameTo(new File(newDir, "${newName}.gradle"))
-
-	// update project references in every .gradle file
-	def projectRefPattern = /('|"|:)${java.util.regex.Pattern.quote(oldName)}('|")/
-	def replacementPattern = "\$1$newName\$2"
-	srcDir.eachFileRecurse(groovy.io.FileType.FILES) { file ->
-		if (!file.name.endsWith('.gradle'))
-			return
-		fileReplace file, projectRefPattern, replacementPattern
-	}
-	fileReplace rootProject.buildFile, projectRefPattern, replacementPattern
-}
-
-task renameProject {
-	description "Renames a project. Required arguments: -Pfrom=oldName -Pto=newName"
-	group "Refactoring"
-	doFirst {
-		def oldName = project.properties.from
-		def newName = project.properties.to
-		applyProjectRenaming oldName, newName
-		def oldTestsName = oldName + '.Tests'
-		if (rootProject.findProject(":$oldTestsName")) {
-			def newTestsName = newName + '.Tests'
-			applyProjectRenaming oldTestsName, newTestsName
-		}
-	}
-}
-
-task createProject {
-	description "Creates a new project. Required argument: -PprojectName=projectName"
-	group "Refactoring"
-	doFirst {
-		def projectName = project.properties.projectName
-		def projectDir = file("src/$projectName")
-		assert !projectDir.exists()
-		projectDir.mkdirs()
-		def buildFile = new File(projectDir, "${projectName}.gradle")
-		buildFile.text = "version = '0.1.0'\n"
-	}
-}
