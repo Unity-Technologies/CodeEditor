@@ -21,6 +21,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			_document = document;
 			_classifier = classifier;
 			_classificationStyler = classificationStyler;
+			_classificationStyler.Changed += (Sender, Args) => RemoveCachedLinesFrom(0);
 			Buffer.Changed += OnBufferChange;
 			Caret = caret;
 		}
@@ -54,6 +55,11 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		public IFile File
 		{
 			get { return _document.File; }
+		}
+
+		public IClassificationStyler ClassificationStyler
+		{
+			get { return _classificationStyler; }
 		}
 
 		public ITextViewLine Line(int index)

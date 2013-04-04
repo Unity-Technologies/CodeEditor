@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CodeEditor.Composition;
 using CodeEditor.Text.UI.Unity.Engine;
+using UnityEditor;
 using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
@@ -11,57 +12,53 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 	{
 		public ITextViewAppearance AppearanceFor(ITextViewDocument document, IFontManager fontManager)
 		{
-			return new TextViewAppearance(fontManager);
-		}
-	}
-
-	public class TextViewAppearance : ITextViewAppearance
-	{
-		private readonly GUIStyle _background;
-		private readonly GUIStyle _text;
-		private readonly GUIStyle _lineNumber;
-		private readonly Color _lineNumberColor;
-		private readonly Color _selectionColor;
-		private readonly IFontManager _fontManager;
-
-		public event EventHandler Changed;
-
-		public TextViewAppearance(IFontManager fontManager)
-		{
-			_fontManager = fontManager;
-			_fontManager.Changed += (Sender, Args) => OnFontChanged();
-
-			_background = "AnimationCurveEditorBackground";
 			string userSkinPath = "Assets/Editor/CodeEditor/CodeEditorSkin.guiskin";
-
 			GUISkin skin = UnityEditor.AssetDatabase.LoadAssetAtPath(userSkinPath, typeof(GUISkin)) as GUISkin;
 			if (skin == null)
-			{
-				//Debug.Log ("Could not find user skin at: " + userSkinPath + ". Using default skin");
 				skin = GUI.skin;
-			}
-			else
-			{
-				//Debug.Log ("User skin found, font: " + skin.font.name);
-			}
 
-			_text = new GUIStyle(skin.label)
+			// Make a copy of guistyle to ensure we do not change the guistyle of the skin
+			GUIStyle textStyle = new GUIStyle(skin.label)
 			{
 				richText = true,
 				alignment = TextAnchor.UpperLeft,
 				padding = { left = 0, right = 0 }
 			};
-			_text.normal.textColor = Color.white;
+			textStyle.normal.textColor = Color.white;
+
+			GUIStyle backgroundStyle = skin.GetStyle("InnerShadowBg");
+			Color lineNumberColor = new Color(1, 1, 1, 0.5f);
+			Color selectionColor = new Color(80 / 255f, 80 / 255f, 80 / 255f, 1f);
+			return new TextViewAppearance(fontManager, textStyle, backgroundStyle, lineNumberColor, selectionColor);
+		}
+	}
+
+	public class TextViewAppearance : ITextViewAppearance
+	{
+		private GUIStyle _background;
+		private GUIStyle _text;
+		private GUIStyle _lineNumber;
+		private Color _lineNumberColor;
+		private Color _selectionColor;
+		private Color _backgroundColor;
+		private readonly IFontManager _fontManager;
+
+		public event EventHandler Changed;
+
+		public TextViewAppearance(IFontManager fontManager, GUIStyle textStyle, GUIStyle backgroundStyle, Color lineNumberColor, Color selectionColor)
+		{
+			_fontManager = fontManager;
+			_fontManager.Changed += (Sender, Args) => OnFontChanged();
+			_background = backgroundStyle;
+			_text = textStyle;
+			_lineNumberColor = lineNumberColor;
+			_selectionColor = selectionColor;
 
 			_lineNumber = new GUIStyle (_text)
 			{
 				richText = false,
 				alignment = TextAnchor.UpperRight
 			};
-
-			_lineNumberColor = new Color(1, 1, 1, 0.5f);
-
-			_selectionColor = new Color(80/255f, 80/255f, 80/255f, 1f);
 
 			_text.font = _lineNumber.font = _fontManager.CurrentFont;
 		}
@@ -81,6 +78,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		public GUIStyle Background
 		{
 			get { return _background; }
+			set { _background = value; }
 		}
 
 		public GUIStyle Text
@@ -96,11 +94,19 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		public Color LineNumberColor
 		{
 			get { return _lineNumberColor; }
+			set { _lineNumberColor = value; OnChanged(); }
 		}
 
 		public Color SelectionColor
 		{
 			get { return _selectionColor; }
+			set { _selectionColor = value; OnChanged(); }
+		}
+
+		public Color BackgroundColor 
+		{
+			get { return _backgroundColor; }
+			set { _backgroundColor = value; OnChanged(); }
 		}
 	}
 }

@@ -191,7 +191,9 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		private void EraseBackground()
 		{
-			GUI.Label(ViewPort, GUIContent.none, BackgroudStyle);
+			GUIUtils.DrawRect(ViewPort, Appearance.BackgroundColor);
+			if (BackgroundStyle != null)
+				GUI.Label(ViewPort, GUIContent.none, BackgroundStyle);
 		}
 
 		public Rect SpanForCurrentCharacter()
@@ -502,9 +504,9 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			return _document.Line(row);
 		}
 
-		GUIStyle BackgroudStyle
+		GUIStyle BackgroundStyle
 		{
-			get { return _appearance.Background;  }
+			get { return _appearance.Background; }
 		}
 
 		GUIStyle LineStyle

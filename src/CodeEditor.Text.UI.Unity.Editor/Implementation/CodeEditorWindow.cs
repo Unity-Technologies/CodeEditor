@@ -99,6 +99,9 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			_textView = TextViewFactory.ViewForFile(_filePath);
 			_codeView = new CodeView(this, _textView);
 			_fileNameWithExtension = Path.GetFileName(_filePath);
+
+			if (_textView != null)
+				_settingsDialog = new SettingsDialog(_textView);
 			return true;
 		}
 
@@ -138,9 +141,6 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				_textView.ScrollOffset = _backupData.scrollOffset;
 				_textView.SelectionAnchor = new Position((int)_backupData.selectionAnchor.y, (int)_backupData.selectionAnchor.x);
 			}
-
-			if (_settingsDialog == null && _textView != null)
-				_settingsDialog = new SettingsDialog(_textView);
 		}
 
 		void SetPosition(int row, int column)

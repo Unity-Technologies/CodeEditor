@@ -11,6 +11,7 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		ICaret Caret { get; }
 		ITextBuffer Buffer { get; }
 		IFile File { get; }
+		IClassificationStyler ClassificationStyler {get;}
 		void Save();
 	}
 

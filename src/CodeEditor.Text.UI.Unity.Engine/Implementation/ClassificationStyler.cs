@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using CodeEditor.Composition;
 using CodeEditor.Text.Logic;
@@ -9,14 +10,14 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 	public class ClassificationStyler : IClassificationStyler
 	{
 		private readonly IStandardClassificationRegistry _standardClassificationRegistry;
-		private readonly Dictionary<IClassification, Color> _classificationColors;
+		private Dictionary<IClassification, Color> _classificationColors;
 
 		[ImportingConstructor]
 		public ClassificationStyler(IStandardClassificationRegistry standardClassificationRegistry)
 		{
 			_standardClassificationRegistry = standardClassificationRegistry;
 
-			// Colors for a dark background
+			// Default colors (for a dark background)
 			_classificationColors = new Dictionary<IClassification, Color>
 			{
 				{_standardClassificationRegistry.Keyword, Colors.LightBlue},
@@ -29,6 +30,25 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				{_standardClassificationRegistry.Comment, Colors.Grey},
 				{_standardClassificationRegistry.Number, Colors.Green},
 			};
+		}
+
+		public event EventHandler Changed;
+
+		protected void OnChanged()
+		{
+			if (Changed != null)
+				Changed(this, EventArgs.Empty);
+		}
+
+		public IStandardClassificationRegistry StandardClassificationRegistry
+		{
+			get { return _standardClassificationRegistry; }
+		}
+
+		public Dictionary<IClassification, Color> ClassificationColors 
+		{ 
+			get { return _classificationColors; }
+			set { _classificationColors = value; OnChanged(); }
 		}
 
 		public Color ColorFor(IClassification classification)

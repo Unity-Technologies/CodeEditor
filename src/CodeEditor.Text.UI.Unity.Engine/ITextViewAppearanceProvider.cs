@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace CodeEditor.Text.UI.Unity.Engine
 {
 	/// <summary>
