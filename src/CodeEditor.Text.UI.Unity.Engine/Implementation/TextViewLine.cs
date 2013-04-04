@@ -56,7 +56,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		private static string HexifyColorComponent(float c)
 		{
-			return Mathf.FloorToInt(c * 255).ToString("X2");
+			return Mathf.FloorToInt(c * 255).ToString("x2");
 		}
 	}
 }
