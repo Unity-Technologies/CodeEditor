@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Engine
 {
@@ -10,11 +6,11 @@ namespace CodeEditor.Text.UI.Unity.Engine
 	{
 		private static GUIStyle _style;
 
-		public static void DrawRect(Rect lineRect, Color color)
+		public static void DrawRect(Rect rect, Color color)
 		{
 			var backup = GUI.color;
 			GUI.color = color;
-			GUI.Label(lineRect, GUIContent.none, Style);
+			GUI.Label(rect, GUIContent.none, Style);
 			GUI.color = backup;
 		}
 
