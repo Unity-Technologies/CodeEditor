@@ -128,6 +128,11 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			{
 				throw new InvalidOperationException();
 			}
+
+			public bool Exists()
+			{
+				return false;
+			}
 		}
 	}
 }

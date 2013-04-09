@@ -5,8 +5,8 @@ namespace CodeEditor.IO
 {
 	public interface IFileSystem
 	{
-		IFile FileFor(string file);
-		IFolder FolderFor(string folder);
+		IFile FileFor(string path);
+		IFolder FolderFor(string path);
 	}
 
 	public interface IFile
@@ -24,11 +24,14 @@ namespace CodeEditor.IO
 		string ReadAllText();
 		void WriteAllText(string text);
 		void Delete();
+		bool Exists();
 	}
 
 	public interface IFolder
 	{
+		IFile GetFile(string fileName);
 		IEnumerable<IFile> GetFiles(string pattern, SearchOption searchOption);
+		IEnumerable<IFolder> GetFolders();
 	}
 
 	public static class FileExtensions

@@ -36,5 +36,10 @@ namespace CodeEditor.IO.Implementation
 		{
 			System.IO.File.Delete(_fullName);
 		}
+
+		public bool Exists()
+		{
+			return System.IO.File.Exists(_fullName);
+		}
 	}
 }
