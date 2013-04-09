@@ -1,7 +1,6 @@
 * kaizen Clr.exec should set MONO_EXECUTABLE
 * move File search also to the server (using the client search only as a fallback)
 * rename all Implementation folders to Internal
-* rename all gradle files to build.gradle
 * multi level undo
 * fix dead keys on osx
 * register MonoScript inspector
