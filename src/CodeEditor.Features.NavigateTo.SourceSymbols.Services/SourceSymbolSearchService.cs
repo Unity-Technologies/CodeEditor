@@ -1,4 +1,4 @@
-using CodeEditor.Features.NavigateTo.SourceSymbols.ServiceInterface;
+using CodeEditor.Features.NavigateTo.SourceSymbols.ServiceModel;
 using CodeEditor.Reactive;
 using CodeEditor.ReactiveServiceStack;
 using ServiceStack.ServiceInterface;

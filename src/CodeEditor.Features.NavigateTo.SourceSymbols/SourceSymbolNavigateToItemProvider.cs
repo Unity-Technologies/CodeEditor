@@ -1,5 +1,5 @@
 using CodeEditor.Composition;
-using CodeEditor.Features.NavigateTo.SourceSymbols.ServiceInterface;
+using CodeEditor.Features.NavigateTo.SourceSymbols.ServiceModel;
 using CodeEditor.Logging;
 using CodeEditor.Reactive;
 using CodeEditor.ReactiveServiceStack;

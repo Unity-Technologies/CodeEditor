@@ -14,7 +14,7 @@ dependencies {
 		'CodeEditor.Collections',
 		'CodeEditor.ServiceClient',
 		'CodeEditor.ReactiveServiceStack',
-		'CodeEditor.Features.NavigateTo.SourceSymbols.ServiceInterface',
+		'CodeEditor.Features.NavigateTo.SourceSymbols.ServiceModel',
 	]
 	projectReferences.each {
 		'default' project(":$it")

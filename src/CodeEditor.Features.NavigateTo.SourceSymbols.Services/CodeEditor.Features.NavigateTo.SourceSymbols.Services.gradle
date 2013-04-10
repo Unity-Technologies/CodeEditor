@@ -1,7 +1,7 @@
 version = '0.1.0'
 
 dependencies {
-	'default' project(':CodeEditor.Features.NavigateTo.SourceSymbols.ServiceInterface')
+	'default' project(':CodeEditor.Features.NavigateTo.SourceSymbols.ServiceModel')
 	'default' project(':CodeEditor.Composition')
 	'default' project(':CodeEditor.Reactive')
 	'default' project(':CodeEditor.ReactiveServiceStack')

@@ -2,7 +2,7 @@
 dependencies {
   'default' rootProject.references.languagesCommon
 	def projectReferences = [
-		'CodeEditor.Features.NavigateTo.SourceSymbols.ServiceInterface',
+		'CodeEditor.Features.NavigateTo.SourceSymbols.ServiceModel',
 		'CodeEditor.Grammars',
 	]
 	projectReferences.each {

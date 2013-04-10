@@ -5,7 +5,7 @@ assembly {
 dependencies {
 	'default' rootProject.references.moq
 	[
-		':CodeEditor.Features.NavigateTo.SourceSymbols.ServiceInterface',
+		':CodeEditor.Features.NavigateTo.SourceSymbols.ServiceModel',
 		':CodeEditor.IO',
 		':CodeEditor.Logging',
 		':CodeEditor.Composition',

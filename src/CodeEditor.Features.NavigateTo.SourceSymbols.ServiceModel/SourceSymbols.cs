@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using ServiceStack.ServiceHost;
 
-namespace CodeEditor.Features.NavigateTo.SourceSymbols.ServiceInterface
+namespace CodeEditor.Features.NavigateTo.SourceSymbols.ServiceModel
 {
 	public class SourceSymbolSearchRequest : IReturn<IEnumerable<SourceSymbol>>
 	{
