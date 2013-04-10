@@ -35,6 +35,7 @@ vs {
 			':CodeEditor.Composition',
 			':CodeEditor.ContentTypes',
 			':CodeEditor.IO',
+			':CodeEditor.IO.Unity.Editor',
 			':CodeEditor.Testing',
 			':CodeEditor.ServiceClient',
 			':CodeEditor.ServiceHost',
