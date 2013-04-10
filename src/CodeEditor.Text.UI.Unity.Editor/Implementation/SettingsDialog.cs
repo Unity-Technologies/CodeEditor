@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CodeEditor.Text.Logic;
+using CodeEditor.Text.UI.Unity.Engine;
+using CodeEditor.Text.UI.Unity.Engine.Implementation;
 using UnityEditor;
 using UnityEngine;
 
-namespace CodeEditor.Text.UI.Unity.Engine.Implementation
+namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	public class SettingsDialog
 	{
