@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace CodeEditor.IO.Implementation
+namespace CodeEditor.IO.Internal
 {
 	public class Folder : IFolder
 	{

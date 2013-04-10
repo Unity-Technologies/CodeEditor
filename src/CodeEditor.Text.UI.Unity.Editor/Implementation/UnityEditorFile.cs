@@ -1,5 +1,5 @@
 using System;
-using CodeEditor.IO.Implementation;
+using CodeEditor.IO.Internal;
 using UnityEditor;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation

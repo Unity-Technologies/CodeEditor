@@ -1,6 +1,6 @@
 using System.IO;
 using NUnit.Framework;
-using File = CodeEditor.IO.Implementation.File;
+using File = CodeEditor.IO.Internal.File;
 
 namespace CodeEditor.IO.Tests
 {

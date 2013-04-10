@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace CodeEditor.IO.Implementation
+namespace CodeEditor.IO.Internal
 {
 	public class File : IFile
 	{

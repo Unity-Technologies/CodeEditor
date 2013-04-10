@@ -1,9 +1,9 @@
 using CodeEditor.Composition;
 
-namespace CodeEditor.IO.Implementation
+namespace CodeEditor.IO.Internal
 {
 	[Export(typeof(IFileSystem))]
-	class FileSystem : IFileSystem
+	public class FileSystem : IFileSystem
 	{
 		public IFile FileFor(string file)
 		{
