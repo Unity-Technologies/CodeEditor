@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Linq;
 using CodeEditor.Text.Logic;
 using CodeEditor.Text.UI.Unity.Engine;
 using CodeEditor.Text.UI.Unity.Engine.Implementation;
@@ -31,14 +32,10 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			_appearance = textView.Appearance;
 
 			_colorSchemeIndex = new IntSetting("ColorSchemeIndex", 0, _settings);
-			_colorSchemeIndex.Changed += (Sender, Args) => SetClassificationColors();
+			_colorSchemeIndex.Changed += (sender, args) => SetClassificationColors();
 
 			_fontSizes = _fontManager.GetCurrentFontSizes();
-			var names = new List<GUIContent>();
-			foreach (int size in _fontSizes)
-				names.Add(new GUIContent(size.ToString()));
-			_fontSizesNames = names.ToArray();
-
+			_fontSizesNames = _fontSizes.Select(size => new GUIContent(size.ToString())).ToArray();
 			SetClassificationColors();
 		}
 
