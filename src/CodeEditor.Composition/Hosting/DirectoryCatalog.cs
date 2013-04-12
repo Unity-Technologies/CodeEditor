@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,7 +9,12 @@ namespace CodeEditor.Composition.Hosting
 {
 	public class DirectoryCatalog : IExportDefinitionProvider
 	{
-		private readonly IExportDefinitionProvider _catalog;
+		public static Assembly[] AllAssembliesIn(string directory)
+		{
+			return Directory.GetFiles(directory, "*.dll").Select(s => Assembly.LoadFrom(s)).ToArray();
+		}
+
+		readonly IExportDefinitionProvider _catalog;
 
 		public DirectoryCatalog(string directory)
 		{
@@ -19,11 +24,6 @@ namespace CodeEditor.Composition.Hosting
 		public IEnumerable<ExportDefinition> GetExports(Type contractType)
 		{
 			return _catalog.GetExports(contractType);
-		}
-
-		public static Assembly[] AllAssembliesIn(string directory)
-		{
-			return Directory.GetFiles(directory, "*.dll").Select(s => Assembly.LoadFrom(s)).ToArray();
 		}
 	}
 }
