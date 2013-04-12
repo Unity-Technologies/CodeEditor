@@ -21,18 +21,6 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		readonly IClassificationStyler _classificationStyler;
 		readonly ITextViewAppearance _appearance;
 
-		class Styles
-		{
-			public GUIStyle rightAlignedLabel = new GUIStyle(GUI.skin.label);
-			public Styles()
-			{ 
-				rightAlignedLabel.alignment = TextAnchor.MiddleRight;
-				rightAlignedLabel.fontSize = 12;
-			}
-		}
-		static Styles s_Styles;
-
-
 		public SettingsDialog(ITextView textView)
 		{
 			_settings = textView.Settings;
@@ -54,16 +42,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			SetClassificationColors();
 		}
 
-		void InitIfNeeded()
-		{
-			if (s_Styles == null)
-				s_Styles = new Styles();
-		}
-
 		public void OnGUI(Rect availableRect)
 		{
-			InitIfNeeded();
-
 			_settingsWindowRect.x = availableRect.xMax - _settingsWindowRect.width - 17;
 			_settingsWindowRect.y = availableRect.y + 1;
 
