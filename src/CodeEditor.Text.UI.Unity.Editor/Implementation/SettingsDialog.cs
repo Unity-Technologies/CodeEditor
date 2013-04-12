@@ -9,10 +9,10 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	public class SettingsDialog
 	{
-		Rect _settingsWindowRect = new Rect (0,0, 200, 20);
-		IntSetting _colorSchemeIndex;
-		int[] _fontSizes = null;
-		GUIContent[] _fontSizesNames;
+		Rect _settingsWindowRect = new Rect(0, 0, 200, 20);
+		readonly IntSetting _colorSchemeIndex;
+		readonly int[] _fontSizes;
+		readonly GUIContent[] _fontSizesNames;
 
 		readonly IMouseCursorRegions _mouseCursorsRegions;
 		readonly IMouseCursors _mouseCursors;
