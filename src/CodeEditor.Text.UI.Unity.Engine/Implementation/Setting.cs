@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 {
@@ -15,7 +15,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				settings.AddSetting(id, this);
 			}
 		}
-		
+
 		public string ID { get; set; }
 
 		public event EventHandler Changed;
@@ -26,7 +26,6 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 				Changed(this, EventArgs.Empty);
 		}
 	}
-
 
 	public class IntSetting : Setting
 	{
@@ -41,10 +40,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		public int Value
 		{
-			get
-			{
-				return _value;
-			}
+			get { return _value; }
 			set
 			{
 				if (value != _value)
@@ -54,7 +50,6 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 						_preferences.SetInt(ID, _value);
 					OnChanged();
 				}
-
 			}
 		}
 	}
@@ -72,10 +67,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		public bool Value
 		{
-			get
-			{
-				return _value;
-			}
+			get { return _value; }
 			set
 			{
 				if (value != _value)
@@ -85,7 +77,6 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 						_preferences.SetBool(ID, _value);
 					OnChanged();
 				}
-
 			}
 		}
 	}
@@ -103,10 +94,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		public string Value
 		{
-			get
-			{
-				return _value;
-			}
+			get { return _value; }
 			set
 			{
 				if (value != _value)
@@ -116,7 +104,6 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 						_preferences.SetString(ID, _value);
 					OnChanged();
 				}
-
 			}
 		}
 	}
