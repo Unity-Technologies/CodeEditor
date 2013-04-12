@@ -56,28 +56,31 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			GUILayout.Space(topMargin);
 
 			GUILayout.Label("View", EditorStyles.boldLabel);
-			
-			BoolSetting lineNumberMarginVisiblity = _settings.GetSetting("LineNumberVisiblitySetting") as BoolSetting;
+
+			var lineNumberMarginVisiblity = _settings.GetSetting("LineNumberVisiblitySetting") as BoolSetting;
 			if (lineNumberMarginVisiblity != null)
-				lineNumberMarginVisiblity.Value = EditorGUILayout.Toggle(new GUIContent("Line Numbers"), lineNumberMarginVisiblity.Value);
-			
-			BoolSetting whitespaceVisibility = _settings.GetSetting("VisibleWhitespace") as BoolSetting;
+				lineNumberMarginVisiblity.Value = EditorGUILayout.Toggle(new GUIContent("Line Numbers"),
+					lineNumberMarginVisiblity.Value);
+
+			var whitespaceVisibility = _settings.GetSetting("VisibleWhitespace") as BoolSetting;
 			if (whitespaceVisibility != null)
 				whitespaceVisibility.Value = EditorGUILayout.Toggle(new GUIContent("Whitespace"), whitespaceVisibility.Value);
 
 			GUILayout.Label("Tab", EditorStyles.boldLabel);
-			
-			IntSetting numSpacePerTab = _settings.GetSetting("NumSpacesPerTab") as IntSetting;
+
+			var numSpacePerTab = _settings.GetSetting("NumSpacesPerTab") as IntSetting;
 			if (numSpacePerTab != null)
 				numSpacePerTab.Value = EditorGUILayout.IntField(new GUIContent("Tab Size"), numSpacePerTab.Value);
 
 			GUILayout.Label("Font", EditorStyles.boldLabel);
-			
-			_fontManager.CurrentFontSize = EditorGUILayout.IntPopup(new GUIContent("Font Size"), _fontManager.CurrentFontSize, _fontSizesNames, _fontSizes);
+
+			_fontManager.CurrentFontSize = EditorGUILayout.IntPopup(new GUIContent("Font Size"), _fontManager.CurrentFontSize,
+				_fontSizesNames, _fontSizes);
 
 			GUILayout.Label("Colors", EditorStyles.boldLabel);
 
-			_colorSchemeIndex.Value = EditorGUILayout.IntPopup(new GUIContent("Color scheme"), _colorSchemeIndex.Value, new []{new GUIContent("Dark"), new GUIContent("Light")}, new []{0,1});
+			_colorSchemeIndex.Value = EditorGUILayout.IntPopup(new GUIContent("Color scheme"), _colorSchemeIndex.Value,
+				new[] {new GUIContent("Dark"), new GUIContent("Light")}, new[] {0, 1});
 
 			GUILayout.Space(10);
 
@@ -91,25 +94,25 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 			GUILayout.EndVertical();
 
-			if (size.height > 30) 
+			if (size.height > 30)
 				_settingsWindowRect.height = size.height + 20f; // + window header
 		}
 
 		void SetClassificationColors()
 		{
-			Color bgDark1 = new Color (0/255f, 43/255f, 54/255f);
-			Color bgDark2 = new Color(37 / 255f, 39 / 255f, 39 / 255f);
-			Color bgLight1 = new Color (238/255f, 232/255f, 213/255f);
-			Color bgLight2 = new Color (253/255f, 246/255f, 227/255f);
-			Color grey = new Color(130 / 255f, 148 / 255f, 150 / 255f);
-			Color yellow = new Color (181/255f, 137/255f, 0/255f);
-			Color orange = new Color (204/255f, 75/255f, 22/255f);
-			Color red = new Color(220/255f, 50/255f, 47/255f);
-			Color magenta = new Color(211/255f, 54/255f, 130/255f);
-			Color violet = new Color(108/255f, 113/255f, 196/255f);
-			Color blue = new Color(28/255f, 129/255f, 200/255f);
-			Color cyan = new Color(42/255f, 161/255f, 152/255f);
-			Color green = new Color(133/255f, 153/255f, 0/255f);
+			var bgDark1 = new Color(0 / 255f, 43 / 255f, 54 / 255f);
+			var bgDark2 = new Color(37 / 255f, 39 / 255f, 39 / 255f);
+			//Color bgLight1 = new Color (238/255f, 232/255f, 213/255f);
+			var bgLight2 = new Color(253 / 255f, 246 / 255f, 227 / 255f);
+			var grey = new Color(130 / 255f, 148 / 255f, 150 / 255f);
+			var yellow = new Color(181 / 255f, 137 / 255f, 0 / 255f);
+			var orange = new Color(204 / 255f, 75 / 255f, 22 / 255f);
+			var red = new Color(220 / 255f, 50 / 255f, 47 / 255f);
+			var magenta = new Color(211 / 255f, 54 / 255f, 130 / 255f);
+			//Color violet = new Color(108/255f, 113/255f, 196/255f);
+			var blue = new Color(28 / 255f, 129 / 255f, 200 / 255f);
+			var cyan = new Color(42 / 255f, 161 / 255f, 152 / 255f);
+			var green = new Color(133 / 255f, 153 / 255f, 0 / 255f);
 
 			Dictionary<IClassification, Color> syntaxColors;
 			Color selectionColor;
@@ -154,13 +157,13 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					{StandardClassificationRegistry.Number, red}
 				};
 			}
-			
+
 			_classificationStyler.ClassificationColors = syntaxColors;
 			_appearance.LineNumberColor = lineNumberColor;
 			_appearance.SelectionColor = selectionColor;
 			_appearance.BackgroundColor = backgroundColor;
 		}
-		
+
 		IStandardClassificationRegistry StandardClassificationRegistry
 		{
 			get { return _classificationStyler.StandardClassificationRegistry; }
