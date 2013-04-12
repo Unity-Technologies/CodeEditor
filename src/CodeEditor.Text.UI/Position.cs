@@ -14,17 +14,36 @@ namespace CodeEditor.Text.UI
 
 		public static bool operator ==(Position lhs, Position rhs)
 		{
-			return lhs.Row == rhs.Row && lhs.Column == rhs.Column;
+			return lhs.Equals(rhs);
 		}
 
 		public static bool operator !=(Position lhs, Position rhs)
 		{
-			return lhs.Column != rhs.Column || lhs.Row != rhs.Row;
+			return !lhs.Equals(rhs);
+		}
+
+		public bool Equals(Position other)
+		{
+			return Column == other.Column && Row == other.Row;
 		}
 
 		public override string ToString()
 		{
 			return string.Format("(row {0}, column {1})", Row, Column);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			return obj is Position && Equals((Position)obj);
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				return (Column * 397) ^ Row;
+			}
 		}
 	}
 }
