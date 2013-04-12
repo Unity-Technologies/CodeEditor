@@ -13,16 +13,21 @@ namespace CodeEditor.ReactiveServiceStack
 	{
 		public static IStreamWriter ToJsonStreamWriter<T>(this IObservableX<T> source)
 		{
+			return source.ToEnumerable().ToJsonStreamWriter();
+		}
+
+		public static IStreamWriter ToJsonStreamWriter<T>(this IEnumerable<T> source)
+		{
 			return new ObservableStreamWriter<T>(source);
 		}
 
-		public class ObservableStreamWriter<T> : IStreamWriter, IHasOptions
+		class ObservableStreamWriter<T> : IStreamWriter, IHasOptions
 		{
-			readonly IObservableX<T> _source;
 			readonly JsonSerializer<T> _serializer;
 			readonly IDictionary<string, string> _options;
+			readonly IEnumerable<T> _source;
 
-			public ObservableStreamWriter(IObservableX<T> source)
+			public ObservableStreamWriter(IEnumerable<T> source)
 			{
 				_source = source;
 				_serializer = new JsonSerializer<T>();
@@ -43,7 +48,7 @@ namespace CodeEditor.ReactiveServiceStack
 				{
 					writer.WriteLine('[');
 					writer.Flush();
-					using (var enumerator = _source.ToEnumerable().GetEnumerator())
+					using (var enumerator = _source.GetEnumerator())
 					{
 						if (enumerator.MoveNext())
 						{
