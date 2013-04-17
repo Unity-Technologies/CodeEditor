@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using CodeEditor.Reactive;
 using CodeEditor.Reactive.Disposables;
+using ServiceStack.Service;
 using ServiceStack.ServiceClient.Web;
 using ServiceStack.ServiceHost;
 
@@ -10,6 +11,7 @@ namespace CodeEditor.ReactiveServiceStack
 {
 	public interface IObservableServiceClient
 	{
+		IObservableX<TResponse> Observe<TResponse>(IReturn<TResponse> request);
 		IObservableX<TResponse> ObserveMany<TResponse>(IReturn<IEnumerable<TResponse>> request);
 	}
 
@@ -24,31 +26,57 @@ namespace CodeEditor.ReactiveServiceStack
 			_baseUri = baseUri;
 		}
 
+		public IObservableX<TResponse> Observe<TResponse>(IReturn<TResponse> request)
+		{
+			return SendAsync<TResponse, TResponse>(request, onSuccess: (response, observer, disposable) =>
+			{
+				disposable.Disposable = null;
+				observer.OnNext(response);
+				observer.OnCompleted();
+			});
+		}
+
 		public IObservableX<TResponse> ObserveMany<TResponse>(IReturn<IEnumerable<TResponse>> request)
 		{
-			return ObservableX.CreateWithDisposable<TResponse>(observer =>
+			return SendAsync<HttpWebResponse, TResponse>(request, onSuccess: (response, observer, disposable) =>
 			{
-				var client = new JsonServiceClient(_baseUri) {Timeout = Timeout};
-				var disposable = new MultipleAssignmentDisposable
-				{
-					Disposable = Disposable.Create(client.CancelAsync)
-				};
+				var responseStream = response.GetResponseStream();
+				disposable.Disposable = responseStream.DeserializeMany<TResponse>().Subscribe(observer);
+			});
+		}
 
-				client.SendAsync<HttpWebResponse>(
+		IObservableX<TResult> SendAsync<TResponse, TResult>(object request, Action<TResponse, IObserverX<TResult>, MultipleAssignmentDisposable> onSuccess)
+		{
+			return ObservableX.CreateWithDisposable<TResult>(observer =>
+			{
+				var client = NewJsonServiceClient();
+				var disposable = MultipleAssignmentDisposableFor(client);
+				client.SendAsync<TResponse>(
 					request,
-					onSuccess: response =>
-					{
-						var responseStream = response.GetResponseStream();
-						disposable.Disposable = responseStream.DeserializeMany<TResponse>().Subscribe(observer);
-					},
+					onSuccess: response => onSuccess(response, observer, disposable),
 					onError: (response, exception) =>
 					{
 						disposable.Disposable = null;
 						observer.OnError(exception);
 					});
-
 				return disposable;
 			});
+		}
+
+		JsonServiceClient NewJsonServiceClient()
+		{
+			return new JsonServiceClient(_baseUri)
+			{
+				Timeout = Timeout
+			};
+		}
+
+		static MultipleAssignmentDisposable MultipleAssignmentDisposableFor(IRestClientAsync client)
+		{
+			return new MultipleAssignmentDisposable
+			{
+				Disposable = Disposable.Create(client.CancelAsync)
+			};
 		}
 	}
 }
