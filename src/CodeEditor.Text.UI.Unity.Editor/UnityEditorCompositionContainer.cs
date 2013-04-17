@@ -6,6 +6,7 @@ using CodeEditor.Composition.Hosting;
 using CodeEditor.IO;
 using CodeEditor.IO.Unity.Editor;
 using CodeEditor.Logging;
+using CodeEditor.Logging.Unity;
 using CodeEditor.ServiceClient;
 
 namespace CodeEditor.Text.UI.Unity.Editor
@@ -43,19 +44,6 @@ namespace CodeEditor.Text.UI.Unity.Editor
 		static string ProjectPath
 		{
 			get { return Path.GetDirectoryName(UnityEngine.Application.dataPath); }
-		}
-
-		class UnityLogger : ILogger
-		{
-			public void Log(object value)
-			{
-				UnityEngine.Debug.Log(value);
-			}
-
-			public void LogError(Exception exception)
-			{
-				UnityEngine.Debug.LogException(exception);
-			}
 		}
 	}
 }
