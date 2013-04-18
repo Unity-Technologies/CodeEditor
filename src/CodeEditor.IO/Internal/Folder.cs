@@ -4,30 +4,38 @@ using System.Linq;
 
 namespace CodeEditor.IO.Internal
 {
-	public class Folder : IFolder
+	public class Folder : Resource, IFolder
 	{
-		private readonly IFileSystem _fileSystem;
-		private readonly string _folder;
+		readonly IFileSystem _fileSystem;
 
-		public Folder(string folder, IFileSystem fileSystem)
+		public Folder(ResourcePath folder, IFileSystem fileSystem) : base(folder)
 		{
 			_fileSystem = fileSystem;
-			_folder = folder;
 		}
 
-		public IFile GetFile(string fileName)
+		public IFile GetFile(ResourcePath relativeFilePath)
 		{
-			return _fileSystem.FileFor(Path.Combine(_folder, fileName));
+			return _fileSystem.GetFile(Path.Combine(relativeFilePath));
+		}
+
+		public IFolder GetFolder(ResourcePath relativeFilePath)
+		{
+			return _fileSystem.GetFolder(Path.Combine(relativeFilePath));
 		}
 
 		public IEnumerable<IFile> GetFiles(string pattern, SearchOption searchOption)
 		{
-			return Directory.GetFiles(_folder, pattern, searchOption).Select(_fileSystem.FileFor);
+			return Directory.GetFiles(Location, pattern, searchOption).Select(_ => _fileSystem.GetFile(_));
 		}
 
 		public IEnumerable<IFolder> GetFolders()
 		{
-			return Directory.GetDirectories(_folder).Select(_fileSystem.FolderFor);
+			return Directory.GetDirectories(Location).Select(_ => _fileSystem.GetFolder(_));
+		}
+
+		public override bool Exists()
+		{
+			return Directory.Exists(Location);
 		}
 	}
 }

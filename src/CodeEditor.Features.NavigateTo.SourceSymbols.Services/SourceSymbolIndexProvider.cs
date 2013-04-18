@@ -135,13 +135,13 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 			get
 			{
 				// ServerDirectory is $Project/Library/CodeEditor/Server
-				var assetsFolder = Path.Combine(ServerDirectory, "../../../Assets");
+				var assetsFolder = ServerDirectory.Combine("../../../Assets").ToAbsolutePath();
 				Logger.Log("Assets folder is " + assetsFolder);
-				return FileSystem.FolderFor(assetsFolder);
+				return FileSystem.GetFolder(assetsFolder);
 			}
 		}
 
-		string ServerDirectory
+		ResourcePath ServerDirectory
 		{
 			get { return Path.GetDirectoryName(GetType().Module.FullyQualifiedName); }
 		}

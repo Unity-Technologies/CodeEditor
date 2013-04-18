@@ -11,19 +11,9 @@ namespace CodeEditor.IO.Unity.Editor
 	/// </summary>
 	public class UnityEditorFileSystem : IFileSystem
 	{
-		public IFile FileFor(string file)
-		{
-			return new UnityEditorFile(file);
-		}
-
-		public IFolder FolderFor(string folder)
-		{
-			return new Folder(folder, this);
-		}
-
 		class UnityEditorFile : File
 		{
-			public UnityEditorFile(string file)
+			public UnityEditorFile(ResourcePath file)
 				: base(file)
 			{
 			}
@@ -41,8 +31,18 @@ namespace CodeEditor.IO.Unity.Editor
 
 			string AssetPath
 			{
-				get { return FullName.Substring(Environment.CurrentDirectory.Length + 1); }
+				get { return Location.Substring(Environment.CurrentDirectory.Length + 1); }
 			}
+		}
+
+		public IFile GetFile(ResourcePath path)
+		{
+			return new UnityEditorFile(path);
+		}
+
+		public IFolder GetFolder(ResourcePath path)
+		{
+			return new Folder(path, this);
 		}
 	}
 }

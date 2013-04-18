@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using NUnit.Framework;
 using File = CodeEditor.IO.Internal.File;
@@ -17,6 +18,15 @@ namespace CodeEditor.IO.Tests
 				writer.Flush();
 				Assert.AreEqual("42", new File(fileName).ReadAllText());
 			}
+		}
+
+		[Test]
+		public void FileRemembersAbsoluteLocationAtMomentOfCreation()
+		{
+			var file = new File("test");
+			var originalDirectory = Environment.CurrentDirectory;
+			Environment.CurrentDirectory = Path.GetDirectoryName(originalDirectory);
+			Assert.AreEqual(Path.Combine(originalDirectory, "test"), file.Path.Location);
 		}
 	}
 }

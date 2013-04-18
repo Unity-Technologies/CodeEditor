@@ -5,14 +5,14 @@ namespace CodeEditor.IO.Internal
 	[Export(typeof(IFileSystem))]
 	public class FileSystem : IFileSystem
 	{
-		public IFile FileFor(string file)
+		public IFile GetFile(ResourcePath path)
 		{
-			return new File(file);
+			return new File(path);
 		}
 
-		public IFolder FolderFor(string folder)
+		public IFolder GetFolder(ResourcePath path)
 		{
-			return new Folder(folder, this);
+			return new Folder(path, this);
 		}
 	}
 }

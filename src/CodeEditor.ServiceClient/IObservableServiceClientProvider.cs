@@ -1,12 +1,11 @@
 using System;
-using System.IO;
+using ServiceStack.Text;
 using CodeEditor.Composition;
 using CodeEditor.IO;
 using CodeEditor.Logging;
 using CodeEditor.Reactive;
 using CodeEditor.Reactive.Disposables;
 using CodeEditor.ReactiveServiceStack;
-using ServiceStack.Text;
 
 namespace CodeEditor.ServiceClient
 {
@@ -22,7 +21,7 @@ namespace CodeEditor.ServiceClient
 
 		public ObservableServiceClientProvider()
 		{
-			_serviceHostUriFile = new Lazy<IFile>(() => FileSystem.FileFor(ServiceHostUriFilePath));
+			_serviceHostUriFile = new Lazy<IFile>(() => FileSystem.GetFile(ServiceHostUriFilePath));
 		}
 
 		[Import]
@@ -100,7 +99,7 @@ namespace CodeEditor.ServiceClient
 		{
 			var executable = ServiceHostExecutable;
 			Logger.Log("Starting {0}".Fmt(executable));
-			using (Shell.StartManagedProcess(executable))
+			using (Shell.StartManagedProcess(executable.Location))
 			{
 				// this doesn't kill the actual process but
 				// just releases any resources attached to
@@ -126,12 +125,12 @@ namespace CodeEditor.ServiceClient
 			}
 		}
 
-		string ServiceHostUriFilePath
+		ResourcePath ServiceHostUriFilePath
 		{
-			get { return Path.ChangeExtension(ServiceHostExecutable, "uri"); }
+			get { return ServiceHostExecutable.ChangeExtension("uri"); }
 		}
 
-		string ServiceHostExecutable
+		ResourcePath ServiceHostExecutable
 		{
 			get { return ServiceHostExecutableProvider.ServiceHostExecutable; }
 		}

@@ -2,44 +2,31 @@ using System.IO;
 
 namespace CodeEditor.IO.Internal
 {
-	public class File : IFile
+	public class File : Resource, IFile
 	{
-		private readonly string _fullName;
-
-		public File(string fullName)
+		public File(ResourcePath path) : base(path)
 		{
-			_fullName = Path.GetFullPath(fullName);
-		}
-
-		public string FullName
-		{
-			get { return _fullName; }
-		}
-
-		public string Extension
-		{
-			get { return Path.GetExtension(_fullName); }
 		}
 
 		public string ReadAllText()
 		{
-			using (var reader = new StreamReader(System.IO.File.Open(_fullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
+			using (var reader = new StreamReader(System.IO.File.Open(Location, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)))
 				return reader.ReadToEnd();
 		}
 
 		public virtual void WriteAllText(string text)
 		{
-			System.IO.File.WriteAllText(_fullName, text);
+			System.IO.File.WriteAllText(Location, text);
 		}
 
 		public void Delete()
 		{
-			System.IO.File.Delete(_fullName);
+			System.IO.File.Delete(Location);
 		}
 
-		public bool Exists()
+		public override bool Exists()
 		{
-			return System.IO.File.Exists(_fullName);
+			return System.IO.File.Exists(Location);
 		}
 	}
 }

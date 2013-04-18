@@ -51,7 +51,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		public ITextView ViewForFile(string fileName)
 		{
-			return CreateView(new TextViewCreationOptions {File = FileSystem.FileFor(fileName)});
+			return CreateView(new TextViewCreationOptions {File = FileSystem.GetFile(fileName)});
 		}
 
 		public ITextView CreateView()
@@ -97,21 +97,26 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		class TransientFile : IFile
 		{
-			private readonly string _extension;
+			readonly ResourcePath _path;
 
 			public TransientFile(string extension)
 			{
-				_extension = extension;
+				_path = new ResourcePath(extension);
 			}
 
-			public string FullName
+			public ResourcePath Path
+			{
+				get { return _path; }
+			}
+
+			public string Location
 			{
 				get { return ""; }
 			}
 
 			public string Extension
 			{
-				get { return _extension; }
+				get { return _path.Extension; }
 			}
 
 			public string ReadAllText()

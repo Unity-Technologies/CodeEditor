@@ -15,7 +15,7 @@ namespace CodeEditor.ServiceClient.Tests
 		public void GetsServerAddressFromUriFile()
 		{
 			const string serverExecutable = "server.exe";
-			const string serverUrilFile = "server.uri";
+			const string serverUriFile = "server.uri";
 			const string serverAddress = "http://localhost:1337/";
 
 			var projectPathProvider = MockFor<IServiceHostExecutableProvider>();
@@ -28,7 +28,7 @@ namespace CodeEditor.ServiceClient.Tests
 			var fileSystem = MockFor<IFileSystem>();
 			var uriFile = MockFor<IFile>();
 			fileSystem
-				.Setup(_ => _.FileFor(serverUrilFile))
+				.Setup(_ => _.GetFile(serverUriFile))
 				.Returns(uriFile.Object);
 
 			// throw IOException when provider tries to delete the file

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CodeEditor.Composition;
@@ -41,11 +41,16 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 				return ObservableX.CreateWithDisposable<IFileNotification>(observer =>
 				{
 					foreach (var fileExtension in FileExtensionsWithExportedSourceSymbolProvider())
-						foreach (var file in SourceFolderProvider.AssetsFolder.GetFiles("*" + fileExtension, SearchOption.AllDirectories))
+						foreach (var file in SourceFolder.GetFiles("*" + fileExtension, SearchOption.AllDirectories))
 							observer.OnNext(new FileNotification(file, FileNotificationKind.New));
 					return Disposable.Empty;
 				});
 			}
+		}
+
+		IFolder SourceFolder
+		{
+			get { return SourceFolderProvider.AssetsFolder; }
 		}
 
 		IEnumerable<string> FileExtensionsWithExportedSourceSymbolProvider()
@@ -70,7 +75,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 
 		public override string ToString()
 		{
-			return string.Format("{0}:{1}", NotificationKind, File.FullName);
+			return string.Format("{0}:{1}", NotificationKind, File.Path);
 		}
 	}
 }

@@ -14,7 +14,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 			return
 				SourceSymbolIndex
 					.SearchSymbol(request.Filter)
-					.Select(s => new SourceSymbol {DisplayText = s.DisplayText, SourceFile = s.SourceFile.FullName, Line = s.Line-1, Column = s.Column-1})
+					.Select(s => new SourceSymbol {DisplayText = s.DisplayText, SourceFile = s.SourceFile.Path, Line = s.Line-1, Column = s.Column-1})
 					.ToJsonStreamWriter();
 		}
 
