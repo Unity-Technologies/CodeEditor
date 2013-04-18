@@ -1,4 +1,4 @@
-﻿using CodeEditor.Testing;
+using CodeEditor.Testing;
 using CodeEditor.Text.UI.Unity.Engine.Implementation;
 using NUnit.Framework;
 
@@ -15,7 +15,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Tests
 	{
 		public ITextViewWhitespace GetTextViewWhitespace()
 		{
-			return new TextViewWhitespace(null, new BoolSetting("visible", true, null), new IntSetting("numSpaces", 4, null));
+			return new TextViewWhitespace(new BoolSetting("visible", true, null), new IntSetting("numSpaces", 4, null));
 		}
 
 		void TestBaseTextFormatting(int numberOfSpacesPerTab, string input, string expectedResult)

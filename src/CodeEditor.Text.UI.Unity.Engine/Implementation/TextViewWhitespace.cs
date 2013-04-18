@@ -14,7 +14,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		BoolSetting _showWhitespace;
 		IntSetting _numSpacesPerTab;
 
-		public TextViewWhitespace(ISettings settings, BoolSetting showWhitespace, IntSetting numSpacesPerTab)
+		public TextViewWhitespace(BoolSetting showWhitespace, IntSetting numSpacesPerTab)
 		{
 			_showWhitespace = showWhitespace;
 			_numSpacesPerTab = numSpacesPerTab;

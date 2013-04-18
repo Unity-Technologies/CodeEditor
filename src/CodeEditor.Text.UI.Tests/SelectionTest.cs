@@ -29,8 +29,8 @@ namespace CodeEditor.Text.UI.Tests
 			var anchorPos = new[] {
 				new Position (1,1), new Position (1,5), new Position (1, 10),
 				new Position (5,1), new Position (5,5), new Position (5, 10),
-				new Position (10,1), new Position (10,5), new Position (10, 10),
-			};
+				new Position (10,1), new Position (10,5), new Position (10, 10)
+			                      };
 			var selection = GetSelectionWithCaretPos(caretPos.Row, caretPos.Column);
 
 			for (var i=0; i<anchorPos.Length; i++)

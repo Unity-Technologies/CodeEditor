@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using CodeEditor.Text.Data;
 using CodeEditor.Text.UI.Completion;
 using CodeEditor.Text.UI.Unity.Engine;
-using CodeEditor.Text.UI.Unity.Engine.Implementation;
 using UnityEditor;
 using UnityEngine;
 
@@ -12,7 +11,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	internal class CodeEditorWindow : EditorWindow, ICompletionSessionProvider
 	{
-		[System.Serializable]
+		[Serializable]
 		class BackupData 
 		{
 			public int caretRow, caretColumn;

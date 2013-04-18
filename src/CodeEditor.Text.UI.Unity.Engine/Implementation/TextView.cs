@@ -170,12 +170,12 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			HandleMouseCursorImage();
 		}
 
-		private bool verticalScrollbarVisible 
+		private bool VerticalScrollbarVisible 
 		{
 			get { return ContentRect.height > ViewPort.height; }
 		}
 
-		private bool horizontalScrollbarVisible
+		private bool HorizontalScrollbarVisible
 		{
 			get { return ContentRect.height > ViewPort.height; }
 		}
@@ -186,9 +186,9 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			textAreaRect.x += Margins.TotalWidth;
 			textAreaRect.width -= Margins.TotalWidth;
 			const float kScrollbarWidth = 17f;
-			if (verticalScrollbarVisible)
+			if (VerticalScrollbarVisible)
 				textAreaRect.width -= kScrollbarWidth;
-			if (horizontalScrollbarVisible)
+			if (HorizontalScrollbarVisible)
 				textAreaRect.height -= kScrollbarWidth;
 			_mouseCursorsRegions.AddMouseCursorRegion(textAreaRect, _mouseCursors.Text);
 		}
@@ -540,11 +540,6 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		GUIStyle LineStyle
 		{
 			get { return _appearance.Text; }
-		}
-
-		GUIStyle LineNumberStyle
-		{
-			get { return _appearance.LineNumber; }
 		}
 	}
 }

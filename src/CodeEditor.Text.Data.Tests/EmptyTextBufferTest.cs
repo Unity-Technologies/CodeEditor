@@ -1,5 +1,3 @@
-using System;
-using System.Diagnostics;
 using NUnit.Framework;
 
 namespace CodeEditor.Text.Data.Tests

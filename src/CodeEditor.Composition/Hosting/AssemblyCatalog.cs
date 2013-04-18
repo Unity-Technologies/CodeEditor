@@ -46,7 +46,7 @@ namespace CodeEditor.Composition.Hosting
 		{
 			return _assembly
 				.GetTypes()
-				.SelectMany<Type, ExportDefinition>(ExportsFromType)
+				.SelectMany(ExportsFromType)
 				.Where(e => e != null)
 				.GroupBy(e => e.ContractType)
 				.ToDictionary(e => e.Key, e => e.ToArray());

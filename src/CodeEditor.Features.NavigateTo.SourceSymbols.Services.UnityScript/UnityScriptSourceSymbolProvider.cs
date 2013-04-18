@@ -53,11 +53,6 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.UnityScript
 				_symbols.Add(new UnityScriptSourceSymbol(node, _sourceFile));
 			}
 
-			public override void OnMethod(Method node)
-			{
-				base.OnMethod(node);
-			}
-
 			class UnityScriptSourceSymbol : ISourceSymbol
 			{
 				readonly TypeMember _node;

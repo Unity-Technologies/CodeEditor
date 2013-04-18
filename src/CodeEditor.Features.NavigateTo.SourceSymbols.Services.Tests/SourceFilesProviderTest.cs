@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CodeEditor.Composition;
 using CodeEditor.ContentTypes;
 using CodeEditor.IO;
 using CodeEditor.Reactive;
-using CodeEditor.Reactive.Disposables;
 using CodeEditor.Testing;
 using Moq;
 using NUnit.Framework;

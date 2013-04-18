@@ -1,4 +1,3 @@
-using CodeEditor.Composition;
 using CodeEditor.Text.Data;
 using UnityEngine;
 

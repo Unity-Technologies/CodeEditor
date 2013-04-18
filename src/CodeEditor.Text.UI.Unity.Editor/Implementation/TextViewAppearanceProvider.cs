@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using CodeEditor.Composition;
 using CodeEditor.Text.UI.Unity.Engine;
-using UnityEditor;
 using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation

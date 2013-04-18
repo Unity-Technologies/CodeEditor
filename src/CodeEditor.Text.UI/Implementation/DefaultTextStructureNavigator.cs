@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CodeEditor.Composition;
 using CodeEditor.Text.Data;
 

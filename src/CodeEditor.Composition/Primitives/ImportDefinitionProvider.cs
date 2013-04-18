@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -135,7 +135,7 @@ namespace CodeEditor.Composition.Primitives
 			if (metadataType == null)
 				return lazyType.GetMethod("FromUntyped").Invoke(null, new object[] { factory });
 			var metadata = export.Metadata.Single(metadataType.IsInstanceOfType);
-			return lazyType.GetMethod("FromUntypedWithMetadata").Invoke(null, new object[] { factory, metadata });
+			return lazyType.GetMethod("FromUntypedWithMetadata").Invoke(null, new[] { factory, metadata });
 		}
 
 		private Type ContractType()

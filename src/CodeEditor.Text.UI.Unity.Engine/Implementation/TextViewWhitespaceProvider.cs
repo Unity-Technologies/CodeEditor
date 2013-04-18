@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using CodeEditor.Composition;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
@@ -13,7 +9,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		{
 			var visibleWhitespace = new BoolSetting("VisibleWhitespace", false, settings);
 			var numSpacesPerTab = new IntSetting("NumSpacesPerTab", 4, settings);
-			return new TextViewWhitespace(settings, visibleWhitespace, numSpacesPerTab);
+			return new TextViewWhitespace(visibleWhitespace, numSpacesPerTab);
 		}
 	}
 }

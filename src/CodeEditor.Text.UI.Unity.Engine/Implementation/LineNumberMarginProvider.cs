@@ -1,5 +1,4 @@
 using CodeEditor.Composition;
-using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 {
