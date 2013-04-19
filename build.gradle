@@ -99,7 +99,7 @@ configurations {
 	tests {
 		description "Configuration for testing artifacts."
 	}
-	services {
+	serviceHost {
 		description "Configuration for service artifacts."
 	}
 }
@@ -198,7 +198,7 @@ subprojects { subProject ->
 		break
 	case ~/.+\.ServiceHost$/:
 	case ~/.+\.Services($|\..+)/:
-		bundleDependency('services', subProject)
+		bundleDependency('serviceHost', subProject)
 		break
 	case ~/.+\.(Testing|Fixtures)$/:
 		break
@@ -247,15 +247,15 @@ task updateUnityProjectEditorConfig(type: UpdateDir) {
 	destinationDir = "$unityProjectDir/Assets/kaizen/lib/Editor"
 }
 
-task updateUnityProjectServicesConfig(type: UpdateDir) {
+task updateUnityProjectServiceHostConfig(type: UpdateDir) {
 	description 'Builds and copies required assemblies to the configured Unity project (unityProjectDir)'
-	inputs.source project.configurations.services
-	destinationDir = "$unityProjectDir/Library/CodeEditor/Services"
+	inputs.source project.configurations.serviceHost
+	destinationDir = "$unityProjectDir/Library/CodeEditor/ServiceHost"
 }
 
 task updateUnityProject {
 	dependsOn updateUnityProjectEditorConfig
-	dependsOn updateUnityProjectServicesConfig
+	dependsOn updateUnityProjectServiceHostConfig
 }
 
 task open {

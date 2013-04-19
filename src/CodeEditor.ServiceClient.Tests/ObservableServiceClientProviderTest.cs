@@ -15,20 +15,15 @@ namespace CodeEditor.ServiceClient.Tests
 		public void GetsServerAddressFromUriFile()
 		{
 			const string serverExecutable = "server.exe";
-			const string serverUriFile = "server.uri";
+			const string uriFilePath = "server.uri";
 			const string serverAddress = "http://localhost:1337/";
-
-			var projectPathProvider = MockFor<IServiceHostExecutableProvider>();
-			projectPathProvider
-				.SetupGet(_ => _.ServiceHostExecutable)
-				.Returns(serverExecutable);
 
 			// provider tries to delete pid file to decide if it needs
 			// to start the server
 			var fileSystem = MockFor<IFileSystem>();
 			var uriFile = MockFor<IFile>();
 			fileSystem
-				.Setup(_ => _.GetFile(serverUriFile))
+				.Setup(_ => _.FileFor(uriFilePath))
 				.Returns(uriFile.Object);
 
 			// throw IOException when provider tries to delete the file
@@ -43,11 +38,10 @@ namespace CodeEditor.ServiceClient.Tests
 			
 			var subject = new ObservableServiceClientProvider
 			{
-				ServiceHostExecutableProvider = projectPathProvider.Object,
 				FileSystem = fileSystem.Object,
 				Logger = new StandardLogger()
 			};
-			Assert.IsNotNull(subject.Client.FirstOrTimeout(TimeSpan.FromSeconds(1)));
+			Assert.IsNotNull(subject.ClientFor(serverExecutable).FirstOrTimeout(TimeSpan.FromSeconds(1)));
 
 			VerifyAllMocks();
 		}

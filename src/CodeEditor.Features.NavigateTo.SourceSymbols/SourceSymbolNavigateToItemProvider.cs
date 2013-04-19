@@ -12,7 +12,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols
 	public class SourceSymbolNavigateToItemProvider : INavigateToItemProvider
 	{
 		[Import]
-		public IObservableServiceClientProvider ServiceClientProvider { get; set; }
+		public ICodeEditorServiceClientProvider ServiceClientProvider { get; set; }
 
 		[Import]
 		public IFileNavigationService FileNavigationService { get; set; }

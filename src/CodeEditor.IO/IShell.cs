@@ -1,11 +1,44 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using CodeEditor.Composition;
 
 namespace CodeEditor.IO
 {
+	using EnvironmentVariable = KeyValuePair<string, string>;
+
 	public interface IShell
 	{
-		IProcess StartManagedProcess(string executable);
+		IProcess StartManagedProcess(ProcessSettings settings);
+	}
+
+	public class ProcessSettings
+	{
+		public static implicit operator ProcessSettings(string executable)
+		{
+			return new ProcessSettings(executable);
+		}
+
+		public static implicit operator ProcessSettings(ResourcePath executable)
+		{
+			return new ProcessSettings(executable);
+		}
+
+		public ProcessSettings(ResourcePath executable, params EnvironmentVariable[] environmentVariables)
+		{
+			Executable = executable;
+			EnvironmentVariables = environmentVariables;
+		}
+
+		public ProcessSettings(ResourcePath executable, IEnumerable<EnvironmentVariable> environmentVariables)
+		{
+			Executable = executable;
+			EnvironmentVariables = environmentVariables.ToArray();
+		}
+
+		public ResourcePath Executable { get; private set; }
+
+		public EnvironmentVariable[] EnvironmentVariables { get; private set; }
 	}
 
 	public interface IProcess : IDisposable

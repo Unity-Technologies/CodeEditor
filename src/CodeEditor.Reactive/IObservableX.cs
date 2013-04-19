@@ -49,18 +49,38 @@ namespace CodeEditor.Reactive
 		}
 
 		/// <summary>
-		/// Delays the observable sequence by <paramref name="dueTimeout"/>.
+		/// Delays the observable sequence by <paramref name="dueTime"/>.
 		/// 
 		/// OnError notifications ARE NOT DELAYED!
 		/// </summary>
-		public static IObservableX<T> Delay<T>(this IObservableX<T> source, TimeSpan dueTimeout)
+		public static IObservableX<T> Delay<T>(this IObservableX<T> source, TimeSpan dueTime)
 		{
-			return source.Map(_ => _.Delay(dueTimeout));
+			return source.Map(_ => _.Delay(dueTime));
 		}
 
 		public static IObservableX<T> Retry<T>(this IObservableX<T> source)
 		{
 			return source.Map(_ => _.Retry());
+		}
+
+		public static IObservableX<T> Retry<T>(this IObservableX<T> source, int retryCount)
+		{
+			return source.Map(_ => _.Retry(retryCount));
+		}
+
+		public static IObservableX<T> RetryEvery<T>(this IObservableX<T> source, TimeSpan retryPeriod, int retryCount)
+		{
+			return source.CatchAndDelayRethrowBy(retryPeriod).Retry(retryCount);
+		}
+
+		public static IObservableX<T> CatchAndDelayRethrowBy<T>(this IObservableX<T> source, TimeSpan dueTime)
+		{
+			return source.Catch((Exception e) => ThrowAfterTimeout<T>(dueTime, e));
+		}
+
+		public static IObservableX<T> ThrowAfterTimeout<T>(TimeSpan dueTime, Exception e)
+		{
+			return Never<T>().Timeout(dueTime, Throw<T>(e));
 		}
 
 		public static IObservableX<T> Return<T>(T value)

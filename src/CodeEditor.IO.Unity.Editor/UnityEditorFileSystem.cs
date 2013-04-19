@@ -35,12 +35,12 @@ namespace CodeEditor.IO.Unity.Editor
 			}
 		}
 
-		public IFile GetFile(ResourcePath path)
+		public IFile FileFor(ResourcePath path)
 		{
 			return new UnityEditorFile(path);
 		}
 
-		public IFolder GetFolder(ResourcePath path)
+		public IFolder FolderFor(ResourcePath path)
 		{
 			return new Folder(path, this);
 		}

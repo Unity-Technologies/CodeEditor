@@ -40,15 +40,15 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services.Tests
 				.Returns(sourceFolder.Object);
 			var csFile = MockFor<IFile>().Object;
 			sourceFolder
-				.Setup(_ => _.GetFiles("*.cs", SearchOption.AllDirectories))
+				.Setup(_ => _.SearchFiles("*.cs", SearchOption.AllDirectories))
 				.Returns(new[] {csFile});
 			var jsFile = MockFor<IFile>().Object;
 			sourceFolder
-				.Setup(_ => _.GetFiles("*.js", SearchOption.AllDirectories))
+				.Setup(_ => _.SearchFiles("*.js", SearchOption.AllDirectories))
 				.Returns(new[] {jsFile});
 			var usFile = MockFor<IFile>().Object;
 			sourceFolder
-				.Setup(_ => _.GetFiles("*.us", SearchOption.AllDirectories))
+				.Setup(_ => _.SearchFiles("*.us", SearchOption.AllDirectories))
 				.Returns(new[] {usFile});
 
 			var subject = new SourceFilesProvider

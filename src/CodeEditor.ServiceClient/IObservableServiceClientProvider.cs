@@ -9,24 +9,19 @@ using CodeEditor.ReactiveServiceStack;
 
 namespace CodeEditor.ServiceClient
 {
-	public interface IObservableServiceClientProvider
+	public interface ICodeEditorServiceClientProvider
 	{
 		IObservableX<IObservableServiceClient> Client { get; }
+	}
+
+	public interface IObservableServiceClientProvider
+	{
+		IObservableX<IObservableServiceClient> ClientFor(ProcessSettings serviceHostProcessSettings);
 	}
 
 	[Export(typeof(IObservableServiceClientProvider))]
 	public class ObservableServiceClientProvider : IObservableServiceClientProvider
 	{
-		readonly Lazy<IFile> _serviceHostUriFile;
-
-		public ObservableServiceClientProvider()
-		{
-			_serviceHostUriFile = new Lazy<IFile>(() => FileSystem.GetFile(ServiceHostUriFilePath));
-		}
-
-		[Import]
-		public IServiceHostExecutableProvider ServiceHostExecutableProvider { get; set; }
-
 		[Import]
 		public IFileSystem FileSystem { get; set; }
 
@@ -36,32 +31,21 @@ namespace CodeEditor.ServiceClient
 		[Import]
 		public ILogger Logger { get; set; }
 
-		public IObservableX<IObservableServiceClient> Client
+		public IObservableX<IObservableServiceClient> ClientFor(ProcessSettings serviceHostProcessSettings)
 		{
-			get
-			{
-				return
-					CreateClient()
-					.Catch(
-						(Exception e) =>
-							ObservableX
-							.Never<IObservableServiceClient>()
-							.Timeout(
-								TimeSpan.FromMilliseconds(500),
-								ObservableX.Throw<IObservableServiceClient>(e)))
-					.Retry();
-			}
+			return CreateClientFor(serviceHostProcessSettings).RetryEvery(TimeSpan.FromMilliseconds(500), 3);
 		}
 
-		IObservableX<IObservableServiceClient> CreateClient()
+		IObservableX<IObservableServiceClient> CreateClientFor(ProcessSettings serviceHostProcessSettings)
 		{
 			return ObservableX.CreateWithDisposable<IObservableServiceClient>(observer =>
 			{
 				try
 				{
-					EnsureCompositionServerIsRunning();
-					var baseUri = FirstLineFromUriFile();
-					observer.CompleteWith(new ObservableServiceClient(baseUri));
+					var uriFile = UriFileFor(serviceHostProcessSettings.Executable);
+					EnsureServiceHostProcessIsUp(uriFile, serviceHostProcessSettings);
+					var serviceHostUri = FirstLineOf(uriFile);
+					observer.CompleteWith(new ObservableServiceClient(serviceHostUri));
 				}
 				catch (Exception e)
 				{
@@ -72,34 +56,38 @@ namespace CodeEditor.ServiceClient
 			});
 		}
 
-		string FirstLineFromUriFile()
+		string FirstLineOf(IFile uriFile)
 		{
-			var content = UriFile.ReadAllText();
+			var content = uriFile.ReadAllText();
 			if (string.IsNullOrEmpty(content))
 				throw new InvalidOperationException("Server address couldn't be read.");
 			return content.Trim();
 		}
 
-		void EnsureCompositionServerIsRunning()
+		void EnsureServiceHostProcessIsUp(IFile uriFile, ProcessSettings serviceHostProcessSettings)
 		{
-			if (IsRunning())
+			if (!uriFile.TryToDelete())
 			{
 				Logger.Log("server is already running");
 				return;
 			}
-			StartCompositionContainer();
+			StartServiceHost(serviceHostProcessSettings);
 		}
 
-		IFile UriFile
+		IFile UriFileFor(ResourcePath serviceHostExecutablePath)
 		{
-			get { return _serviceHostUriFile.Value; }
+			return FileFor(UriFilePathFor(serviceHostExecutablePath));
 		}
 
-		void StartCompositionContainer()
+		IFile FileFor(ResourcePath path)
 		{
-			var executable = ServiceHostExecutable;
-			Logger.Log("Starting {0}".Fmt(executable));
-			using (Shell.StartManagedProcess(executable.Location))
+			return FileSystem.FileFor(path);
+		}
+
+		void StartServiceHost(ProcessSettings serviceHostProcessSettings)
+		{
+			Logger.Log("Starting {0}".Fmt(serviceHostProcessSettings.Executable));
+			using (Shell.StartManagedProcess(serviceHostProcessSettings))
 			{
 				// this doesn't kill the actual process but
 				// just releases any resources attached to
@@ -107,52 +95,9 @@ namespace CodeEditor.ServiceClient
 			}
 		}
 
-		bool IsRunning()
+		ResourcePath UriFilePathFor(ResourcePath serviceHostExecutablePath)
 		{
-			return !TryToDeleteUriFile();
-		}
-
-		bool TryToDeleteUriFile()
-		{
-			try
-			{
-				UriFile.Delete();
-				return true;
-			}
-			catch (Exception)
-			{
-				return false;
-			}
-		}
-
-		ResourcePath ServiceHostUriFilePath
-		{
-			get { return ServiceHostExecutable.ChangeExtension("uri"); }
-		}
-
-		ResourcePath ServiceHostExecutable
-		{
-			get { return ServiceHostExecutableProvider.ServiceHostExecutable; }
-		}
-	}
-
-	public interface IServiceHostExecutableProvider
-	{
-		string ServiceHostExecutable { get; }
-	}
-
-	public class ServiceHostExecutableProvider : IServiceHostExecutableProvider
-	{
-		readonly string _serviceHostExecutable;
-
-		public ServiceHostExecutableProvider(string serviceHostExecutable)
-		{
-			_serviceHostExecutable = serviceHostExecutable;
-		}
-
-		public string ServiceHostExecutable
-		{
-			get { return _serviceHostExecutable; }
+			return serviceHostExecutablePath.ChangeExtension("uri");
 		}
 	}
 }

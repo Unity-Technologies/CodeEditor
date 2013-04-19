@@ -51,7 +51,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		public ITextView ViewForFile(string fileName)
 		{
-			return CreateView(new TextViewCreationOptions {File = FileSystem.GetFile(fileName)});
+			return CreateView(new TextViewCreationOptions {File = FileSystem.FileFor(fileName)});
 		}
 
 		public ITextView CreateView()

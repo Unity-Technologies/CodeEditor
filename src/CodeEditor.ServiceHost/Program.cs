@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using CodeEditor.Composition.Hosting;
 using Funq;
 using ServiceStack.Configuration;
@@ -28,8 +29,7 @@ namespace CodeEditor.ServiceHost
 					appHost.Init();
 					appHost.Start(baseUri);
 
-					Console.WriteLine("Press <ENTER> to quit");
-					Console.ReadLine();
+					Thread.Sleep(Timeout.Infinite);
 				}
 			}
 		}

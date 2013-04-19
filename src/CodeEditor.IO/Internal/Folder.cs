@@ -13,24 +13,24 @@ namespace CodeEditor.IO.Internal
 			_fileSystem = fileSystem;
 		}
 
-		public IFile GetFile(ResourcePath relativeFilePath)
+		public IFile FileFor(ResourcePath relativeFilePath)
 		{
-			return _fileSystem.GetFile(Path.Combine(relativeFilePath));
+			return _fileSystem.FileFor(Path / relativeFilePath);
 		}
 
-		public IFolder GetFolder(ResourcePath relativeFilePath)
+		public IFolder FolderFor(ResourcePath relativeFilePath)
 		{
-			return _fileSystem.GetFolder(Path.Combine(relativeFilePath));
+			return _fileSystem.FolderFor(Path / relativeFilePath);
 		}
 
-		public IEnumerable<IFile> GetFiles(string pattern, SearchOption searchOption)
+		public IEnumerable<IFile> SearchFiles(string pattern, SearchOption searchOption)
 		{
-			return Directory.GetFiles(Location, pattern, searchOption).Select(_ => _fileSystem.GetFile(_));
+			return Directory.GetFiles(Location, pattern, searchOption).Select(_ => _fileSystem.FileFor(_));
 		}
 
-		public IEnumerable<IFolder> GetFolders()
+		public IEnumerable<IFolder> Folders
 		{
-			return Directory.GetDirectories(Location).Select(_ => _fileSystem.GetFolder(_));
+			get { return Directory.GetDirectories(Location).Select(_ => _fileSystem.FolderFor(_)); }
 		}
 
 		public override bool Exists()

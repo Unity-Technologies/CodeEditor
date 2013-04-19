@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using CodeEditor.Composition;
 using CodeEditor.Composition.Hosting;
@@ -7,6 +6,8 @@ using CodeEditor.IO;
 using CodeEditor.IO.Unity.Editor;
 using CodeEditor.Logging;
 using CodeEditor.Logging.Unity;
+using CodeEditor.Reactive;
+using CodeEditor.ReactiveServiceStack;
 using CodeEditor.ServiceClient;
 
 namespace CodeEditor.Text.UI.Unity.Editor
@@ -29,21 +30,70 @@ namespace CodeEditor.Text.UI.Unity.Editor
 		{
 			var container = new CompositionContainer(AppDomain.CurrentDomain.GetAssemblies().ToArray());
 			container.AddExportedValue<IFileSystem>(new UnityEditorFileSystem());
-			container.AddExportedValue<IServiceHostExecutableProvider>(new ServiceHostExecutableProvider(ServerExecutable));
+			container.AddExportedValue(new DataPathProvider(UnityEngine.Application.dataPath));
 			container.AddExportedValue<IMonoExecutableProvider>(new UnityMonoExecutableProvider());
 			if (UnityEngine.Debug.isDebugBuild)
 				container.AddExportedValue<ILogger>(new UnityLogger());
 			return container;
 		}
+	}
 
-		static string ServerExecutable
+	class DataPathProvider
+	{
+		public ResourcePath DataPath { get; private set; }
+
+		public DataPathProvider(ResourcePath dataPath)
 		{
-			get { return Path.Combine(ProjectPath, "Library/CodeEditor/Services/CodeEditor.ServiceHost.exe"); }
+			DataPath = dataPath;
+		}
+	}
+
+	[Export]
+	class ProjectPathProvider
+	{
+		public ResourcePath ProjectPath { get; private set; }
+
+		[ImportingConstructor]
+		public ProjectPathProvider(DataPathProvider dataPathProvider)
+		{
+			ProjectPath = dataPathProvider.DataPath.Parent;
+		}
+	}
+
+	[Export(typeof(ICodeEditorServiceClientProvider))]
+	class CodeEditorServiceClientProvider : ICodeEditorServiceClientProvider
+	{
+		readonly Lazy<ProcessSettings> _serviceHostProcessSettings;
+
+		public CodeEditorServiceClientProvider()
+		{
+			_serviceHostProcessSettings = new Lazy<ProcessSettings>(() => new ProcessSettings(ServiceHostExecutable));
 		}
 
-		static string ProjectPath
+		public IObservableX<IObservableServiceClient> Client
 		{
-			get { return Path.GetDirectoryName(UnityEngine.Application.dataPath); }
+			get { return ServiceClientProvider.ClientFor(ServiceHostProcessSettings); }
+		}
+
+		[Import]
+		public ProjectPathProvider ProjectPathProvider { get; set; }
+
+		[Import]
+		public IObservableServiceClientProvider ServiceClientProvider { get; set; }
+
+		ResourcePath ServiceHostExecutable
+		{
+			get { return ProjectPath / "Library/CodeEditor/ServiceHost/CodeEditor.ServiceHost.exe"; }
+		}
+
+		ResourcePath ProjectPath
+		{
+			get { return ProjectPathProvider.ProjectPath; }
+		}
+
+		ProcessSettings ServiceHostProcessSettings
+		{
+			get { return _serviceHostProcessSettings.Value; }
 		}
 	}
 }

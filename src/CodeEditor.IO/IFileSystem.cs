@@ -10,8 +10,8 @@ namespace CodeEditor.IO
 
 	public interface IResourceContainer
 	{
-		IFile GetFile(ResourcePath path);
-		IFolder GetFolder(ResourcePath path);
+		IFile FileFor(ResourcePath path);
+		IFolder FolderFor(ResourcePath path);
 	}
 
 	public interface IResource
@@ -38,8 +38,8 @@ namespace CodeEditor.IO
 
 	public interface IFolder : IResource, IResourceContainer
 	{
-		IEnumerable<IFile> GetFiles(string pattern, SearchOption searchOption);
-		IEnumerable<IFolder> GetFolders();
+		IEnumerable<IFolder> Folders { get; }
+		IEnumerable<IFile> SearchFiles(string pattern, SearchOption searchOption);
 	}
 
 	public static class FileExtensions
@@ -47,6 +47,19 @@ namespace CodeEditor.IO
 		public static TextReader OpenText(this IFile file)
 		{
 			return new StringReader(file.ReadAllText());
+		}
+
+		public static bool TryToDelete(this IFile file)
+		{
+			try
+			{
+				file.Delete();
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
 		}
 	}
 
@@ -60,6 +73,11 @@ namespace CodeEditor.IO
 		public static implicit operator string(ResourcePath path)
 		{
 			return path.Location;
+		}
+
+		public static ResourcePath operator /(ResourcePath left, ResourcePath right)
+		{
+			return left.Combine(right);
 		}
 
 		public static bool operator ==(ResourcePath left, ResourcePath right)
@@ -103,6 +121,11 @@ namespace CodeEditor.IO
 		public string Location
 		{
 			get { return _location; }
+		}
+
+		public ResourcePath Parent
+		{
+			get { return Path.GetDirectoryName(Location); }
 		}
 
 		public ResourcePath Combine(ResourcePath relativePath)

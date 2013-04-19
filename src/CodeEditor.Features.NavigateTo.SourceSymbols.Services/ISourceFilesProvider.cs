@@ -41,7 +41,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 				return ObservableX.CreateWithDisposable<IFileNotification>(observer =>
 				{
 					foreach (var fileExtension in FileExtensionsWithExportedSourceSymbolProvider())
-						foreach (var file in SourceFolder.GetFiles("*" + fileExtension, SearchOption.AllDirectories))
+						foreach (var file in SourceFolder.SearchFiles("*" + fileExtension, SearchOption.AllDirectories))
 							observer.OnNext(new FileNotification(file, FileNotificationKind.New));
 					return Disposable.Empty;
 				});

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using CodeEditor.Composition;
 
@@ -9,12 +10,20 @@ namespace CodeEditor.IO.Internal
 		[Import]
 		public IMonoExecutableProvider MonoExecutableProvider { get; set; }
 
-		public IProcess StartManagedProcess(string executable)
+		public IProcess StartManagedProcess(ProcessSettings settings)
 		{
-			return new StandardProcess(Process.Start(new ProcessStartInfo(MonoExecutable, executable)
-			{
-				WindowStyle = ProcessWindowStyle.Minimized
-			}));
+			return new StandardProcess(Process.Start(StartInfoFrom(settings)));
+		}
+
+		ProcessStartInfo StartInfoFrom(ProcessSettings settings)
+		{
+			var startInfo = new ProcessStartInfo(MonoExecutable, settings.Executable);
+			startInfo.WorkingDirectory = settings.Executable.Parent;
+			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+			startInfo.UseShellExecute = false;
+			foreach (var variable in settings.EnvironmentVariables)
+				startInfo.EnvironmentVariables.Add(variable.Key, variable.Value);
+			return startInfo;
 		}
 
 		string MonoExecutable
