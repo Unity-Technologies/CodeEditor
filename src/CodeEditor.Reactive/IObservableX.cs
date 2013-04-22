@@ -58,6 +58,16 @@ namespace CodeEditor.Reactive
 			return source.Map(_ => _.Delay(dueTime));
 		}
 
+		public static IObservableX<T> Repeat<T>(this IObservableX<T> source)
+		{
+			return source.Map(_ => _.Repeat());
+		}
+
+		public static IObservableX<T> Repeat<T>(this IObservableX<T> source, int repeatCount)
+		{
+			return source.Map(_ => _.Repeat(repeatCount));
+		}
+
 		public static IObservableX<T> Retry<T>(this IObservableX<T> source)
 		{
 			return source.Map(_ => _.Retry());
