@@ -206,6 +206,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 					if (GUILayout.Button(s_Styles.optionsIcon, EditorStyles.label))
 					{
 						_showingSettings = !_showingSettings;
+						Repaint();
 					}
 
 					GUILayout.Space(10f);
