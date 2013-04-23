@@ -15,7 +15,9 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		IFontManager FontManager { get; }
 		
 		float LineHeight { get; }
-		Rect SpanForCurrentCharacter();
+		Rect GetCurrentCharacterRect();
+		Rect GetSubstringRect(int row, int column, int length);
+		Position GetCaretPositionUnderMouseCursor(Vector2 cursorPosition);
 		Rect ViewPort { get; set; }
 		Vector2 ScrollOffset { get; set; }
 		bool HasSelection {get;}
@@ -24,6 +26,7 @@ namespace CodeEditor.Text.UI.Unity.Engine
 		bool GetSelectionEnd (out int row, out int column);
 		bool GetSelectionInDocument (out int pos, out int length);
 		Action<int, int, int> Clicked { get; set; }	// row, column, clickcount
+		Action TextViewEvent { get; set; }
 		void EnsureCursorIsVisible();
 		bool ShowCursor { get; set; }
 		void OnGUI();

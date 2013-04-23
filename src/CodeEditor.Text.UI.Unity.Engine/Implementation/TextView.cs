@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using CodeEditor.Text.Data;
 using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Engine.Implementation
@@ -30,6 +31,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 		readonly IMouseCursorRegions _mouseCursorsRegions;
 		readonly ISettings _settings;
 		public Action<int, int, int> Clicked {get; set;}
+		public Action TextViewEvent { get; set; }
 		public bool ShowCursor { get; set; }
 
 		public TextView(
@@ -160,6 +162,8 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 				DoGUIOnElements();
 				HandleMouseDragSelection ();
+				if (TextViewEvent != null)
+					TextViewEvent();
 
 			} GUI.EndScrollView();
 
@@ -194,11 +198,6 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			GUIUtils.DrawRect(ViewPort, Appearance.BackgroundColor);
 			if (BackgroundStyle != null)
 				GUI.Label(ViewPort, GUIContent.none, BackgroundStyle);
-		}
-
-		public Rect SpanForCurrentCharacter()
-		{
-			return GetTextSpanRect(GetLineRect(CaretRow), CurrentLine.Text, Math.Max(0, CaretColumn - 1), 1);
 		}
 
 		void DoGUIOnElements()
@@ -400,13 +399,13 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			lastRowVisible = Mathf.Min(firstRowVisible + (int)Mathf.Ceil(heightInPixels / LineHeight), numRows - 1);
 		}
 
-		Position GetCaretPositionUnderMouseCursor (Vector2 cursorPosition)
+		public Position GetCaretPositionUnderMouseCursor (Vector2 cursorPosition)
 		{
 			if (cursorPosition.x < ViewPort.x || cursorPosition.x > ViewPort.xMax)
 				return new Position(-1,-1);
 
 			var row = GetRow(cursorPosition.y);
-			
+
 			if (row >= LineCount)
 				row = LineCount-1;
 
@@ -448,17 +447,46 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			ScrollOffset = scrollOffset;
 		}
 
-		Rect GetTextSpanRect(Rect lineRect, string text, int startPos, int length)
+		public Rect GetCurrentCharacterRect()
 		{
-			if (startPos < 0)
-				startPos = 0;
-			if (startPos >= text.Length - 1)
-				startPos = text.Length - 1;
-			if (startPos + length >= text.Length)
-				length = Mathf.Max(1, text.Length - startPos);
+			return GetSubstringRect(CaretRow, Math.Max(0, CaretColumn - 1), 1);
+		}
 
-			var start = LineStyle.GetCursorPixelPosition(lineRect, MissingEngineAPI.GUIContent_Temp(text), startPos);
-			var end = LineStyle.GetCursorPixelPosition(lineRect, MissingEngineAPI.GUIContent_Temp(text), startPos + length);
+		// Input data in document text values
+		public Rect GetSubstringRect(int row, int column, int length)
+		{
+			if (column < 0 || row < 0 || length < 0)
+			{
+				Debug.LogError("GetSubstringRect: Invalid input: (column " + column + ", length " + length + ", row " + row + ")");
+				return new Rect();
+			}
+
+			var line = Line(row);
+			string renderText = Whitespace.FormatBaseText(line.Text);
+			if (renderText.Length == 0)	
+			{
+				length = 0;
+				column = 0;
+			}
+
+			int startColumn = Whitespace.ConvertToGraphicalCaretColumn(column, line);
+			Rect textRect = GetTextSpanRect(GetLineRect(row), renderText, startColumn, length);
+			textRect.x += CodeOffset;
+			return textRect;
+		}
+
+		// Input data in render text values
+		Rect GetTextSpanRect(Rect lineRect, string renderText, int startPosition, int length)
+		{
+			if (startPosition < 0)
+				startPosition = 0;
+			if (startPosition >= renderText.Length - 1)
+				startPosition = renderText.Length - 1;
+			if (startPosition + length >= renderText.Length)
+				length = Mathf.Max(1, renderText.Length - startPosition);
+
+			var start = LineStyle.GetCursorPixelPosition(lineRect, MissingEngineAPI.GUIContent_Temp(renderText), startPosition);
+			var end = LineStyle.GetCursorPixelPosition(lineRect, MissingEngineAPI.GUIContent_Temp(renderText), startPosition + length);
 
 			return new Rect(start.x, start.y, end.x - start.x, LineHeight);
 		}
@@ -499,7 +527,7 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 			get { return _document.LineCount; }
 		}
 
-		private ITextViewLine Line(int row)
+		private ITextViewLine Line(int row)	
 		{
 			return _document.Line(row);
 		}
