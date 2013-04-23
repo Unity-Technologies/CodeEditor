@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using CodeEditor.Text.Data;
 using CodeEditor.Text.UI.Implementation;
+using CodeEditor.Text.UI.Unity.Editor.Implementation.ListPopup;
 using CodeEditor.Text.UI.Unity.Engine;
 using UnityEngine;
 using UnityEditor;
@@ -24,6 +26,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		private readonly ITextView _textView;
 		private readonly Font _font;
 		private readonly ITextStructureNavigator _navigator;
+		private readonly CodeViewCompletion _completion;
 
 		public CodeView(EditorWindow owner, ITextView textView)
 		{
@@ -33,6 +36,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			var textFont = _textView.Appearance.Text.font;
 			_font = textFont ? textFont : GUI.skin.font;
 			_navigator = new DefaultTextStructureNavigator();
+			_completion = new CodeViewCompletion(this, _textView);
+
 			Caret.Moved += OnCaretMoved;
 			_textView.Clicked = OnTextViewClicked;
 		}
@@ -54,8 +59,13 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			HandleCommandEvents();
 			_textView.ViewPort = rect;
 			_textView.OnGUI();
-			HandleCompletionSession();
 			HandleKeyboard(true);
+			_completion.OnGUI();
+		}
+
+		public void SetKeyboardFocus()
+		{
+			m_Owner.Focus();
 		}
 
 		private void SetKeyboardControl(Rect rect)
@@ -70,20 +80,12 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			}
 		}
 
-		private void HandleCompletionSession()
+		public void StartCompletionSession(CompletionSession session)
 		{
-			if(m_Session == null)
-				return;
-
-			var state = new CodeViewPopUp.PopUpState();
-			state.m_ListElements = m_Session.Completions.ToList();
-			state.m_OnSelectCallback += CodeCompletionCallback;
-			state.m_SelectedCompletion = -1; // Use -1 for invisible marker when showing
-			state.m_CodeView = this;
-			var spanRect = _textView.SpanForCurrentCharacter();
-			var screenPos = new Vector2(spanRect.x, spanRect.y + _textView.LineHeight);
-			m_Session = null;
-			CodeViewPopUp.ShowAtPosition(screenPos, state);
+			// To be able to calculate the screen pos for the popup we need to do it from an OnGUI code path so
+			// we save the session and request a repaint to get an OnGUI event (see LineGUI for handling)
+			m_Session = session;
+			Repaint();
 		}
 
 		public void HandleKeyboard(bool requireKeyboardFocus)
@@ -125,24 +127,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				m_GrabKeyboardControl = true;
 		}
 
-		private void CodeCompletionCallback(string selectedText, int selectedIndex)
-		{
-			m_GrabKeyboardControl = true;
-			var line = _document.CurrentLine;
-			_document.Buffer.Insert(line.Start + Caret.Column, selectedText.Substring(1));
-			Caret.SetPosition(Caret.Row, Caret.Column + selectedText.Length);
-			m_Owner.Focus();
-		}
-
-		public void StartCompletionSession(CompletionSession session)
-		{
-			// To be able to calculate the screen pos for the popup we need to do it from an OnGUI code path so
-			// we save the session and request a repaint to get an OnGUI event (see LineGUI for handling)
-			m_Session = session;
-			Repaint();
-		}
-
-		private ICaret Caret
+		public ICaret Caret
 		{
 			get { return _document.Caret; }
 		}
@@ -300,10 +285,16 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 
 		private void PreviousWord()
 		{
-			var span = _navigator.GetSpanFor(AbsoluteCaretPosition, CurrentSnapshot);
-			if(span.Start == AbsoluteCaretPosition)
-				span = _navigator.GetPreviousSpanFor(span);
+			var span = PreviousWordSpan();
 			MoveToPosition(span.Start);
+		}
+
+		public TextSpan PreviousWordSpan()
+		{
+			var span = _navigator.GetSpanFor(AbsoluteCaretPosition, CurrentSnapshot);
+			if (span.Start == AbsoluteCaretPosition)
+				span = _navigator.GetPreviousSpanFor(span);
+			return span;
 		}
 
 		private void NextWord()
@@ -331,17 +322,17 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			Caret.SetPosition(line, position - LineStart(line));
 		}
 
-		private int AbsoluteCaretPosition
+		public int AbsoluteCaretPosition
 		{
 			get { return CurrentLineStart + Caret.Column; }
 		}
 
-		private int LineStart(int line)
+		public int LineStart(int line)
 		{
 			return CurrentSnapshot.Lines[line].Start;
 		}
 
-		private int LineNumberForPosition(int position)
+		public int LineNumberForPosition(int position)
 		{
 			return CurrentSnapshot.LineNumberForPosition(position);
 		}
