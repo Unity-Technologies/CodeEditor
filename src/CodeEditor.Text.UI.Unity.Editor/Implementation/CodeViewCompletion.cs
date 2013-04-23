@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using CodeEditor.Text.Data;
-using CodeEditor.Text.UI.Implementation;
 using CodeEditor.Text.UI.Unity.Editor.Implementation.ListPopup;
 using CodeEditor.Text.UI.Unity.Engine;
+using CodeEditor.Text.UI.Unity.Engine.Implementation;
 using UnityEngine;
-using UnityEditor;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
@@ -23,15 +22,18 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		string _word;
 		Rect _wordScreenRect;
 
-		private readonly CodeView _codeView;		// owner
-		private readonly ITextView _textView;
-		private readonly ITextViewDocument _document;
+		readonly CodeView _codeView;		// owner
+		readonly ITextView _textView;
+		readonly ITextViewDocument _document;
+		readonly BoolSetting _enabled;
+		
 
 		public CodeViewCompletion(CodeView codeView, ITextView textView)
 		{
 			_codeView = codeView;
 			_textView = textView;
 			_document = textView.Document;
+			_enabled = new BoolSetting("CompletionEnabled", false, textView.Settings);
 
 			_document.Buffer.Changed += OnBufferChanged;
 			_textView.TextViewEvent += OnTextViewEvent;
@@ -39,6 +41,9 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		
 		void OnBufferChanged(object sender, TextChangeArgs args)
 		{
+			if (!_enabled.Value)
+				return;
+
 			_state = State.UpdateScreenRectNeeded;
 			_codeView.Repaint();
 		}

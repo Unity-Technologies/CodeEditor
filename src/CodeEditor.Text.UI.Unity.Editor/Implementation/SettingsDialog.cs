@@ -82,6 +82,11 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			_colorSchemeIndex.Value = EditorGUILayout.IntPopup(new GUIContent("Color scheme"), _colorSchemeIndex.Value,
 				new[] {new GUIContent("Dark"), new GUIContent("Light")}, new[] {0, 1});
 
+			GUILayout.Label("Code Completion", EditorStyles.boldLabel);
+			var completionEnabled = _settings.GetSetting("CompletionEnabled") as BoolSetting;
+			if (completionEnabled != null)
+				completionEnabled.Value = EditorGUILayout.Toggle(new GUIContent("Enabled"), completionEnabled.Value);
+
 			GUILayout.Space(10);
 
 			// Make window draggable
