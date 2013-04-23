@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -39,10 +39,22 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			_textView.TextViewEvent += OnTextViewEvent;
 		}
 		
+		bool ShouldCloseCompletionWindow(string inputText)
+		{
+			return inputText == "." || inputText == "\n" || inputText.Length > 1;
+		}
+
 		void OnBufferChanged(object sender, TextChangeArgs args)
 		{
 			if (!_enabled.Value)
 				return;
+
+			if (ShouldCloseCompletionWindow(args.NewText))
+			{
+				_state = State.Idle;
+				CodeCompletionWindow.CloseList();
+				return;
+			}
 
 			_state = State.UpdateScreenRectNeeded;
 			_codeView.Repaint();
