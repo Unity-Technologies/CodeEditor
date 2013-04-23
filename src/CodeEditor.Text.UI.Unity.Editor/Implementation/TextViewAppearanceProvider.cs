@@ -12,10 +12,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 	{
 		public ITextViewAppearance AppearanceFor(ITextViewDocument document, IFontManager fontManager)
 		{
-			string userSkinPath = "Assets/Editor/CodeEditor/CodeEditorSkin.guiskin";
-			GUISkin skin = UnityEditor.AssetDatabase.LoadAssetAtPath(userSkinPath, typeof(GUISkin)) as GUISkin;
-			if (skin == null)
-				skin = GUI.skin;
+			GUISkin skin = UnityEditorCompositionContainer.GetExportedValue<IGUISkinProvider>().GetGUISkin();
 
 			// Make a copy of guistyle to ensure we do not change the guistyle of the skin
 			GUIStyle textStyle = new GUIStyle(skin.label)
