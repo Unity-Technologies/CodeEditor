@@ -156,9 +156,16 @@ namespace CodeEditor.Text.UI.Unity.Engine.Implementation
 
 		public int ConvertToGraphicalCaretColumn(int logicalCaretColumn, ITextViewLine line, List<int> tabSizes)
 		{
+			if (logicalCaretColumn < 0 || logicalCaretColumn > line.Text.Length)
+			{
+				Debug.LogError("Invalid input: Ensure 0 <= logicalCaretColumn <= line.Text.Length (logicalCaretColumn: " + logicalCaretColumn + ", text length " + line.Text.Length + ")");
+				return 0;
+			}
+
 			int glyphCounter = 0;
 			int tabCounter = 0;
-			for (int i = 0; i <= line.Text.Length; i++)
+			int textLength = line.Text.Length;
+			for (int i = 0; i <= textLength; i++)
 			{
 				if (i == logicalCaretColumn)
 					return glyphCounter;
