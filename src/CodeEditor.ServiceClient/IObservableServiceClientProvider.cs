@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using ServiceStack.Text;
 using CodeEditor.Composition;
 using CodeEditor.IO;
@@ -42,9 +43,7 @@ namespace CodeEditor.ServiceClient
 			{
 				try
 				{
-					var uriFile = UriFileFor(serviceHostProcessSettings.Executable);
-					EnsureServiceHostProcessIsUp(uriFile, serviceHostProcessSettings);
-					var serviceHostUri = FirstLineOf(uriFile);
+					var serviceHostUri = ServiceHostUriFor(serviceHostProcessSettings);
 					observer.CompleteWith(new ObservableServiceClient(serviceHostUri));
 				}
 				catch (Exception e)
@@ -54,6 +53,16 @@ namespace CodeEditor.ServiceClient
 				}
 				return Disposable.Empty;
 			});
+		}
+
+		string ServiceHostUriFor(ProcessSettings serviceHostProcessSettings)
+		{
+			lock (this)
+			{
+				var uriFile = UriFileFor(serviceHostProcessSettings.Executable);
+				EnsureServiceHostProcessIsUp(uriFile, serviceHostProcessSettings);
+				return FirstLineOf(uriFile);
+			}
 		}
 
 		string FirstLineOf(IFile uriFile)
@@ -72,6 +81,14 @@ namespace CodeEditor.ServiceClient
 				return;
 			}
 			StartServiceHost(serviceHostProcessSettings);
+			WaitFor(uriFile, TimeSpan.FromMilliseconds(200));
+		}
+
+		void WaitFor(IFile uriFile, TimeSpan timeout)
+		{
+			var timer = Stopwatch.StartNew();
+			while (!uriFile.Exists() && timer.Elapsed < timeout)
+				System.Threading.Thread.Sleep(0);
 		}
 
 		IFile UriFileFor(ResourcePath serviceHostExecutablePath)
