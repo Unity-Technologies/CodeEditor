@@ -72,6 +72,6 @@ namespace CodeEditor.Composition.Hosting
 			return CustomAttribute<InheritedExportAttribute>.AllFrom(baseType);
 		}
 
-		static readonly ExportDefinition[] NoExportsDefinition = new ExportDefinition[0];
+		static readonly ExportDefinition[] NoExportsDefinition = EmptyArray.Of<ExportDefinition>();
 	}
 }

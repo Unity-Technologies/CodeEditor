@@ -1,4 +1,5 @@
 using CodeEditor.Composition;
+using CodeEditor.Composition.Hosting;
 using CodeEditor.ContentTypes;
 using CodeEditor.IO;
 
@@ -24,7 +25,7 @@ namespace CodeEditor.Features.NavigateTo.SourceSymbols.Services
 			var provider = ProviderFor(file);
 			return provider != null
 				? provider.SourceSymbolsFor(file)
-				: new ISourceSymbol[0];
+				: EmptyArray.Of<ISourceSymbol>();
 		}
 
 		private ISourceSymbolProvider ProviderFor(IFile file)
