@@ -240,6 +240,9 @@ class UpdateDir extends DefaultTask {
 }
 
 def unityProjectDir = project.properties.get('unityProjectDir', 'UnityProject')
+def unityExecutable = project.hasProperty('unityExecutable') ? 
+                      project.property ('unityExecutable') :
+                      rootProject.extensions.unity.executable
 
 task updateUnityProjectEditorConfig(type: UpdateDir) {
 	description 'Builds and copies required assemblies to the configured Unity project (unityProjectDir)'
@@ -262,7 +265,7 @@ task open {
 	dependsOn updateUnityProject
 	doFirst {
 		project.exec {
-			executable rootProject.extensions.unity.executable
+			executable unityExecutable
 			args '-projectPath'
 			args file(unityProjectDir)
 		}
