@@ -106,7 +106,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		void SetClassificationColors()
 		{
 			var bgDark1 = new Color(0 / 255f, 43 / 255f, 54 / 255f);
-			var bgDark2 = new Color(37 / 255f, 39 / 255f, 39 / 255f);
+			var bgDark2 = new Color(51 / 255f, 51 / 255f, 51 / 255f);
 			//Color bgLight1 = new Color (238/255f, 232/255f, 213/255f);
 			var bgLight2 = new Color(253 / 255f, 246 / 255f, 227 / 255f);
 			var grey = new Color(130 / 255f, 148 / 255f, 150 / 255f);
@@ -116,6 +116,8 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			var magenta = new Color(211 / 255f, 54 / 255f, 130 / 255f);
 			//Color violet = new Color(108/255f, 113/255f, 196/255f);
 			var blue = new Color(28 / 255f, 129 / 255f, 200 / 255f);
+			var unityProSelectionBlue = new Color(61 / 255f, 96 / 255f, 145 / 255f);
+			var unitySelectionBlue = new Color(61 / 255f, 128 / 255f, 223 / 255f);
 			var cyan = new Color(42 / 255f, 161 / 255f, 152 / 255f);
 			var green = new Color(133 / 255f, 153 / 255f, 0 / 255f);
 
@@ -128,7 +130,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			{
 				// Dark background
 				backgroundColor = bgDark2;
-				selectionColor = grey;
+				selectionColor = unityProSelectionBlue;
 				lineNumberColor = grey;
 				syntaxColors = new Dictionary<IClassification, Color>
 				{
