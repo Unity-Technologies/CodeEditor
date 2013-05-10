@@ -11,7 +11,7 @@ using UnityEditor;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
-	internal partial class CodeView
+	public partial class CodeView
 	{
 		private CompletionSession m_Session;
 		private int m_KeyboardControlID;
@@ -79,7 +79,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 			}
 		}
 
-		public void StartCompletionSession(CompletionSession session)
+		internal void StartCompletionSession(CompletionSession session)
 		{
 			// To be able to calculate the screen pos for the popup we need to do it from an OnGUI code path so
 			// we save the session and request a repaint to get an OnGUI event (see LineGUI for handling)
@@ -150,7 +150,7 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 		}
 	}
 
-	internal partial class CodeView
+	public partial class CodeView
 	{
 		private static Hashtable s_Keyactions;
 
