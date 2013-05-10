@@ -4,37 +4,28 @@ namespace CodeEditor.Text.UI.Unity.Engine
 {
 	public class GUIUtils
 	{
-		private static GUIStyle _style;
+		private static Texture2D _whiteTexture;
 
 		public static void DrawRect(Rect rect, Color color)
 		{
 			var backup = GUI.color;
-			GUI.color = color;
-			GUI.Label(rect, GUIContent.none, Style);
+			GUI.color =  new Color(color.r, color.g, color.b);
+			GUI.DrawTexture(rect, whiteTexture, ScaleMode.StretchToFill, false);
 			GUI.color = backup;
 		}
 
-		protected static GUIStyle Style
+		private static Texture2D whiteTexture
 		{
 			get
 			{
-				if (_style != null)
-					return _style;
-
-				_style = new GUIStyle();
-				_style.normal.background = DummyTexture();
-				_style.normal.textColor = Color.white;
-
-				return _style;
+				if (_whiteTexture != null)
+					return _whiteTexture;
+				
+				_whiteTexture = new Texture2D(1, 1);
+				_whiteTexture.SetPixel(0, 0, Color.white);
+				_whiteTexture.hideFlags = HideFlags.HideAndDontSave;
+				return _whiteTexture;
 			}
-		}
-
-		private static Texture2D DummyTexture()
-		{
-			var dummyTexture = new Texture2D(1, 1);
-			dummyTexture.SetPixel(0,0,Color.white);
-			dummyTexture.hideFlags = HideFlags.HideAndDontSave;
-			return dummyTexture;
 		}
 	}
 }
