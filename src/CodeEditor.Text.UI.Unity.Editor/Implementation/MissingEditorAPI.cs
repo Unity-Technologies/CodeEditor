@@ -1,11 +1,27 @@
 ﻿using System;
 using System.Reflection;
 using UnityEditor;
+using UnityEngine;
 
 namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 {
 	static class MissingEditorAPI
 	{
+		static Type inspectorWindowType;
+		static FieldInfo currentInspectorWindowFieldInfo;
+		static PropertyInfo helpBoxStyleFieldInfo;
+		static Type inspectorStateType;
+
+		public static EditorWindow currentInspectorWindow
+		{
+			get { return currentInspectorWindowFieldInfo.GetValue(null) as EditorWindow; }
+		}
+
+		public static GUIStyle helpBoxStyle
+		{
+			get { return helpBoxStyleFieldInfo.GetValue(null, new object[0]) as GUIStyle; }
+		}
+
 		public static bool ParentHasFocus(EditorWindow editorWindow)
 		{
 			return (bool) PropertyOf(ParentOf(editorWindow), "hasFocus");
@@ -32,5 +48,98 @@ namespace CodeEditor.Text.UI.Unity.Editor.Implementation
 				throw new ArgumentException(string.Format("Can't find {0}.{1}", o, fieldName));
 			return field.GetValue(o);
 		}
+
+		// InspectorState access
+
+		public static void SetPeristedValueOfType<T>(string key, T value)
+		{
+			MethodInfo methodInfo = StaticMethodOf(inspectorStateType, SetterMethodNameFromType(typeof(T)));
+			methodInfo.Invoke(null, new object[] { key, value });
+		}
+
+		public static T GetPeristedValueOfType<T>(string key, T defaultValue)
+		{
+			MethodInfo methodInfo = StaticMethodOf(inspectorStateType, GetterMethodNameFromType(typeof(T)));
+			object result = methodInfo.Invoke(null, new object[] { key, defaultValue });
+			return (T)result;		
+		}
+
+		static string SetterMethodNameFromType(Type type)
+		{
+			if (type == typeof(bool))
+				return "SetBool";
+			if (type == typeof(int))
+				return "SetInt";
+			if (type == typeof(float))
+				return "SetFloat";
+			if (type == typeof(Vector3))
+				return "SetVector3";
+
+			throw new ArgumentException(string.Format("Invalid type: '{0}' is not supported as persited type", type));
+		}
+
+		static string GetterMethodNameFromType(Type type)
+		{
+			if (type == typeof(bool))
+				return "GetBool";
+			if (type == typeof(int))
+				return "GetInt";
+			if (type == typeof(float))
+				return "GetFloat";
+			if (type == typeof(Vector3))
+				return "GetVector3";
+
+			throw new ArgumentException(string.Format("Invalid type: '{0}' is not supported as persited type", type));
+		}
+
+		static MissingEditorAPI()
+		{
+			var editorAssembly = typeof(EditorWindow).Assembly;
+			inspectorStateType = editorAssembly.GetType("UnityEditor.InspectorState");
+			if (inspectorStateType == null)
+				Debug.LogError("Could not get type: UnityEditor.InspectorWindow");
+
+			inspectorWindowType = editorAssembly.GetType("UnityEditor.InspectorWindow");
+			if (inspectorWindowType != null)
+				currentInspectorWindowFieldInfo = inspectorWindowType.GetField("s_CurrentInspectorWindow", BindingFlags.Static | BindingFlags.GetField | BindingFlags.Public | BindingFlags.NonPublic);
+			else
+				Debug.LogError("Could not get type: UnityEditor.InspectorWindow");
+
+			if (currentInspectorWindow == null)
+				Debug.LogError("Could not GetValue from fieldInfo currentInspectorWindowFieldInfo");
+
+			helpBoxStyleFieldInfo = typeof(EditorStyles).GetProperty("helpBox", BindingFlags.Static | BindingFlags.GetField | BindingFlags.Public | BindingFlags.NonPublic);
+			if (helpBoxStyle == null)
+				Debug.LogError("Could not GetValue from fieldInfo helpBoxStyle");
+		}
+
+/*
+		private static readonly GetBoolFromCpp _getbool = (GetBoolFromCpp)DelegateForStaticMethodOf<inspectorStateType, GetBoolFromCpp>("GetBool");
+
+		private delegate bool GetBoolFromCpp(string key);
+
+		private static Delegate DelegateForStaticMethodOf<T, TDelegate>(string name)
+		{
+			return DelegateForStaticMethodOf(typeof(T), name, typeof(TDelegate));
+		}
+		private static Delegate DelegateForStaticMethodOf(Type type, string name, Type delegateType)
+		{
+			return Delegate.CreateDelegate(delegateType, StaticMethodOf(type, name, DelegateSignature(delegateType)));
+		}
+
+		private static Type[] DelegateSignature(Type delegateType)
+		{
+			return delegateType.GetMethod("Invoke").GetParameters().Select(_ => _.ParameterType).ToArray();
+		}
+*/
+		private static MethodInfo StaticMethodOf(Type type, string name/*, params Type[] signature*/)
+		{
+			var result = type.GetMethod(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+			if (result == null)
+				throw new ArgumentException(string.Format("Can't find method {0}.{1}({2})", type.Name, name, ""/*string.Join(", ", signature.Select(_ => _.FullName).ToArray()*/));
+			return result;
+		}
+
+
 	}
 }
